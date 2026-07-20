@@ -1,0 +1,25 @@
+# --- Secrets / environnement ---
+.env
+*.local
+
+# --- Certificats TLS (generes localement, jamais commites) ---
+*.pem
+*.key
+*.crt
+nginx/certs/
+
+# --- Dependances / build (pour plus tard) ---
+node_modules/
+dist/
+build/
+*.log
+
+# --- Fichiers d'OS / editeurs ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Conf podman generee par le Makefile ---
+.podman/
