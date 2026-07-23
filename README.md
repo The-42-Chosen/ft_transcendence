@@ -19,3 +19,9 @@ How to categorize your commits depending on changes you've done
 > `(refactor):` restructuring the code
 
 > `(ci):` github actions & hooks
+
+### Branches
+
+Main: branche du rendu du projet mais tout est toujours fonctionnel dessus
+
+Develop: la ou on va passer le plus claire de notre temps, la branche ou on va reunir notre travail au fur et a mesure
