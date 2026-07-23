@@ -56,6 +56,7 @@ clean: down
 
 fclean: storage
 	$(DC) down -v --rmi all --remove-orphans
+	podman image prune -a -f
 
 info: storage
 	@echo "store   : $(STORE)"
