@@ -2,7 +2,7 @@ services:
   postgres:
     build:
       context: ./docker/postgres
-    container_name: transcendence_postgres
+    container_name: postgres
     environment:
       POSTGRES_DB: "${POSTGRES_DB:-transcendence}"
       POSTGRES_USER: "${POSTGRES_USER:-transcendence}"
@@ -23,7 +23,7 @@ services:
   nginx:
     build:
       context: ./docker/nginx
-    container_name: transcendence_nginx
+    container_name: nginx
     environment:
       NGINX_SSL_PORT: "${NGINX_SSL_PORT:-8443}"
     ports:
