@@ -1,0 +1,2 @@
+-- Script d'initialisation execute au premier demarrage du conteneur
+-- (uniquement si le volume de donnees est vide).

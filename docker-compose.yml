@@ -1,8 +1,31 @@
+name: transcendence
+
 services:
+  postgres:
+    build:
+      context: ./docker/postgres
+    container_name: postgres
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-transcendence}"
+      POSTGRES_USER: "${POSTGRES_USER:-transcendence}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # ports:
+    #   - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transcendence
+    restart: unless-stopped
+
   nginx:
     build:
       context: ./docker/nginx
-    container_name: transcendence_nginx
+    container_name: nginx
     environment:
       NGINX_SSL_PORT: "${NGINX_SSL_PORT:-8443}"
     ports:
@@ -18,3 +41,6 @@ services:
 networks:
   transcendence:
     driver: bridge
+
+volumes:
+  postgres_data:
