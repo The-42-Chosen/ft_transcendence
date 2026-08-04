@@ -63,4 +63,4 @@ Those two exporters are a little bit more specific:
 By default, everything set up in Grafana is stored inside its own internal database, so it is neither versioned in git nor reproducible on a teammate's machine. To avoid that, we use provisioning: Grafana reads YAML/JSON files at startup that describe the datasources and the dashboards gives a fully configured Grafana.
 
 #### Access
-Prometheus and the exporters will only be accessible inside the docker/podman network, with no exterior connection. Grafana, on the other hand, will be exposed through NGINX with HTTPS and will require a login.
+Prometheus and the exporters are only accessible inside the docker/podman network, with no exterior connection. Grafana, on the other hand, is exposed through NGINX with HTTPS and requires a login.

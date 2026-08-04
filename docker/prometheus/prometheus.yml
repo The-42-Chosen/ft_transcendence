@@ -1,0 +1,48 @@
+# Configuration Prometheus : la liste des cibles a scraper.
+# Chaque cible = un container sur le reseau "transcendence" qui expose /metrics.
+# Le nom du container sert de nom DNS (comme "postgres" dans le compose).
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  # Prometheus se surveille lui-meme
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Machine hote : CPU, RAM, disque, reseau
+  - job_name: "node"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # Metriques par container
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # PostgreSQL via postgres-exporter
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+
+  # Nginx via nginx-exporter (lit la page stub_status)
+  - job_name: "nginx"
+    static_configs:
+      - targets: ["nginx-exporter:9113"]
+
+  # Grafana expose /metrics nativement (cas 1 : rien a installer).
+  # Le prefixe /grafana vient de GF_SERVER_SERVE_FROM_SUB_PATH=true.
+  - job_name: "grafana"
+    metrics_path: /grafana/metrics
+    static_configs:
+      - targets: ["grafana:3000"]
+
+  # Plus tard : les services du backend, 3 lignes par service :
+  # - job_name: "auth-service"
+  #   static_configs:
+  #     - targets: ["auth-service:3000"]

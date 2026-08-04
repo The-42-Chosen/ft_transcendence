@@ -1,0 +1,11 @@
+# Provisioning des dashboards : Grafana charge au demarrage tous les JSON
+# presents dans /var/lib/grafana/dashboards (monte depuis docker/grafana/dashboards).
+apiVersion: 1
+
+providers:
+  - name: transcendence
+    folder: Transcendence
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

@@ -34,6 +34,7 @@ storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
 	@printf '[storage]\ndriver = "overlay"\nrunroot = "/run/user/%s"\ngraphroot = "%s"\n' \
 		'$(UID)' '$(STORE)' > $(STORAGE_CONF)
+	@systemctl --user enable --now podman.socket 2>/dev/null || true # necessary for cadvisor
 
 up: storage
 	$(DC) up -d --build --remove-orphans
