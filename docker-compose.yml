@@ -101,7 +101,7 @@ services:
       - /:/rootfs:ro
       - /sys:/sys:ro
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ${XDG_RUNTIME_DIR}/podman/podman.sock:/var/run/podman/podman.sock:ro
+      - ${XDG_RUNTIME_DIR:-/tmp}/podman/podman.sock:/var/run/podman/podman.sock:ro
     networks:
       - transcendence
     restart: unless-stopped

@@ -48,6 +48,28 @@ jobs:
       - name: Verifier que nginx repond
         run: curl -fsS --retry 5 --retry-delay 2 --retry-connrefused http://localhost:8080 -o /dev/null
 
+      - name: Verifier la conf nginx rendue (templates + env)
+        run: docker exec nginx nginx -t
+
+      - name: Verifier que toutes les cibles Prometheus sont up
+        run: |
+          for i in $(seq 1 20); do
+            if docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
+               | jq -e '[.data.activeTargets[] | select(.health != "up")] | length == 0' > /dev/null; then
+              echo "Toutes les cibles sont up"
+              exit 0
+            fi
+            echo "Cibles pas encore toutes up (tentative $i/20)"
+            sleep 3
+          done
+          echo "::error::Des cibles Prometheus sont restees down"
+          docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
+            | jq '.data.activeTargets[] | {job: .labels.job, health: .health, lastError: .lastError}'
+          exit 1
+
+      - name: Verifier Grafana derriere nginx (HTTPS + sous-chemin)
+        run: curl -fsk --retry 5 --retry-delay 2 --retry-connrefused https://localhost:8443/grafana/api/health
+
       - name: Logs en cas d'echec
         if: failure()
         run: docker compose logs
