@@ -76,4 +76,47 @@ req PUT "/_slm/policy/transcendence-nightly" '{
   "retention": { "expire_after": "90d", "min_count": 5, "max_count": 50 }
 }'
 
+# ------------------------------------------------------------------
+# Kibana : data view 
+# ------------------------------------------------------------------
+KB="http://kibana:5601/kibana"
+
+kb() {
+    local method="$1" path="$2" body="${3:-}"
+    if [ -n "$body" ]; then
+        curl -fsS -u "$AUTH" -X "$method" "$KB$path" \
+            -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -d "$body"
+    else
+        curl -fsS -u "$AUTH" -X "$method" "$KB$path" -H 'kbn-xsrf: true'
+    fi
+    echo
+}
+
+echo "[elk-setup] attente de Kibana..."
+until curl -fsS -u "$AUTH" "$KB/api/status" >/dev/null 2>&1; do
+    sleep 5
+done
+echo "[elk-setup] Kibana est pret"
+
+DATA_VIEW_ID="transcendence-logs"
+if curl -fsS -u "$AUTH" -H 'kbn-xsrf: true' \
+        "$KB/api/data_views/data_view/$DATA_VIEW_ID" >/dev/null 2>&1; then
+    echo "[elk-setup] data view '$DATA_VIEW_ID' deja presente"
+else
+    echo "[elk-setup] creation de la data view '$DATA_VIEW_ID'"
+    kb POST "/api/data_views/data_view" '{
+      "data_view": {
+        "id": "transcendence-logs",
+        "title": "transcendence-logs*",
+        "name": "Transcendence Logs",
+        "timeFieldName": "@timestamp"
+      }
+    }' >/dev/null
+    echo "[elk-setup] data view definie par defaut"
+    kb POST "/api/data_views/default" '{
+      "data_view_id": "transcendence-logs",
+      "force": true
+    }'
+fi
+
 echo "[elk-setup] configuration terminee"
