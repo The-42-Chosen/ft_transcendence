@@ -110,6 +110,21 @@ jobs:
           docker logs logstash --tail 50
           exit 1
 
+      - name: Verifier les sondes ELK dans Prometheus (probe_success)
+        run: |
+          for i in $(seq 1 20); do
+            if docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' \
+               | jq -e '(.data.result | length) >= 2 and (.data.result | all(.value[1] == "1"))' > /dev/null; then
+              echo "Logstash et Kibana repondent aux sondes blackbox"
+              exit 0
+            fi
+            echo "Sondes pas encore toutes vertes (tentative $i/20)"
+            sleep 3
+          done
+          echo "::error::Des sondes blackbox restent en echec"
+          docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' | jq .
+          exit 1
+
       - name: Logs en cas d'echec
         if: failure()
         run: docker compose logs

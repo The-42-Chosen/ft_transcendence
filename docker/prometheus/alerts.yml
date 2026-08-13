@@ -49,3 +49,21 @@ groups:
           severity: warning
         annotations:
           summary: "Plus de 80 connexions actives sur PostgreSQL"
+
+  - name: elk
+    rules:
+      - alert: ProbeFailed
+        expr: probe_success == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "La sonde HTTP {{ $labels.instance }} echoue depuis 2 minutes"
+
+      - alert: ElasticsearchClusterRed
+        expr: elasticsearch_cluster_health_status{color="red"} == 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Le cluster Elasticsearch est en etat RED depuis 2 minutes"

@@ -78,6 +78,7 @@ services:
       KIBANA_SYSTEM_PASSWORD: "${KIBANA_SYSTEM_PASSWORD}"
       LOGSTASH_INTERNAL_PASSWORD: "${LOGSTASH_INTERNAL_PASSWORD}"
       KIBANA_USER_PASSWORD: "${KIBANA_USER_PASSWORD}"
+      ES_MONITORING_PASSWORD: "${ES_MONITORING_PASSWORD}"
     volumes:
       - ./docker/elk/setup/setup.sh:/setup.sh:ro
     entrypoint: ["bash", "/setup.sh"]
@@ -211,6 +212,33 @@ services:
       - "--nginx.scrape-uri=http://nginx:8081/stub_status"
     depends_on:
       - nginx
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  elasticsearch-exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
+    container_name: elasticsearch-exporter
+    command:
+      - "--es.uri=http://elasticsearch:9200"
+      - "--es.indices"
+    environment:
+      ES_USERNAME: monitoring_internal
+      ES_PASSWORD: "${ES_MONITORING_PASSWORD}"
+    depends_on:
+      - elasticsearch
+      - elk-setup
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  # Logstash et Kibana exporter
+  blackbox-exporter:
+    image: docker.io/prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    depends_on:
+      - logstash
+      - kibana
     networks:
       - transcendence
     restart: unless-stopped

@@ -48,6 +48,22 @@ req PUT "/_security/user/kibana_user" "{
   \"full_name\": \"Compte utilisateur Kibana\"
 }"
 
+echo "[elk-setup] role monitoring_exporter (moindre privilege : lecture seule des stats cluster et index)"
+req PUT "/_security/role/monitoring_exporter" '{
+  "cluster": ["monitor"],
+  "indices": [{
+    "names": ["*"],
+    "privileges": ["monitor"]
+  }]
+}'
+
+echo "[elk-setup] utilisateur monitoring_internal"
+req PUT "/_security/user/monitoring_internal" "{
+  \"password\": \"${ES_MONITORING_PASSWORD}\",
+  \"roles\": [\"monitoring_exporter\"],
+  \"full_name\": \"Compte technique elasticsearch-exporter (Prometheus)\"
+}"
+
 echo "[elk-setup] politique ILM transcendence-logs (rollover 1g/1j, suppression a 30j)"
 req PUT "/_ilm/policy/transcendence-logs" '{
   "policy": {
