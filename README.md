@@ -26,6 +26,9 @@ Main: branche du rendu du projet mais tout est toujours fonctionnel dessus
 
 Develop: la ou on va passer le plus claire de notre temps, la branche ou on va reunir notre travail au fur et a mesure
 
+
+
+
 ### Database
 
 We chose PostgreSQL, in line with two requirements from the subject.
@@ -64,3 +67,48 @@ By default, everything set up in Grafana is stored inside its own internal datab
 
 #### Access
 Prometheus and the exporters are only accessible inside the docker/podman network, with no exterior connection. Grafana, on the other hand, is exposed through NGINX with HTTPS and requires a login.
+
+### ELK
+
+ELK stands for Elasticsearch, Logstash and Kibana, the three tools of what we call the 'ELK stack'.
+
+The goal of these tools is to centralize logs: without them, the logs are scattered across the different containers of the project. By default they are also lost whenever a container is destroyed, so we centralize them with the ELK stack.
+
+We don't only centralize the logs, we also make them usable: with the ELK stack they become structured, searchable and visualizable.
+
+#### Logstash
+
+Logstash can read logs from various sources (file, tcp, udp, syslog, ...). But Logstash does not only receive logs, it also transforms them for better use with different filters (json, grok, date, mutate).
+Once done with the collection and parsing, it sends the data to Elasticsearch for storage, ready to be searched.
+
+#### Elasticsearch
+
+Elasticsearch is a search engine. We can only interact with it through HTTP/JSON requests, as a REST API.
+Elasticsearch uses an inverted index: a data structure which maps each word to the list of documents it appears in. It allows an efficient search by content, faster than a SQL query in a classic database.
+
+#### Kibana
+
+Kibana is the web interface of the ELK stack, it allows us to visualize the data in various ways:
+* 'Discover' => a search engine over the logs
+* 'Dashboards' => organize data into specific visualizations
+* 'Data views' => declare where to look for data (in our case everything is in transcendence-logs*)
+
+Kibana does not store any log data itself: it directly queries the Elasticsearch container.
+
+#### Index Lifecycle Management and retention
+
+With a lot of logs you need to manage their lifecycle and retention, so we need a clear policy for those logs. 
+In a small project like ours we chose to do it the simplest way possible, our logs can only be in 2 states:    
+* HOT => means writable and searchable
+* DELETE => automatic deletion
+
+We could have gone through intermediate stages such as WARM, COLD, FROZEN... but we kept it simple. When the active index reaches 1 GB or 1 day of age, a new index 'transcendence-logs-XXXXXX' is created and the writes switch to it (this is called a rollover). Each index is then deleted 30 days after its rollover, which gives us a rolling retention of about 30 days and keeps disk usage under control.
+
+#### Snapshots and SLM
+
+Deleting is fine for retention, but we may want to archive the logs before they are gone. A snapshot is an incremental backup of the indices into a repository (in our case a persistent directory of the Elasticsearch volume).
+SLM (Snapshot Lifecycle Management) automates this: a snapshot is taken every night at 2:30, and kept for 90 days (minimum 5, maximum 50 snapshots).
+So in the end: 30 days of logs searchable live, and up to 90 days restorable from the archive.
+
+#### Access
+Logstash and Elasticsearch are only accessible inside the docker/podman network, with no external connection. Kibana is exposed through NGINX with HTTPS and requires a login.
