@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Configuration initiale d'Elasticsearch :
-# politique de retention (ILM) + d'archivage (snapshots + SLM).
 set -euo pipefail
 
 ES="http://elasticsearch:9200"
@@ -41,6 +39,13 @@ req PUT "/_security/user/logstash_internal" "{
   \"password\": \"${LOGSTASH_INTERNAL_PASSWORD}\",
   \"roles\": [\"logstash_writer\"],
   \"full_name\": \"Compte technique Logstash\"
+}"
+
+echo "[elk-setup] utilisateur kibana_user (login humain, role editor : lecture des donnees + gestion des dashboards)"
+req PUT "/_security/user/kibana_user" "{
+  \"password\": \"${KIBANA_USER_PASSWORD}\",
+  \"roles\": [\"editor\"],
+  \"full_name\": \"Compte utilisateur Kibana\"
 }"
 
 echo "[elk-setup] politique ILM transcendence-logs (rollover 1g/1j, suppression a 30j)"
