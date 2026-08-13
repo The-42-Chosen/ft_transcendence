@@ -26,8 +26,16 @@ Main: branche du rendu du projet mais tout est toujours fonctionnel dessus
 
 Develop: la ou on va passer le plus claire de notre temps, la branche ou on va reunir notre travail au fur et a mesure
 
+### PODMAN
 
+At 42 Paris, the docker binary (/bin/docker) is a script calling podman, not really docker. Podman is another containerisation solution. We need to change one behavior of podman-compose to get the exact docker network behavior we know: by default podman-compose groups all the services into a single shared "pod", so with `--in-pod=false` each service runs in its own container on the shared bridge network, like docker-compose does.
 
+#### Storage
+
+We are not root on the 42 school computers, and by default podman stores everything inside `~/.local/share/containers/storage`. But the 42 home directory has a size quota, so we need to make sure to use `/goinfre` if it exists (if not, we use the default path).
+
+For that, the Makefile does a little preparation for storage. First, with STORE we pick the storage path: `/goinfre/<user>/containers` if `/goinfre` exists or the default path. We export `CONTAINERS_STORAGE_CONF`, the environment variable podman uses to know which storage configuration file to read.
+Then the make storage rule creates `.podman/storage.conf`, which contains `graphroot` (the STORE path, where podman stores everything persistent: images, volumes...).
 
 ### Database
 

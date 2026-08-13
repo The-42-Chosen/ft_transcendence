@@ -7,7 +7,7 @@ PROJECT      := transcendence
 
 # podman-compose --in-pod=false : chaque service tourne dans son propre
 # conteneur sur le reseau bridge partage (modele docker)
-COMPOSE ?= podman-compose --in-pod=false
+COMPOSE := podman-compose --in-pod=false
 DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
 
 #################################################################
@@ -22,7 +22,7 @@ STORE := $(strip $(if $(wildcard /goinfre/$(LOGIN)/.),\
            $(HOME)/.local/share/containers/storage))
 
 STORAGE_CONF := $(CURDIR)/.podman/storage.conf
-export CONTAINERS_STORAGE_CONF = $(STORAGE_CONF)
+export CONTAINERS_STORAGE_CONF := $(STORAGE_CONF)
 
 #################################################################
 ##################### RULES #####################################
