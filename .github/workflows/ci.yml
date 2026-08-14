@@ -19,12 +19,16 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     needs: validate
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Creer le .env (valeurs factices pour la CI)
         run: cp .env.example .env
+
+      - name: Augmenter vm.max_map_count pour Elasticsearch
+        run: sudo sysctl -w vm.max_map_count=262144
 
       - name: Demarrer la stack
         run: docker compose up -d --build
@@ -69,6 +73,57 @@ jobs:
 
       - name: Verifier Grafana derriere nginx (HTTPS + sous-chemin)
         run: curl -fsk --retry 5 --retry-delay 2 --retry-connrefused https://localhost:8443/grafana/api/health
+
+      - name: Attendre la fin d'elk-setup (comptes, ILM, SLM, data view)
+        run: |
+          code=$(timeout 600 docker wait elk-setup || echo "timeout")
+          echo "elk-setup est sorti avec le code : $code"
+          if [ "$code" != "0" ]; then
+            echo "::error::elk-setup a echoue ou n'a pas termine a temps"
+            docker logs elk-setup
+            exit 1
+          fi
+
+      - name: Verifier Kibana derriere nginx (HTTPS + sous-chemin + login kibana_user)
+        run: |
+          source .env
+          curl -fsk --retry 5 --retry-delay 2 --retry-connrefused \
+            -u "kibana_user:${KIBANA_USER_PASSWORD}" \
+            https://localhost:8443/kibana/api/status -o /dev/null
+
+      - name: Verifier le pipeline de logs bout-en-bout (nginx -> Logstash -> Elasticsearch)
+        run: |
+          source .env
+          for i in $(seq 1 30); do
+            curl -fsk https://localhost:8443/ -o /dev/null || true
+            count=$(docker exec elasticsearch curl -fsS -u "elastic:${ELASTIC_PASSWORD}" \
+              "localhost:9200/transcendence-logs*/_count" \
+              | grep -o '"count":[0-9]*' | cut -d: -f2)
+            echo "documents indexes : ${count:-0} (tentative $i/30)"
+            if [ "${count:-0}" -gt 0 ]; then
+              echo "Le pipeline de logs fonctionne"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::aucun log n'est arrive dans Elasticsearch"
+          docker logs logstash --tail 50
+          exit 1
+
+      - name: Verifier les sondes ELK dans Prometheus (probe_success)
+        run: |
+          for i in $(seq 1 20); do
+            if docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' \
+               | jq -e '(.data.result | length) >= 2 and (.data.result | all(.value[1] == "1"))' > /dev/null; then
+              echo "Logstash et Kibana repondent aux sondes blackbox"
+              exit 0
+            fi
+            echo "Sondes pas encore toutes vertes (tentative $i/20)"
+            sleep 3
+          done
+          echo "::error::Des sondes blackbox restent en echec"
+          docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' | jq .
+          exit 1
 
       - name: Logs en cas d'echec
         if: failure()

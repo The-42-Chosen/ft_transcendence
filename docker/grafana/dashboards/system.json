@@ -14,7 +14,8 @@
       "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
-        { "expr": "up", "legendFormat": "{{job}}", "refId": "A" }
+        { "expr": "up{job!=\"elk-probes\"}", "legendFormat": "{{job}}", "refId": "A" },
+        { "expr": "probe_success", "legendFormat": "{{probe}}", "refId": "B" }
       ],
       "options": {
         "colorMode": "background",

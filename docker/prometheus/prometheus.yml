@@ -35,12 +35,36 @@ scrape_configs:
     static_configs:
       - targets: ["nginx-exporter:9113"]
 
-  # Grafana expose /metrics nativement (cas 1 : rien a installer).
-  # Le prefixe /grafana vient de GF_SERVER_SERVE_FROM_SUB_PATH=true.
+  # Grafana expose /metrics nativement
   - job_name: "grafana"
     metrics_path: /grafana/metrics
     static_configs:
       - targets: ["grafana:3000"]
+
+  # Elasticsearch via elasticsearch-exporter
+  - job_name: "elasticsearch"
+    static_configs:
+      - targets: ["elasticsearch-exporter:9114"]
+
+  # Logstash et Kibana via black-box exporter
+  - job_name: "elk-probes"
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets: ["http://logstash:9600"]
+        labels:
+          probe: logstash
+      - targets: ["http://kibana:5601/kibana/login"]
+        labels:
+          probe: kibana
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
 
   # Plus tard : les services du backend, 3 lignes par service :
   # - job_name: "auth-service"

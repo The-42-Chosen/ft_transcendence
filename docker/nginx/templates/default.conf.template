@@ -4,15 +4,31 @@ map $http_upgrade $connection_upgrade {
     ''      close;
 }
 
+# Logs d'acces en JSON pour NGINX
+log_format json_logs escape=json '{'
+    '"time":"$time_iso8601",'
+    '"client_ip":"$remote_addr",'
+    '"method":"$request_method",'
+    '"path":"$request_uri",'
+    '"status":"$status",'
+    '"bytes":"$body_bytes_sent",'
+    '"request_time":"$request_time",'
+    '"referer":"$http_referer",'
+    '"user_agent":"$http_user_agent"'
+'}';
+
 server {
     listen 80;
     server_name _;
+    access_log /var/log/nginx/access.json.log json_logs;
     return 301 https://$host:${NGINX_SSL_PORT}$request_uri;
 }
 server {
     listen 443 ssl;
     http2 on;
     server_name _;
+
+    access_log /var/log/nginx/access.json.log json_logs;
 
     ssl_certificate     /etc/nginx/certs/cert.pem;
     ssl_certificate_key /etc/nginx/certs/key.pem;
@@ -40,6 +56,21 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
+    }
+
+    # Kibana, servi en sous-chemin derriere le proxy SSL.
+    location /kibana/ {
+        proxy_pass http://kibana:5601;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        $connection_upgrade;
+    }
+    location = /kibana {
+        return 301 /kibana/;
     }
 }
 
