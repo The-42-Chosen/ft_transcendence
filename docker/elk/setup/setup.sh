@@ -140,4 +140,19 @@ else
     }'
 fi
 
+for f in /setup/*.ndjson; do
+    [ -e "$f" ] || continue
+    echo "[elk-setup] import Kibana : $(basename "$f")"
+    resp=$(curl -fsS -u "$AUTH" -X POST "$KB/api/saved_objects/_import" \
+        -H 'kbn-xsrf: true' --form file=@"$f")
+    echo "$resp"
+    if echo "$resp" | grep -q '"success":false' \
+       && echo "$resp" | grep -Eq '"successCount":[1-9]'; then
+        echo "[elk-setup] conflits partiels -> reimport avec overwrite=true"
+        curl -fsS -u "$AUTH" -X POST "$KB/api/saved_objects/_import?overwrite=true" \
+            -H 'kbn-xsrf: true' --form file=@"$f"
+        echo
+    fi
+done
+
 echo "[elk-setup] configuration terminee"
