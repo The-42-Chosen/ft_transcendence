@@ -62,6 +62,26 @@ services:
       - transcendence
     restart: unless-stopped
 
+  # use `make dev` to launch the project on port :3000 with auto-update 
+  next-dev:
+    profiles:
+      - dev
+    build:
+      context: ./docker/next
+      target: dev
+    container_name: next-dev
+    environment:
+      NODE_ENV: development
+    ports:
+      - "${NEXT_DEV_PORT:-3000}:3000"
+    volumes:
+      - ./docker/next:/app
+      - next_dev_node_modules:/app/node_modules
+      - next_dev_build:/app/.next
+    networks:
+      - transcendence
+    restart: unless-stopped
+
   # ------------------------------------------------------------------
   # ELK
   # ------------------------------------------------------------------
@@ -273,6 +293,8 @@ networks:
     driver: bridge
 
 volumes:
+  next_dev_node_modules:
+  next_dev_build:
   postgres_data:
   prometheus_data:
   grafana_data:
