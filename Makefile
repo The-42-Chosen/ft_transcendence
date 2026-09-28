@@ -28,7 +28,11 @@ export CONTAINERS_STORAGE_CONF := $(STORAGE_CONF)
 ##################### RULES #####################################
 #################################################################
 
-all: up
+all:
+	$(MAKE) up
+
+check_env:
+	@test -f .env || { echo "Erreur : File .env missing"; exit 1; }
 
 storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
@@ -36,7 +40,7 @@ storage:
 		'$(UID)' '$(STORE)' > $(STORAGE_CONF)
 	@systemctl --user enable --now podman.socket 2>/dev/null || true # necessary for cadvisor
 
-up: storage
+up: check_env storage
 	$(DC) up -d --build --remove-orphans
 
 down: storage
@@ -63,4 +67,4 @@ info: storage
 	@echo "store   : $(STORE)"
 	@podman info --format 'graphroot: {{.Store.GraphRoot}}{{"\n"}}volumes  : {{.Store.VolumePath}}'
 
-.PHONY: storage up down re build logs ps clean fclean info
+.PHONY: storage check_env up down re build logs ps clean fclean info
