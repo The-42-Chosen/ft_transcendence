@@ -14,6 +14,8 @@ DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
 ################ PREPARATION  FOR STORAGE #######################
 #################################################################
  
+NEXT_DEV_PORT ?= 3000
+
 UID   := $(shell id -u)
 LOGIN := $(shell id -un)
 
@@ -57,6 +59,33 @@ logs: storage
 ps: storage
 	$(DC) ps
 
+#################################################################
+##################### APPLICATION NEXT ##########################
+#################################################################
+
+# Use `make dev` to lauch the front end without passing throught Nginx and with auto-update on
+# (change the static website, it will be update without compiling again)
+dev: check_env storage
+	$(DC) --profile dev up -d --build next-dev
+	@echo "Mode developpement : http://localhost:$(NEXT_DEV_PORT)"
+
+dev-logs: storage
+	$(DC) --profile dev logs -f --tail=200 next-dev
+
+dev-down: storage
+	$(DC) --profile dev rm -sf next-dev
+
+next-reload: storage
+	$(DC) rm -sf next
+	$(DC) up -d --build --no-deps next
+	podman kill -s HUP nginx
+
+next-shell: storage
+	$(DC) exec next sh
+
+next-logs: storage
+	$(DC) logs -f --tail=200 next
+
 clean: down
 
 fclean: storage
@@ -67,4 +96,5 @@ info: storage
 	@echo "store   : $(STORE)"
 	@podman info --format 'graphroot: {{.Store.GraphRoot}}{{"\n"}}volumes  : {{.Store.VolumePath}}'
 
-.PHONY: storage check_env up down re build logs ps clean fclean info
+.PHONY: storage check_env up down re build logs ps clean fclean info \
+        next-shell next-logs dev dev-logs dev-down next-reload
