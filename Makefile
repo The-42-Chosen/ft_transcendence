@@ -57,6 +57,16 @@ logs: storage
 ps: storage
 	$(DC) ps
 
+#################################################################
+##################### APPLICATION NEXT ##########################
+#################################################################
+
+next-shell: storage
+	$(DC) exec next sh
+
+next-logs: storage
+	$(DC) logs -f --tail=200 next
+
 clean: down
 
 fclean: storage
@@ -67,4 +77,5 @@ info: storage
 	@echo "store   : $(STORE)"
 	@podman info --format 'graphroot: {{.Store.GraphRoot}}{{"\n"}}volumes  : {{.Store.VolumePath}}'
 
-.PHONY: storage check_env up down re build logs ps clean fclean info
+.PHONY: storage check_env up down re build logs ps clean fclean info \
+        next-shell next-logs
