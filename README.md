@@ -26,6 +26,15 @@ Main: branche du rendu du projet mais tout est toujours fonctionnel dessus
 
 Dev: la ou on va passer le plus claire de notre temps, la branche ou on va reunir notre travail au fur et a mesure
 
+How to create your branch
+
+At first, select a ticket to be placed.
+After checking the number of the ticket, create your local branch as
+`_ticket_nb_/_login_/_module_category_/_conventional_commit_type_/_pending_work_`
+
+Example:
+`009/sbrochar/Web/feat/User`
+
 ### PODMAN
 
 At 42 Paris, the docker binary (/bin/docker) is a script calling podman, not really docker. Podman is another containerisation solution. We need to change one behavior of podman-compose to get the exact docker network behavior we know: by default podman-compose groups all the services into a single shared "pod", so with `--in-pod=false` each service runs in its own container on the shared bridge network, like docker-compose does.
