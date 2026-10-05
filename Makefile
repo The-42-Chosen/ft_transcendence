@@ -14,7 +14,7 @@ DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
 ################ PREPARATION  FOR STORAGE #######################
 #################################################################
  
-NEXT_DEV_PORT ?= 3000
+NEXT_DEV_PORT ?= $(or $(shell sed -n 's/^NEXT_DEV_PORT=//p' .env 2>/dev/null),3000)
 
 UID   := $(shell id -u)
 LOGIN := $(shell id -un)
@@ -30,6 +30,9 @@ export CONTAINERS_STORAGE_CONF := $(STORAGE_CONF)
 ##################### RULES #####################################
 #################################################################
 
+NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
+                $(DC) up -d --no-deps next nginx nginx-exporter
+
 all:
 	$(MAKE) up
 
@@ -42,8 +45,15 @@ storage:
 		'$(UID)' '$(STORE)' > $(STORAGE_CONF)
 	@systemctl --user enable --now podman.socket 2>/dev/null || true # necessary for cadvisor
 
+
 up: check_env storage
-	$(DC) up -d --build --remove-orphans
+	$(DC) build
+	@if [ -n "$$(podman ps -aq -f name='^next$$')" ] && \
+	   [ "$$(podman inspect -f '{{.Image}}' next)" != "$$(podman image inspect -f '{{.Id}}' $(PROJECT)_next)" ]; then \
+		echo "Next image has changed : container recreated"; \
+		$(NEXT_RECREATE); \
+	fi
+	$(DC) up -d --remove-orphans
 
 down: storage
 	$(DC) down --remove-orphans
@@ -66,19 +76,22 @@ ps: storage
 # Use `make dev` to lauch the front end without passing throught Nginx and with auto-update on
 # (change the static website, it will be update without compiling again)
 dev: check_env storage
-	$(DC) --profile dev up -d --build next-dev
+	$(DC) --profile dev build next-dev
+	podman rm -f -i next-dev
+	@# volumes recreated
+	podman volume rm -f $(PROJECT)_next_dev_node_modules
+	$(DC) --profile dev up -d next-dev
 	@echo "Mode developpement : http://localhost:$(NEXT_DEV_PORT)"
 
 dev-logs: storage
 	$(DC) --profile dev logs -f --tail=200 next-dev
 
 dev-down: storage
-	$(DC) --profile dev rm -sf next-dev
+	podman rm -f -i next-dev
 
 next-reload: storage
-	$(DC) rm -sf next
-	$(DC) up -d --build --no-deps next
-	podman kill -s HUP nginx
+	$(DC) build next
+	$(NEXT_RECREATE)
 
 next-shell: storage
 	$(DC) exec next sh

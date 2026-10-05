@@ -38,9 +38,6 @@ server {
     ssl_session_cache   shared:SSL:10m;
     ssl_session_timeout 10m;
 
-    root  /usr/share/nginx/html;
-    index index.html;
-
     location / {
         proxy_pass http://next:3000;
         proxy_set_header Host              $host;
