@@ -32,7 +32,6 @@ services:
       - "${NGINX_SSL_PORT:-8443}:443"
     volumes:
       - ./docker/nginx/templates:/etc/nginx/templates:ro
-      - ./docker/nginx/html:/usr/share/nginx/html:ro
       - nginx_logs:/var/log/nginx
     depends_on:
       - next
