@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Configuration pnpm propre a la machine
 .npmrc
+node_modules/
+dist/
+.env
