@@ -109,5 +109,20 @@ info: storage
 	@echo "store   : $(STORE)"
 	@podman info --format 'graphroot: {{.Store.GraphRoot}}{{"\n"}}volumes  : {{.Store.VolumePath}}'
 
+##################### PRISMA ##########################
+
+prisma-emit:
+	podman exec next-dev pnpm prisma contract emit
+
+prisma-migrate:
+	podman exec next-dev pnpm prisma migration plan
+	podman exec next-dev pnpm prisma db migrate
+
+prisma-status:
+	podman exec next-dev pnpm prisma migration status
+
+prisma: prisma-emit prisma-migrate
+
+
 .PHONY: storage check_env up down re build logs ps clean fclean info \
         next-shell next-logs dev dev-logs dev-down next-reload
