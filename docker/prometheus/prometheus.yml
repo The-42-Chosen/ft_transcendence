@@ -46,12 +46,15 @@ scrape_configs:
     static_configs:
       - targets: ["elasticsearch-exporter:9114"]
 
-  # Logstash et Kibana via black-box exporter
-  - job_name: "elk-probes"
+  # Next, Logstash et Kibana via black-box exporter
+  - job_name: "probes"
     metrics_path: /probe
     params:
       module: [http_2xx]
     static_configs:
+      - targets: ["http://next:3000/api/health"]
+        labels:
+          probe: next
       - targets: ["http://logstash:9600"]
         labels:
           probe: logstash

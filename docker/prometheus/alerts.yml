@@ -14,6 +14,14 @@ groups:
         annotations:
           summary: "{{ $labels.job }} ne repond plus depuis 1 minute"
 
+      - alert: ProbeFailed
+        expr: probe_success == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "La sonde HTTP {{ $labels.instance }} echoue depuis 2 minutes"
+
   - name: resources
     rules:
       - alert: HighCpuUsage
@@ -52,14 +60,6 @@ groups:
 
   - name: elk
     rules:
-      - alert: ProbeFailed
-        expr: probe_success == 0
-        for: 2m
-        labels:
-          severity: critical
-        annotations:
-          summary: "La sonde HTTP {{ $labels.instance }} echoue depuis 2 minutes"
-
       - alert: ElasticsearchClusterRed
         expr: elasticsearch_cluster_health_status{color="red"} == 1
         for: 2m
