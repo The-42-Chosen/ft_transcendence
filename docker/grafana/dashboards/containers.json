@@ -8,10 +8,55 @@
   "time": { "from": "now-1h", "to": "now" },
   "panels": [
     {
+      "id": 4,
+      "type": "stat",
+      "title": "Next (sonde /api/health)",
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "probe_success{probe=\"next\"}", "legendFormat": "Etat", "refId": "A" },
+        { "expr": "probe_duration_seconds{probe=\"next\"}", "legendFormat": "Temps de reponse", "refId": "B" },
+        { "expr": "time() - container_start_time_seconds{name=\"next\"}", "legendFormat": "Uptime du container", "refId": "C" }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byFrameRefID", "options": "A" },
+            "properties": [
+              { "id": "mappings", "value": [ { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } } ] },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] } }
+            ]
+          },
+          {
+            "matcher": { "id": "byFrameRefID", "options": "B" },
+            "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 3 } ] } }
+            ]
+          },
+          {
+            "matcher": { "id": "byFrameRefID", "options": "C" },
+            "properties": [
+              { "id": "unit", "value": "dtdurations" }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": 1,
       "type": "timeseries",
       "title": "CPU par container (%)",
-      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 5 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[5m])) * 100", "legendFormat": "{{name}}", "refId": "A" }
@@ -25,7 +70,7 @@
       "id": 2,
       "type": "timeseries",
       "title": "Memoire par container",
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 14 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "container_memory_usage_bytes{name!=\"\"}", "legendFormat": "{{name}}", "refId": "A" }
@@ -39,7 +84,7 @@
       "id": 3,
       "type": "timeseries",
       "title": "Reseau par container (reception, octets/s)",
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 14 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "sum by (name) (rate(container_network_receive_bytes_total{name!=\"\"}[5m]))", "legendFormat": "{{name}} rx", "refId": "A" },
