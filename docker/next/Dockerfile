@@ -7,7 +7,7 @@ FROM docker.io/library/node:22-alpine AS deps
 WORKDIR /app
 
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN corepack install && pnpm install --frozen-lockfile
 
 ################################################################################
@@ -26,7 +26,7 @@ RUN corepack install && pnpm run build
 FROM docker.io/library/node:22-alpine AS dev
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN corepack install && pnpm install --frozen-lockfile
 
 ENV NODE_ENV=development
