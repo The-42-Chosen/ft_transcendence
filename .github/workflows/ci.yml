@@ -6,6 +6,12 @@ on:
   push:
     branches: [main, dev]
 
+# Deux push rapproches sur une meme PR : seul le dernier run est conserve.
+# Sur dev et main, chaque commit garde son run complet.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -15,6 +21,28 @@ jobs:
 
       - name: Valider la syntaxe du docker-compose
         run: docker compose -f docker-compose.yml config
+
+      # promtool check config verifie aussi les fichiers listes dans rule_files
+      - name: Valider la config et les regles Prometheus
+        run: |
+          docker run --rm --entrypoint promtool \
+            -v "$PWD/docker/prometheus:/etc/prometheus:ro" \
+            docker.io/prom/prometheus:v3.2.1 \
+            check config /etc/prometheus/prometheus.yml
+
+      # Rejoue des series fictives contre alerts.yml, sans demarrer de conteneur
+      - name: Tester les regles d'alerte
+        run: |
+          docker run --rm --entrypoint promtool \
+            -v "$PWD/docker/prometheus:/etc/prometheus:ro" \
+            docker.io/prom/prometheus:v3.2.1 \
+            test rules /etc/prometheus/alerts_test.yml
+
+      - name: Valider les JSON des dashboards Grafana
+        run: jq empty docker/grafana/dashboards/*.json
+
+      - name: Valider la syntaxe des scripts shell
+        run: bash -n docker/elk/setup/setup.sh docker/postgres/init/02-monitoring-user.sh
 
   smoke-test:
     runs-on: ubuntu-latest
@@ -73,6 +101,24 @@ jobs:
 
       - name: Verifier Grafana derriere nginx (HTTPS + sous-chemin)
         run: curl -fsk --retry 5 --retry-delay 2 --retry-connrefused https://localhost:8443/grafana/api/health
+
+      # /api/health repond OK meme si Grafana a ignore un dashboard illisible :
+      # on compare le nombre de dashboards charges au nombre de fichiers JSON
+      - name: Verifier que les dashboards Grafana sont provisionnes
+        run: |
+          source .env
+          expected=$(ls docker/grafana/dashboards/*.json | wc -l)
+          for i in $(seq 1 10); do
+            count=$(curl -fsk -u "${GRAFANA_ADMIN_USER}:${GRAFANA_ADMIN_PASSWORD}" \
+              "https://localhost:8443/grafana/api/search?type=dash-db" | jq 'length')
+            echo "dashboards charges : ${count:-0} / $expected (tentative $i/10)"
+            if [ "${count:-0}" -ge "$expected" ]; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::Grafana n'a pas charge tous les dashboards"
+          exit 1
 
       - name: Attendre la fin d'elk-setup (comptes, ILM, SLM, data view)
         run: |
