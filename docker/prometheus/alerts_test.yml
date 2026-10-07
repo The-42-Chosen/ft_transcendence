@@ -1,0 +1,177 @@
+# Tests unitaires des regles d'alerte (promtool test rules).
+# Chaque test injecte des series fictives et verifie que l'alerte n'est pas
+# encore levee avant la duree "for:", puis qu'elle l'est apres.
+# Lance par la CI (job validate) sans demarrer aucun conteneur :
+#   promtool test rules alerts_test.yml
+
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 15s
+
+tests:
+  # ---------------------------------------------------------------- ServiceDown
+  - interval: 15s
+    input_series:
+      # up pendant 30 s, puis la cible ne repond plus
+      - series: 'up{job="postgres", instance="postgres-exporter:9187"}'
+        values: '1 1 0x20'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: ServiceDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: ServiceDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: postgres
+              instance: postgres-exporter:9187
+            exp_annotations:
+              summary: "postgres ne repond plus depuis 1 minute"
+
+  # ---------------------------------------------------------------- ProbeFailed
+  - interval: 15s
+    input_series:
+      - series: 'probe_success{job="probes", probe="next", instance="http://next:3000/api/health"}'
+        values: '1 1 0x20'
+    alert_rule_test:
+      # down depuis 30 s seulement : pas encore d'alerte
+      - eval_time: 1m
+        alertname: ProbeFailed
+        exp_alerts: []
+      # down depuis plus de 2 min : l'alerte doit etre levee
+      - eval_time: 4m
+        alertname: ProbeFailed
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: probes
+              probe: next
+              instance: http://next:3000/api/health
+            exp_annotations:
+              summary: "La sonde HTTP http://next:3000/api/health echoue depuis 2 minutes"
+
+  # --------------------------------------------------------------- HighCpuUsage
+  - interval: 15s
+    input_series:
+      # compteur idle qui avance tres peu : le CPU est occupe a ~99 %
+      - series: 'node_cpu_seconds_total{mode="idle", cpu="0", job="node", instance="node-exporter:9100"}'
+        values: '0+0.05x80'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: HighCpuUsage
+        exp_alerts: []
+      - eval_time: 10m
+        alertname: HighCpuUsage
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "CPU de la machine > 90% depuis 5 minutes"
+
+  # CPU au repos : l'alerte ne doit jamais se lever
+  - interval: 15s
+    input_series:
+      # compteur idle qui avance de 15 s toutes les 15 s : CPU a 100 % idle
+      - series: 'node_cpu_seconds_total{mode="idle", cpu="0", job="node", instance="node-exporter:9100"}'
+        values: '0+15x80'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: HighCpuUsage
+        exp_alerts: []
+
+  # ------------------------------------------------------------ HighMemoryUsage
+  - interval: 15s
+    input_series:
+      - series: 'node_memory_MemTotal_bytes{job="node", instance="node-exporter:9100"}'
+        values: '1000x40'
+      # 50 / 1000 disponible : 95 % utilise
+      - series: 'node_memory_MemAvailable_bytes{job="node", instance="node-exporter:9100"}'
+        values: '50x40'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: HighMemoryUsage
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: HighMemoryUsage
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: node
+              instance: node-exporter:9100
+            exp_annotations:
+              summary: "RAM de la machine > 90% depuis 5 minutes"
+
+  # ------------------------------------------------------------- DiskAlmostFull
+  - interval: 15s
+    input_series:
+      - series: 'node_filesystem_size_bytes{job="node", instance="node-exporter:9100", device="/dev/sda1", fstype="ext4", mountpoint="/"}'
+        values: '1000x80'
+      # 100 / 1000 disponible : 90 % rempli
+      - series: 'node_filesystem_avail_bytes{job="node", instance="node-exporter:9100", device="/dev/sda1", fstype="ext4", mountpoint="/"}'
+        values: '100x80'
+      # un tmpfs plein doit etre ignore par le filtre fstype
+      - series: 'node_filesystem_size_bytes{job="node", instance="node-exporter:9100", device="tmpfs", fstype="tmpfs", mountpoint="/run"}'
+        values: '1000x80'
+      - series: 'node_filesystem_avail_bytes{job="node", instance="node-exporter:9100", device="tmpfs", fstype="tmpfs", mountpoint="/run"}'
+        values: '0x80'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: DiskAlmostFull
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: DiskAlmostFull
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: node
+              instance: node-exporter:9100
+              device: /dev/sda1
+              fstype: ext4
+              mountpoint: /
+            exp_annotations:
+              summary: "Disque / rempli a plus de 85%"
+
+  # -------------------------------------------------- PostgresTooManyConnections
+  - interval: 15s
+    input_series:
+      # 50 actives + 40 idle = 90 connexions, seuil a 80
+      - series: 'pg_stat_activity_count{job="postgres", instance="postgres-exporter:9187", datname="transcendence", state="active"}'
+        values: '50x40'
+      - series: 'pg_stat_activity_count{job="postgres", instance="postgres-exporter:9187", datname="transcendence", state="idle"}'
+        values: '40x40'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: PostgresTooManyConnections
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: PostgresTooManyConnections
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Plus de 80 connexions actives sur PostgreSQL"
+
+  # ------------------------------------------------------ ElasticsearchClusterRed
+  - interval: 15s
+    input_series:
+      - series: 'elasticsearch_cluster_health_status{job="elasticsearch", instance="elasticsearch-exporter:9114", cluster="docker-cluster", color="red"}'
+        values: '1x30'
+      - series: 'elasticsearch_cluster_health_status{job="elasticsearch", instance="elasticsearch-exporter:9114", cluster="docker-cluster", color="green"}'
+        values: '0x30'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: ElasticsearchClusterRed
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: ElasticsearchClusterRed
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: elasticsearch
+              instance: elasticsearch-exporter:9114
+              cluster: docker-cluster
+              color: red
+            exp_annotations:
+              summary: "Le cluster Elasticsearch est en etat RED depuis 2 minutes"
