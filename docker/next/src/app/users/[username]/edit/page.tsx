@@ -4,17 +4,12 @@ import EditProfileForm from "./EditProfileForm";
 export default async function EditProfilePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ username: string }>;
 }) {
-  const { id } = await params;
-  const userId = Number(id);
-
-  if (!Number.isInteger(userId) || userId <= 0) {
-    return <p>Invalid user id</p>;
-  }
+  const { username } = await params;
 
   const user = await db.orm.public.User
-    .where({ id: userId })
+    .where({ username })
     .first();
 
   if (!user) {
