@@ -1,28 +1,36 @@
 "use client";
 
-import Image from 'next/image';
+import Profile from "@/app/profile";
+import { db } from "@/prisma/db";;
 import Footer from '@/components/commons/Footer';
 import Header from '@/components/commons/Header';
 import Game from '@/components/commons/Game';
 import { useLanguage } from '@/i18n/LanguageContext';
 
-export default function Home() {
-  const { t } = useLanguage();
+export default async function Home() {
+  const user = await db.orm.public.User
+    .where({ id: 1 })
+    .first();
+
+  if (!user) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>User not found</p>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen text-center">
-      <Header/>
-      <div id="main-title">
-        <h1 className="font-display text-6xl tracking-wide">{t.home.title}</h1>
-      </div>
-      <Game/>
-      <Image
-          src="/assets/images/atab.jpg"
-          width={500}
-          height={500}
-          className="m-auto h-auto w-auto"
-          alt={t.home.imageAlt}
-          loading="eager"
+    <main className="min-h-screen flex flex-col items-center justify-center gap-8 text-center">
+      <h1 className="text-4xl font-semibold">
+        All Tutors are Badass
+      </h1>
+
+      <Profile
+        username={user.username}
+        displayName={user.displayName}
+        email={user.email}
+        avatarUrl={user.avatarUrl}
       />
       <Footer/>
     </main>
