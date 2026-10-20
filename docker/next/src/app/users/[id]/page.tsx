@@ -1,5 +1,6 @@
 import Profile from "@/app/profile";
 import { db } from "@/prisma/db";
+import Link from "next/link";
 
 export default async function UserPage({
   params,
@@ -29,6 +30,12 @@ export default async function UserPage({
         email={user.email}
         avatarUrl={user.avatarUrl}
       />
+      <Link
+        href={`/users/${user.id}/edit`}
+        className="rounded border px-4 py-2"
+        >
+        Edit profile
+        </Link>
     </main>
   );
 }
