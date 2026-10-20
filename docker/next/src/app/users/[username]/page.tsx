@@ -5,17 +5,12 @@ import Link from "next/link";
 export default async function UserPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ username: string }>;
 }) {
-  const { id } = await params;
-  const userId = Number(id);
-
-  if (!Number.isInteger(userId) || userId <= 0) {
-    return <p>Invalid user id</p>;
-  }
+  const { username } = await params;
 
   const user = await db.orm.public.User
-    .where({ id: userId })
+    .where({ username })
     .first();
 
   if (!user) {
@@ -23,19 +18,20 @@ export default async function UserPage({
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
+    <main className="min-h-screen flex items-center justify-center gap-4">
       <Profile
         username={user.username}
         displayName={user.displayName}
         email={user.email}
         avatarUrl={user.avatarUrl}
       />
+
       <Link
-        href={`/users/${user.id}/edit`}
+        href={`/users/${user.username}/edit`}
         className="rounded border px-4 py-2"
-        >
+      >
         Edit profile
-        </Link>
+      </Link>
     </main>
   );
 }
