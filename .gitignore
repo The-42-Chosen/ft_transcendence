@@ -27,3 +27,5 @@ Thumbs.db
 
 # --- Python dependance ---
 __pycache__
+# --- Image Avatar ---
+docker/next/public/uploads/avatars/
