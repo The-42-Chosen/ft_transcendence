@@ -1,126 +1,173 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type EditProfileFormProps = {
   id: number;
   username: string;
   email: string;
-  displayName?: string | null;
+  displayName: string | null;
 };
 
 export default function EditProfileForm({
   id,
-  username,
-  email,
-  displayName,
+  username: initialUsername,
+  email: initialEmail,
+  displayName: initialDisplayName,
 }: EditProfileFormProps) {
   const router = useRouter();
 
-  const [form, setForm] = useState({
-    username,
-    email,
-    displayName: displayName ?? "",
-  });
+  const [username, setUsername] = useState(initialUsername);
+  const [email, setEmail] = useState(initialEmail);
+  const [displayName, setDisplayName] = useState(
+    initialDisplayName ?? ""
+  );
+
+  const [avatar, setAvatar] = useState<File | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setLoading(true);
     setError(null);
+    setLoading(true);
 
-    const response = await fetch(`/api/users/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: form.username,
-        email: form.email,
-        displayName: form.displayName,
-      }),
-    });
+    try {
+      const response = await fetch(`/api/users/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          displayName: displayName || null,
+        }),
+      });
 
-    const data = await response.json();
+      if (!response.ok) {
+        const data = await response.json();
 
-    if (!response.ok) {
-      setError(data.error ?? "Unable to update profile");
+        setError(data.error ?? "Unable to update profile");
+        setLoading(false);
+        return;
+      }
+
+      const updatedUser = await response.json();
+
+      if (avatar) {
+        const formData = new FormData();
+
+        formData.append("avatar", avatar);
+
+        const avatarResponse = await fetch(
+          `/api/users/${id}/avatar`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!avatarResponse.ok) {
+          const data = await avatarResponse.json();
+
+          setError(data.error ?? "Unable to upload avatar");
+          setLoading(false);
+          return;
+        }
+      }
+
+      router.push(`/users/${updatedUser.username}`);
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      setError("Something went wrong");
       setLoading(false);
-      return;
     }
-
-    router.push(`/users/${id}`);
-    router.refresh();
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md space-y-4"
+      className="flex w-full max-w-md flex-col gap-4"
     >
-      <div>
-        <label htmlFor="username" className="block mb-1">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="username">
           Username
         </label>
 
         <input
           id="username"
           type="text"
-          value={form.username}
+          value={username}
           onChange={(event) =>
-            setForm({
-              ...form,
-              username: event.target.value,
-            })
+            setUsername(event.target.value)
           }
-          className="w-full rounded border px-3 py-2"
+          className="rounded border px-3 py-2"
         />
       </div>
 
-      <div>
-        <label htmlFor="email" className="block mb-1">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="email">
           Email
         </label>
 
         <input
           id="email"
           type="email"
-          value={form.email}
+          value={email}
           onChange={(event) =>
-            setForm({
-              ...form,
-              email: event.target.value,
-            })
+            setEmail(event.target.value)
           }
-          className="w-full rounded border px-3 py-2"
+          className="rounded border px-3 py-2"
         />
       </div>
 
-      <div>
-        <label htmlFor="displayName" className="block mb-1">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="displayName">
           Display name
         </label>
 
         <input
           id="displayName"
           type="text"
-          value={form.displayName}
+          value={displayName}
           onChange={(event) =>
-            setForm({
-              ...form,
-              displayName: event.target.value,
-            })
+            setDisplayName(event.target.value)
           }
-          className="w-full rounded border px-3 py-2"
+          className="rounded border px-3 py-2"
         />
       </div>
 
+      <div className="flex flex-col gap-1">
+        <label htmlFor="avatar">
+          Avatar
+        </label>
+
+        <input
+          id="avatar"
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          onChange={(event) => {
+            const file =
+              event.target.files?.[0] ?? null;
+
+            setAvatar(file);
+          }}
+        />
+      </div>
+
+      {avatar && (
+        <p className="text-sm text-gray-500">
+          Selected: {avatar.name}
+        </p>
+      )}
+
       {error && (
-        <p className="text-red-500">
+        <p className="text-sm text-red-500">
           {error}
         </p>
       )}
