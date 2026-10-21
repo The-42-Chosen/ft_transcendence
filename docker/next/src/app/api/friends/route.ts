@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { z } from "zod";
+<<<<<<< HEAD
 import { auth } from "@/auth";
 
 const friendshipSchema = z.object({
@@ -32,17 +33,40 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+=======
+
+const friendshipSchema = z.object({
+  userId: z.number().int().positive(),
+  friendId: z.number().int().positive(),
+});
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
     const parsed = friendshipSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
+<<<<<<< HEAD
         { error: "Invalid data" },
+=======
+        {
+          error: "Invalid data",
+          details: parsed.error.flatten(),
+        },
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
         { status: 400 }
       );
     }
 
+<<<<<<< HEAD
     const userId = currentUser.id;
     const { friendId } = parsed.data;
+=======
+    const { userId, friendId } = parsed.data;
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
 
     if (userId === friendId) {
       return NextResponse.json(
@@ -51,17 +75,29 @@ export async function POST(request: Request) {
       );
     }
 
+<<<<<<< HEAD
+=======
+    const user = await db.orm.public.User
+      .where({ id: userId })
+      .first();
+
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
     const friend = await db.orm.public.User
       .where({ id: friendId })
       .first();
 
+<<<<<<< HEAD
     if (!friend) {
+=======
+    if (!user || !friend) {
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
       );
     }
 
+<<<<<<< HEAD
     const existingFriendship =
       (await db.orm.public.Friendship
         .where({ userId, friendId })
@@ -72,6 +108,14 @@ export async function POST(request: Request) {
           friendId: userId,
         })
         .first());
+=======
+    const existingFriendship = await db.orm.public.Friendship
+      .where({
+        userId,
+        friendId,
+      })
+      .first();
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
 
     if (existingFriendship) {
       return NextResponse.json(
@@ -96,6 +140,7 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+<<<<<<< HEAD
 }
 
 // DELETE
@@ -171,4 +216,6 @@ export async function DELETE(request: Request) {
       { status: 500 }
     );
   }
+=======
+>>>>>>> d2e53ba ((feat): USER - Users can now add an another users as a friend)
 }
