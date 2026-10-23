@@ -1,7 +1,72 @@
 @import "tailwindcss";
 
+/* COLORS */
+
+:root {
+  /* Backgrounds */
+  --color-bg-canvas: #090b10;
+  --color-bg-surface: #11141c;
+  --color-bg-elevated: #191d28;
+  --color-bg-subtle: #222736;
+
+  /* Text */
+  --color-text-primary: #f6f7fb;
+  --color-text-secondary: #9aa3b7;
+  --color-text-muted: #687086;
+
+  /* Borders */
+  --color-border-default: #2b3142;
+
+  /* Red team */
+  --color-brand-red: #f0445a;
+  --color-brand-red-dark: #7b2332;
+
+  /* Blue team */
+  --color-brand-blue: #3b7cff;
+  --color-brand-blue-dark: #1c3978;
+
+  /* Accents and status */
+  --color-accent-gold: #f4c95d;
+  --color-status-online: #37d67a;
+
+  /* Optional RGB versions for transparency */
+  --rgb-brand-red: 240 68 90;
+  --rgb-brand-blue: 59 124 255;
+  --rgb-accent-gold: 244 201 93;
+  --rgb-status-online: 55 214 122;
+}
+
+/* GLOBALS */
+
 #main-title{
 	padding: 2em;
-	display: block !important;
-	color: red;
+	color: var(--color-text-primary);
+}
+
+/* Element defaults live in the base layer so Tailwind utilities can override them */
+@layer base {
+  main{
+    background: var(--color-bg-subtle);
+  }
+
+  header{
+    background: var(--color-bg-canvas);
+  }
+
+  button{
+    background: var(--color-bg-elevated);
+    border-radius: 15%;
+  }
+
+  button:hover{
+    background: var(--color-brand-blue);
+  }
+
+  button:active{
+    background: var(--color-brand-blue-dark);
+  }
+}
+
+.word:active{
+  background-color: #687086;
 }
