@@ -58,7 +58,7 @@ up: check_env storage
 down: storage
 	$(DC) down --remove-orphans
 
-re: down up
+re: fclean up
 
 build: storage
 	$(DC) build
