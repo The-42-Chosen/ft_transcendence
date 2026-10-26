@@ -13,21 +13,14 @@ RUN corepack install && pnpm install --frozen-lockfile
 ################################################################################
 # 2. Build
 ################################################################################
-FROM docker.io/library/node:22-alpine AS builder
-WORKDIR /app
-RUN corepack enable
-COPY --from=deps /app/node_modules ./node_modules
+FROM deps AS builder
 COPY . .
 RUN corepack install && pnpm run build
 
 ################################################################################
 # 3. Developpement (auto-update)
 ################################################################################
-FROM docker.io/library/node:22-alpine AS dev
-WORKDIR /app
-RUN corepack enable
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN corepack install && pnpm install --frozen-lockfile
+FROM deps AS dev
 
 ENV NODE_ENV=development
 ENV PORT=3000
