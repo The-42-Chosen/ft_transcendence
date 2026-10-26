@@ -7,18 +7,30 @@ export type Clue = {
   count: number;
 };
 
+export type TeamTurn = "red" | "blue";
+
 type ClueContextValue = {
   clue: Clue | null;
   setClue: (clue: Clue) => void;
+  turn: TeamTurn;
+  endTurn: () => void;
 };
 
 const ClueContext = createContext<ClueContextValue | null>(null);
 
-// Shares the current clue between the spymaster form and the read-only clue bars
+// Shares the current clue and the team whose turn it is between the boards
 export function ClueProvider({ children }: { children: ReactNode }) {
   const [clue, setClue] = useState<Clue | null>(null);
+  const [turn, setTurn] = useState<TeamTurn>("red");
+
+  // Hands over to the other team, the next spymaster has to give a new clue
+  function endTurn() {
+    setTurn((prev) => (prev === "red" ? "blue" : "red"));
+    setClue(null);
+  }
+
   return (
-    <ClueContext value={{ clue, setClue }}>
+    <ClueContext value={{ clue, setClue, turn, endTurn }}>
       {children}
     </ClueContext>
   );
