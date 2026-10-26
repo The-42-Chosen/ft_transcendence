@@ -46,8 +46,10 @@ storage:
 	@systemctl --user enable --now podman.socket 2>/dev/null || true # necessary for cadvisor
 
 
+# pull (reseau) et build (CPU) en parallele via make -j2 : les images
+# distantes (ELK, Prometheus...) se telechargent pendant que next se compile.
 up: check_env storage
-	$(DC) build
+	@$(MAKE) --no-print-directory -j2 pull build
 	@if [ -n "$$(podman ps -aq -f name='^next$$')" ] && \
 	   [ "$$(podman inspect -f '{{.Image}}' next)" != "$$(podman image inspect -f '{{.Id}}' $(PROJECT)_next)" ]; then \
 		echo "Next image has changed : container recreated"; \
@@ -62,6 +64,9 @@ re: fclean up
 
 build: storage
 	$(DC) build
+
+pull: storage
+	$(DC) pull
 
 logs: storage
 	$(DC) logs -f --tail=200
@@ -124,5 +129,5 @@ prisma-status:
 prisma: prisma-emit prisma-migrate
 
 
-.PHONY: storage check_env up down re build logs ps clean fclean info \
+.PHONY: storage check_env up down re build pull logs ps clean fclean info \
         next-shell next-logs dev dev-logs dev-down next-reload
