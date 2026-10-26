@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Configuration pnpm propre a la machine
 .npmrc
+
+/current_rooms
