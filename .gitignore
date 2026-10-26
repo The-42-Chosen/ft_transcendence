@@ -23,3 +23,7 @@ Thumbs.db
 
 # --- Conf podman generee par le Makefile ---
 .podman/
+
+
+# --- Python dependance ---
+__pycache__
