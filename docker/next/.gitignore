@@ -44,4 +44,6 @@ next-env.d.ts
 .npmrc
 node_modules/
 dist/
-.env
+
+# pending game rooms
+/current_rooms
