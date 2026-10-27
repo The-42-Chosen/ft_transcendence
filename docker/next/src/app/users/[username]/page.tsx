@@ -1,9 +1,9 @@
 import Profile from "@/app/profile";
 import Avatar from "@/app/components/User/Avatar";
 import FriendButton from "@/app/components/User/FriendButton";
+import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 import { db } from "@/prisma/db";
 import Link from "next/link";
-import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 
 export default async function UserPage({
   params,
@@ -20,13 +20,10 @@ export default async function UserPage({
     return <p>User not found</p>;
   }
 
-  // Temporaire : utilisateur connecté simulé
+  // Temporaire tant que l'authentification n'est pas faite
   const currentUserId = 1;
 
-  // -------------------------
   // Amis du profil affiché
-  // -------------------------
-
   const friendshipsAsUser = await db.orm.public.Friendship
     .where({ userId: user.id })
     .all();
@@ -52,10 +49,7 @@ export default async function UserPage({
     )
   );
 
-  // -------------------------
-  // Amis de l'utilisateur connecté
-  // -------------------------
-
+  // Amis de l'utilisateur actuellement connecté
   const currentUserFriendshipsAsUser =
     await db.orm.public.Friendship
       .where({ userId: currentUserId })
@@ -80,8 +74,8 @@ export default async function UserPage({
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-8">
-      <PresenceHeartbeat userId={1} />
-      
+      <PresenceHeartbeat userId={currentUserId} />
+
       <Profile
         username={user.username}
         displayName={user.displayName}
@@ -115,30 +109,54 @@ export default async function UserPage({
           <div className="flex flex-col gap-3">
             {friends
               .filter((friend) => friend !== null)
-              .map((friend) => (
-                <Link
-                  key={friend!.id}
-                  href={`/users/${friend!.username}`}
-                  className="flex items-center gap-3 rounded border p-3"
-                >
-                  <Avatar
-                    username={friend!.username}
-                    avatarUrl={friend!.avatarUrl}
-                    size={48}
-                  />
+              .map((friend) => {
+                const isOnline = friend!.lastSeen
+                  ? Date.now() -
+                      new Date(friend!.lastSeen).getTime() <
+                    60_000
+                  : false;
 
-                  <div>
-                    <p className="font-semibold">
-                      {friend!.displayName ??
-                        friend!.username}
-                    </p>
+                return (
+                  <Link
+                    key={friend!.id}
+                    href={`/users/${friend!.username}`}
+                    className="flex items-center gap-3 rounded border p-3"
+                  >
+                    <Avatar
+                      username={friend!.username}
+                      avatarUrl={friend!.avatarUrl}
+                      size={48}
+                    />
 
-                    <p className="text-sm text-gray-500">
-                      @{friend!.username}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                    <div>
+                      <p className="font-semibold">
+                        {friend!.displayName ??
+                          friend!.username}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
+                        @{friend!.username}
+                      </p>
+
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2 w-2 rounded-full ${
+                            isOnline
+                              ? "bg-green-500"
+                              : "bg-gray-400"
+                          }`}
+                        />
+
+                        <span className="text-sm">
+                          {isOnline
+                            ? "Online"
+                            : "Offline"}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
           </div>
         )}
       </section>
