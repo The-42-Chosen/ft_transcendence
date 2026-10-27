@@ -3,6 +3,7 @@ import Avatar from "@/app/components/User/Avatar";
 import FriendButton from "@/app/components/User/FriendButton";
 import { db } from "@/prisma/db";
 import Link from "next/link";
+import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 
 export default async function UserPage({
   params,
@@ -79,6 +80,8 @@ export default async function UserPage({
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-8">
+      <PresenceHeartbeat userId={1} />
+      
       <Profile
         username={user.username}
         displayName={user.displayName}
