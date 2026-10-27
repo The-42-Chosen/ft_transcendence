@@ -1,0 +1,15 @@
+# Override CI du job "app" : postgres + next + nginx.
+# Grafana et Kibana sont remplaces par des stubs pour que nginx demarre.
+services:
+  grafana:
+    image: docker.io/traefik/whoami:v1.10
+    command: ["--port", "3000"]
+    volumes: !reset []
+    environment: !reset {}
+    depends_on: !reset []
+
+  kibana:
+    image: docker.io/traefik/whoami:v1.10
+    command: ["--port", "5601"]
+    environment: !reset {}
+    depends_on: !reset []
