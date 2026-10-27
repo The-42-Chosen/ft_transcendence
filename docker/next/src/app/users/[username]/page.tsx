@@ -2,6 +2,7 @@ import Profile from "@/app/profile";
 import Avatar from "@/app/components/User/Avatar";
 import FriendButton from "@/app/components/User/FriendButton";
 import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
+import OnlineStatus from "@/app/components/User/OnlineStatus";
 import { db } from "@/prisma/db";
 import Link from "next/link";
 
@@ -49,7 +50,7 @@ export default async function UserPage({
     )
   );
 
-  // Amis de l'utilisateur actuellement connecté
+  // Amis de l'utilisateur connecté
   const currentUserFriendshipsAsUser =
     await db.orm.public.Friendship
       .where({ userId: currentUserId })
@@ -109,54 +110,34 @@ export default async function UserPage({
           <div className="flex flex-col gap-3">
             {friends
               .filter((friend) => friend !== null)
-              .map((friend) => {
-                const isOnline = friend!.lastSeen
-                  ? Date.now() -
-                      new Date(friend!.lastSeen).getTime() <
-                    60_000
-                  : false;
+              .map((friend) => (
+                <Link
+                  key={friend!.id}
+                  href={`/users/${friend!.username}`}
+                  className="flex items-center gap-3 rounded border p-3"
+                >
+                  <Avatar
+                    username={friend!.username}
+                    avatarUrl={friend!.avatarUrl}
+                    size={48}
+                  />
 
-                return (
-                  <Link
-                    key={friend!.id}
-                    href={`/users/${friend!.username}`}
-                    className="flex items-center gap-3 rounded border p-3"
-                  >
-                    <Avatar
-                      username={friend!.username}
-                      avatarUrl={friend!.avatarUrl}
-                      size={48}
+                  <div>
+                    <p className="font-semibold">
+                      {friend!.displayName ??
+                        friend!.username}
+                    </p>
+
+                    <p className="text-sm text-gray-500">
+                      @{friend!.username}
+                    </p>
+
+                    <OnlineStatus
+                      lastSeen={friend!.lastSeen}
                     />
-
-                    <div>
-                      <p className="font-semibold">
-                        {friend!.displayName ??
-                          friend!.username}
-                      </p>
-
-                      <p className="text-sm text-gray-500">
-                        @{friend!.username}
-                      </p>
-
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`h-2 w-2 rounded-full ${
-                            isOnline
-                              ? "bg-green-500"
-                              : "bg-gray-400"
-                          }`}
-                        />
-
-                        <span className="text-sm">
-                          {isOnline
-                            ? "Online"
-                            : "Offline"}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+                  </div>
+                </Link>
+              ))}
           </div>
         )}
       </section>
