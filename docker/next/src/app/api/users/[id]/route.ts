@@ -9,7 +9,38 @@ const updateUserSchema = z.object({
   avatarUrl: z.string().nullable().optional(),
 }).strict();
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const userId = Number(id);
+
+  if (!Number.isInteger(userId) || userId <= 0) {
+    return NextResponse.json(
+      { error: "Invalid user id" },
+      { status: 400 }
+    );
+  }
+
+  const user = await db.orm.public.User
+    .where({ id: userId })
+    .first();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json(user);
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const userId = Number(id);
