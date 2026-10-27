@@ -22,14 +22,12 @@ from .vocabulaire import masque_interdits, masque_famille
 # ---------------------------------------------------------------------- #
 @dataclass
 class Plateau:
-    """Les mots encore cachés, vus par le maître-espion."""
-    equipe: list[str]                                   # mes mots (à faire deviner)
+    equipe: list[str]                                
     adverses: list[str] = field(default_factory=list)
     neutres: list[str] = field(default_factory=list)
     assassin: str | None = None
 
     def mauvais(self) -> list[tuple[str, str]]:
-        """(mot, catégorie) pour tous les mots à éviter."""
         liste = [(m, "adverse") for m in self.adverses] + [(m, "neutre") for m in self.neutres]
         if self.assassin:
             liste.append((self.assassin, "assassin"))
@@ -41,9 +39,6 @@ class Plateau:
 
 @dataclass
 class Reglages:
-    """Les boutons de l'heuristique. Les valeurs par défaut conviennent aux
-    vecteurs fastText (similarités réelles : 0,4 à 0,8 entre mots liés,
-    0,1 à 0,3 entre mots sans rapport)."""
 
     # Contraintes dures : un couple (candidat, n) qui les viole est rejeté.
     marge: float = 0.05                # le maillon faible doit dépasser le pire mauvais mot d'au moins ça
@@ -66,7 +61,11 @@ class Reglages:
     seuil_famille: float = 0.40
 
     def poids(self, categorie: str) -> float:
-        return {"assassin": self.poids_assassin, "adverse": self.poids_adverse, "neutre": self.poids_neutre}[categorie]
+        return {
+            "assassin": self.poids_assassin,
+            "adverse": self.poids_adverse,
+            "neutre": self.poids_neutre
+        }[categorie]
 
     def __repr__(self):
         string = f"\n{self.marge=}\n" \
@@ -84,7 +83,6 @@ class Reglages:
 
 @dataclass
 class Indice:
-    """Un couple (mot, nombre) évalué, avec tout ce qu'il faut pour l'expliquer."""
     mot: str
     nombre: int
     cibles: list[str]            # le « cluster » visé : les n mots d'équipe les plus proches
@@ -227,79 +225,6 @@ def choisir_indices(
     return [fabriquer(i, 1, secours=True)]
 
 
-def par_cluster(indices: list[Indice]) -> list[tuple[tuple[str, ...], list[Indice]]]:
-    """Regroupe des indices par cluster visé (même ensemble de cibles), du
-    meilleur cluster au moins bon. Pratique pour lire ce que l'IA a trouvé :
-        [TOUR, PARIS]   : EIFFEL 2, MONTPARNASSE 2
-        [POMME, BANANE] : POIRE 2, PATATE 2, FIGUE 2
-    """
-    groupes: dict[tuple[str, ...], list[Indice]] = {}
-    for indice in indices:
-        groupes.setdefault(tuple(sorted(indice.cibles)), []).append(indice)
-    return sorted(groupes.items(), key=lambda kv: -max(i.score for i in kv[1]))
-
-
-# ---------------------------------------------------------------------- #
-# Explication d'un candidat (les tableaux de la section 7.3)
-# ---------------------------------------------------------------------- #
-def expliquer_candidat(
-    mot: str,
-    s_equipe: np.ndarray, mots_equipe: list[str],
-    s_mauvais: np.ndarray, mots_mauvais: list[str], categories_mauvais: list[str],
-    reglages: Reglages,
-) -> str:
-    """Texte détaillant, pour UN candidat, exactement le raisonnement de 7.3."""
-    poids = np.array([reglages.poids(c) for c in categories_mauvais], dtype=np.float32)
-    res = scorer(s_equipe[None, :], s_mauvais[None, :], poids, reglages)
-    lignes = [f"Candidat « {mot.upper()} »", f"  {'Mot':<16}{'Catégorie':<11}Similarité"]
-    for m, s in zip(mots_equipe, s_equipe):
-        lignes.append(f"  {m:<16}{'équipe':<11}{s:.2f}")
-    for m, c, s in zip(mots_mauvais, categories_mauvais, s_mauvais):
-        lignes.append(f"  {m:<16}{c:<11}{s:.2f}")
-
-    tri = " > ".join(f"{mots_equipe[j]} {s_equipe[j]:.2f}" for j in res.ordre[0])
-    lignes.append(f"\nMots d'équipe triés : {tri}")
-    seuil = max(res.pire_brut[0] + reglages.marge, reglages.similarite_minimale)
-    if res.idx_pire[0] >= 0:
-        j = res.idx_pire[0]
-        lignes.append(
-            f"  Pire mauvais mot    : {mots_mauvais[j]} ({categories_mauvais[j]}) {res.pire_brut[0]:.2f}"
-            f"   → un cluster n'est valide que si son maillon faible ≥ max({res.pire_brut[0]:.2f} + marge {reglages.marge:.2f},"
-            f" minimum {reglages.similarite_minimale:.2f}) = {seuil:.2f}"
-        )
-    else:
-        lignes.append(f"  Aucun mot à éviter  → seuil = minimum {reglages.similarite_minimale:.2f}")
-
-    lignes.append("\n")
-    for n in range(1, len(mots_equipe) + 1):
-        faible = res.S_tri[0, n - 1]
-        cibles = ", ".join(mots_equipe[j] for j in res.ordre[0, :n])
-        if faible < seuil:
-            lignes.append(f"  n={n} : [{cibles}]  maillon faible {faible:.2f} < {seuil:.2f} ✗ rejeté")
-            continue
-        bonus = reglages.bonus_par_mot * (n - 1)
-        pen = res.penalite[0, n - 1]
-        if pen > 0:
-            k = res.idx_penalise[0, n - 1]
-            detail_pen = (f"pénalité {poids[k]:.1f} × ({reglages.distance_securite:.2f} − ({faible:.2f} − {s_mauvais[k]:.2f} {mots_mauvais[k]}))"
-                          f" = {pen:.2f}")
-        else:
-            detail_pen = f"aucun mauvais mot à moins de {reglages.distance_securite:.2f} sous le maillon faible : pénalité 0"
-        lignes.append(
-            f"  n={n} : [{cibles}]  maillon faible {faible:.2f} ≥ {seuil:.2f} ✓  {detail_pen}"
-            f"\n         score = min({faible:.2f}, plafond {reglages.plafond:.2f}) − {pen:.2f} + bonus {bonus:.2f} = {res.scores[0, n - 1]:+.2f}"
-        )
-
-    lignes.append("\n")
-    if np.isfinite(res.scores[0]).any():
-        n = int(np.argmax(res.scores[0] + 1e-6 * np.arange(len(mots_equipe)))) + 1
-        cibles = ", ".join(mots_equipe[j] for j in res.ordre[0, :n])
-        lignes.append(f"  → Verdict : {mot.upper()} {n}, cibles [{cibles}], score {res.scores[0, n - 1]:+.2f}")
-    else:
-        lignes.append(f"  → Verdict : {mot.upper()} rejeté d'office (aucun n ne respecte la marge)")
-    return "\n".join(lignes)
-
-
 # ---------------------------------------------------------------------- #
 # Le maître-espion complet
 # ---------------------------------------------------------------------- #
@@ -313,6 +238,7 @@ class MaitreEspion:
         self.candidats = [c for c in candidats if c in emb.index]
         self.C = emb.matrice[[emb.index[c] for c in self.candidats]]          # (K, d) normalisés
         self.cles = np.array([sans_accents(c.lower()) for c in self.candidats])  # pour l'étape 2
+
 
     def _plateau_vectorise(self, plateau: Plateau):
         """Vecteurs des mots du plateau (en ignorant, avec avertissement, les inconnus)."""
@@ -340,6 +266,7 @@ class MaitreEspion:
         if mots:
             interdit |= masque_famille(self.cles, mots, self.C @ V.T, self.reglages.seuil_famille)
         return np.flatnonzero(~interdit)
+
 
     def proposer(self, plateau: Plateau, nb_resultats: int = 10) -> list[Indice]:
         """Les meilleurs couples (mot, nombre) pour ce plateau, du meilleur au moins bon."""

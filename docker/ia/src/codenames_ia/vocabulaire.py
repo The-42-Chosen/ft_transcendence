@@ -68,14 +68,14 @@ def charger_dictionnaire(chemin: str) -> frozenset[str]:
 
 
 def construire_candidats(
-    emb: Embeddings,
-    nb_max: int = 30_000,
-    longueur_min: int = 3,
-    garder_majuscules: bool = True,
-    rang_max_noms_propres: int = 10_000,
-    mots_outils: frozenset[str] = MOTS_OUTILS_FR,
-    dictionnaire: frozenset[str] | None = None,
-) -> list[str]:
+        emb: Embeddings,
+        nb_max: int = 30_000,
+        longueur_min: int = 3,
+        garder_majuscules: bool = True,
+        rang_max_noms_propres: int = 10_000,
+        mots_outils: frozenset[str] = MOTS_OUTILS_FR,
+        dictionnaire: frozenset[str] | None = None,
+    ) -> list[str]:
     """Étape 1 : les mots que l'IA a le droit de proposer.
 
     On parcourt le vocabulaire dans l'ordre (= fréquence décroissante) et on

@@ -1,5 +1,5 @@
 """
-Chargement des vecteurs de mots (embeddings) et similarité cosinus.
+Chargement des vecteurs de mots (embeddings)
 
 Formats acceptés par `Embeddings.charger` :
   - fastText .vec (première ligne "nb_mots dimension"), éventuellement .gz ;
@@ -25,19 +25,11 @@ SEPARATEURS = re.compile(r"[\s\-'’]+")
 
 
 def sans_accents(texte: str) -> str:
-    """'MÉDECIN' -> 'MEDECIN'. Sert uniquement aux comparaisons de formes."""
     decompose = unicodedata.normalize("NFD", texte)
     return "".join(c for c in decompose if unicodedata.category(c) != "Mn")
 
 
 def formes_possibles(mot: str) -> list[str]:
-    """Les orthographes sous lesquelles un mot du plateau peut exister.
-
-    Le plateau envoie « MÉDECIN » ; les fichiers fastText contiennent
-    « médecin » (très fréquent), « Médecin » (moins), « MÉDECIN » (rare).
-    Pour « PARIS », c'est « Paris » qui est de loin le plus fréquent, et son
-    vecteur est bien meilleur que celui de « paris ».
-    """
     mot = mot.strip()
     base = [mot.lower(), mot.capitalize(), mot, mot.upper()]
     base += [sans_accents(f) for f in base]
@@ -72,6 +64,7 @@ class Embeddings:
             return cls.charger_npz(chemin)
         return cls.charger_texte(chemin, max_mots=max_mots, verbose=verbose)
 
+
     @classmethod
     def charger_texte(cls, chemin: str | Path, max_mots: int = 100_000, verbose: bool = True) -> "Embeddings":
         """Lit un .vec (fastText) ou .txt (GloVe), en ne gardant que les
@@ -104,9 +97,11 @@ class Embeddings:
             raise ValueError(f"aucun vecteur lu dans {chemin}")
         return cls(mots, np.vstack(lignes))
 
+
     def sauvegarder(self, chemin: str | Path) -> None:
         """Cache numpy : les mots (une chaîne, un mot par ligne) + la matrice."""
         np.savez(Path(chemin), mots=np.array("\n".join(self.mots)), matrice=self.matrice)
+
 
     @classmethod
     def charger_npz(cls, chemin: str | Path) -> "Embeddings":
@@ -119,20 +114,17 @@ class Embeddings:
     def __len__(self) -> int:
         return len(self.mots)
 
+
     def __contains__(self, mot: str) -> bool:
         return self.forme_connue(mot) is not None
 
-    def forme_connue(self, mot: str) -> str | None:
-        """La forme du mot présente dans le vocabulaire, ou None.
 
-        S'il en existe plusieurs ('paris', 'Paris', 'PARIS'), on prend la plus
-        FRÉQUENTE (le plus petit indice, les fichiers étant triés par
-        fréquence) : c'est celle dont le vecteur est le mieux appris.
-        """
+    def forme_connue(self, mot: str) -> str | None:
         presentes = [f for f in formes_possibles(mot) if f in self.index]
         if not presentes:
             return None
         return min(presentes, key=self.index.__getitem__)
+
 
     def vecteur(self, mot: str, composes: bool = True) -> np.ndarray | None:
         """Vecteur normalisé du mot, ou None s'il est inconnu.
@@ -151,6 +143,7 @@ class Embeddings:
                 return moyenne / (np.linalg.norm(moyenne) or 1.0)
         return None
 
+
     def vecteurs(self, mots: list[str]) -> tuple[np.ndarray, list[str], list[str]]:
         """Matrice (nb_trouves, dimension) + liste des mots trouvés + liste des manquants."""
         trouves, manquants, lignes = [], [], []
@@ -163,14 +156,4 @@ class Embeddings:
                 lignes.append(v)
         matrice = np.vstack(lignes) if lignes else np.zeros((0, self.dimension), dtype=np.float32)
         return matrice, trouves, manquants
-
-    # ------------------------------------------------------------------ #
-    # Similarité
-    # ------------------------------------------------------------------ #
-    def similarite(self, a: str, b: str) -> float:
-        """Similarité cosinus entre deux mots (NaN si l'un est inconnu)."""
-        va, vb = self.vecteur(a), self.vecteur(b)
-        if va is None or vb is None:
-            return float("nan")
-        return float(va @ vb)
 
