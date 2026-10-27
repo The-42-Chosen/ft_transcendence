@@ -1,0 +1,17 @@
+# Override CI du job "elk" : elasticsearch + elk-setup + logstash + kibana + nginx,
+# plus prometheus / blackbox-exporter / elasticsearch-exporter pour les sondes.
+# Next et Grafana sont remplaces par des stubs pour que nginx demarre.
+services:
+  next:
+    image: docker.io/traefik/whoami:v1.10
+    command: ["--port", "3000"]
+    build: !reset null
+    healthcheck: !reset null
+    environment: !reset {}
+
+  grafana:
+    image: docker.io/traefik/whoami:v1.10
+    command: ["--port", "3000"]
+    volumes: !reset []
+    environment: !reset {}
+    depends_on: !reset []

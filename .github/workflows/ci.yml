@@ -6,21 +6,25 @@ on:
   push:
     branches: [main, dev]
 
-# Deux push rapproches sur une meme PR : seul le dernier run est conserve.
-# Sur dev et main, chaque commit garde son run complet.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Valider la syntaxe du docker-compose
-        run: docker compose -f docker-compose.yml config
+      - name: Valider la syntaxe du docker-compose et des overrides CI
+        run: |
+          docker compose -f docker-compose.yml config -q
+          for job in app monitoring elk; do
+            docker compose -f docker-compose.yml -f ".github/ci/$job.yml" config -q
+          done
 
       # promtool check config verifie aussi les fichiers listes dans rule_files
       - name: Valider la config et les regles Prometheus
@@ -42,11 +46,103 @@ jobs:
         run: jq empty docker/grafana/dashboards/*.json
 
       - name: Valider la syntaxe des scripts shell
-        run: bash -n docker/elk/setup/setup.sh docker/postgres/init/02-monitoring-user.sh
+        run: bash -n docker/elk/setup/setup.sh docker/postgres/init/02-monitoring-user.sh .github/ci/wait-all.sh
 
-  smoke-test:
+  # ---------------------------------------------------------------------------
+  # postgres + next + nginx : la partie applicative
+  # ---------------------------------------------------------------------------
+  app:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Creer le .env (valeurs factices pour la CI)
+        run: cp .env.example .env
+
+      - name: Preparer buildx (necessaire pour exporter le cache de build)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construire l'image Next (avec cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/next
+          tags: transcendence-next:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Demarrer postgres, next et nginx
+        run: |
+          docker compose -f docker-compose.yml -f .github/ci/app.yml \
+            up -d --no-deps postgres next nginx grafana kibana
+
+      - name: Attendre que tout reponde
+        run: |
+          .github/ci/wait-all.sh 180 \
+            "postgres healthy=docker inspect -f '{{.State.Health.Status}}' postgres | grep -qx healthy" \
+            "next healthy=docker inspect -f '{{.State.Health.Status}}' next | grep -qx healthy" \
+            "nginx redirige http vers https=curl -fsS -o /dev/null http://localhost:8080" \
+            "nginx proxifie next en https=curl -fsk -o /dev/null https://localhost:8443/api/health"
+
+      - name: Verifier que postgres repond aux requetes
+        run: docker exec postgres psql -U transcendence -d transcendence -c 'SELECT 1'
+
+      - name: Verifier la conf nginx rendue (templates + env)
+        run: docker exec nginx nginx -t
+
+      - name: Logs en cas d'echec
+        if: failure()
+        run: docker compose -f docker-compose.yml -f .github/ci/app.yml logs
+
+  # ---------------------------------------------------------------------------
+  # prometheus + grafana + exporters : la supervision hors ELK
+  # ---------------------------------------------------------------------------
+  monitoring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Creer le .env (valeurs factices pour la CI)
+        run: cp .env.example .env
+
+      # next et kibana sont des stubs ; postgres est necessaire a postgres-exporter.
+      - name: Demarrer prometheus, grafana et les exporters
+        run: |
+          docker compose -f docker-compose.yml -f .github/ci/monitoring.yml \
+            up -d --no-deps prometheus grafana node-exporter cadvisor \
+                 postgres postgres-exporter nginx nginx-exporter next kibana
+
+      # Les cibles elasticsearch et les sondes blackbox sont testees par le job elk.
+      - name: Attendre que tout reponde
+        run: |
+          set -a; source .env; set +a
+          expected=$(ls docker/grafana/dashboards/*.json | wc -l)
+          .github/ci/wait-all.sh 180 \
+            "cibles prometheus up (hors ELK)=docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
+               | jq -e '[.data.activeTargets[] | select(.labels.job != \"elasticsearch\" and .labels.job != \"probes\")] \
+                        | length > 0 and all(.health == \"up\")'" \
+            "grafana derriere nginx (https + sous-chemin)=curl -fsk -o /dev/null https://localhost:8443/grafana/api/health" \
+            "dashboards grafana provisionnes ($expected)=curl -fsk -u \"$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD\" \
+               'https://localhost:8443/grafana/api/search?type=dash-db' | jq -e 'length >= $expected'"
+
+      - name: Etat des cibles Prometheus en cas d'echec
+        if: failure()
+        run: |
+          docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
+            | jq '.data.activeTargets[] | {job: .labels.job, health: .health, lastError: .lastError}' || true
+          docker compose -f docker-compose.yml -f .github/ci/monitoring.yml logs
+
+  # ---------------------------------------------------------------------------
+  # elasticsearch + elk-setup + logstash + kibana + nginx : la chaine de logs,
+  # plus prometheus / blackbox / elasticsearch-exporter pour les sondes ELK
+  # ---------------------------------------------------------------------------
+  elk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,140 +153,33 @@ jobs:
       - name: Augmenter vm.max_map_count pour Elasticsearch
         run: sudo sysctl -w vm.max_map_count=262144
 
-      - name: Preparer buildx (necessaire pour exporter le cache de build)
-        uses: docker/setup-buildx-action@v3
-
-      # L'image Next est construite a part pour profiter du cache GitHub Actions :
-      # l'etape pnpm install est reprise du cache tant que pnpm-lock.yaml ne change pas.
-      # Le tag doit etre <nom du projet compose>-<service> pour que compose la reutilise.
-      - name: Construire l'image Next (avec cache)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./docker/next
-          tags: transcendence-next:latest
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Sans --build : compose reutilise transcendence-next et ne construit
-      # que les images manquantes (nginx, postgres)
-      - name: Demarrer la stack
-        run: docker compose up -d
-
-      - name: Attendre que postgres soit healthy
+      - name: Demarrer la chaine ELK
         run: |
-          for i in $(seq 1 30); do
-            status=$(docker inspect --format '{{.State.Health.Status}}' postgres 2>/dev/null || echo "absent")
-            echo "postgres: $status (tentative $i/30)"
-            if [ "$status" = "healthy" ]; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::postgres n'est jamais devenu healthy"
-          exit 1
+          docker compose -f docker-compose.yml -f .github/ci/elk.yml \
+            up -d --no-deps elasticsearch elk-setup logstash kibana nginx next grafana \
+                 prometheus blackbox-exporter elasticsearch-exporter
 
-      - name: Verifier que postgres repond aux requetes
-        run: docker exec postgres psql -U transcendence -d transcendence -c 'SELECT 1'
-
-      - name: Verifier que nginx repond
-        run: curl -fsS --retry 5 --retry-delay 2 --retry-connrefused http://localhost:8080 -o /dev/null
-
-      - name: Verifier la conf nginx rendue (templates + env)
-        run: docker exec nginx nginx -t
-
-      - name: Verifier que toutes les cibles Prometheus sont up
+      - name: Attendre que tout reponde
         run: |
-          for i in $(seq 1 20); do
-            if docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
-               | jq -e '[.data.activeTargets[] | select(.health != "up")] | length == 0' > /dev/null; then
-              echo "Toutes les cibles sont up"
-              exit 0
-            fi
-            echo "Cibles pas encore toutes up (tentative $i/20)"
-            sleep 3
-          done
-          echo "::error::Des cibles Prometheus sont restees down"
-          docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
-            | jq '.data.activeTargets[] | {job: .labels.job, health: .health, lastError: .lastError}'
-          exit 1
-
-      - name: Verifier Grafana derriere nginx (HTTPS + sous-chemin)
-        run: curl -fsk --retry 5 --retry-delay 2 --retry-connrefused https://localhost:8443/grafana/api/health
-
-      # /api/health repond OK meme si Grafana a ignore un dashboard illisible :
-      # on compare le nombre de dashboards charges au nombre de fichiers JSON
-      - name: Verifier que les dashboards Grafana sont provisionnes
-        run: |
-          source .env
-          expected=$(ls docker/grafana/dashboards/*.json | wc -l)
-          for i in $(seq 1 10); do
-            count=$(curl -fsk -u "${GRAFANA_ADMIN_USER}:${GRAFANA_ADMIN_PASSWORD}" \
-              "https://localhost:8443/grafana/api/search?type=dash-db" | jq 'length')
-            echo "dashboards charges : ${count:-0} / $expected (tentative $i/10)"
-            if [ "${count:-0}" -ge "$expected" ]; then
-              exit 0
-            fi
-            sleep 3
-          done
-          echo "::error::Grafana n'a pas charge tous les dashboards"
-          exit 1
-
-      - name: Attendre la fin d'elk-setup (comptes, ILM, SLM, data view)
-        run: |
-          code=$(timeout 600 docker wait elk-setup || echo "timeout")
-          echo "elk-setup est sorti avec le code : $code"
-          if [ "$code" != "0" ]; then
-            echo "::error::elk-setup a echoue ou n'a pas termine a temps"
-            docker logs elk-setup
-            exit 1
-          fi
-
-      - name: Verifier Kibana derriere nginx (HTTPS + sous-chemin + login kibana_user)
-        run: |
-          source .env
-          curl -fsk --retry 5 --retry-delay 2 --retry-connrefused \
-            -u "kibana_user:${KIBANA_USER_PASSWORD}" \
-            https://localhost:8443/kibana/api/status -o /dev/null
-
-      - name: Verifier le pipeline de logs bout-en-bout (nginx -> Logstash -> Elasticsearch)
-        run: |
-          source .env
-          for i in $(seq 1 30); do
-            curl -fsk https://localhost:8443/ -o /dev/null || true
-            count=$(docker exec elasticsearch curl -fsS -u "elastic:${ELASTIC_PASSWORD}" \
-              "localhost:9200/transcendence-logs*/_count" \
-              | grep -o '"count":[0-9]*' | cut -d: -f2)
-            echo "documents indexes : ${count:-0} (tentative $i/30)"
-            if [ "${count:-0}" -gt 0 ]; then
-              echo "Le pipeline de logs fonctionne"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::aucun log n'est arrive dans Elasticsearch"
-          docker logs logstash --tail 50
-          exit 1
-
-      - name: Verifier les sondes blackbox dans Prometheus (probe_success)
-        run: |
-          for i in $(seq 1 20); do
-            if docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' \
-               | jq -e '(.data.result | length) >= 3 and (.data.result | all(.value[1] == "1"))' > /dev/null; then
-              echo "Next, Logstash et Kibana repondent aux sondes blackbox"
-              exit 0
-            fi
-            echo "Sondes pas encore toutes vertes (tentative $i/20)"
-            sleep 3
-          done
-          echo "::error::Des sondes blackbox restent en echec"
-          docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' | jq .
-          exit 1
+          set -a; source .env; set +a
+          .github/ci/wait-all.sh 420 \
+            "elasticsearch healthy=docker inspect -f '{{.State.Health.Status}}' elasticsearch | grep -qx healthy" \
+            "elk-setup termine (comptes, ILM, SLM, data view)=s=\$(docker inspect -f '{{.State.Status}}/{{.State.ExitCode}}' elk-setup); \
+               [ \"\$s\" = exited/0 ] && exit 0; case \"\$s\" in exited/*) docker logs elk-setup; exit 2;; esac; exit 1" \
+            "pipeline nginx -> logstash -> elasticsearch=curl -fsk -o /dev/null https://localhost:8443/ || true; \
+               docker exec elasticsearch curl -fsS -u \"elastic:$ELASTIC_PASSWORD\" 'localhost:9200/transcendence-logs*/_count' \
+               | jq -e '.count > 0'" \
+            "kibana derriere nginx (https + sous-chemin + login kibana_user)=curl -fsk -o /dev/null \
+               -u \"kibana_user:$KIBANA_USER_PASSWORD\" https://localhost:8443/kibana/api/status" \
+            "cibles prometheus elasticsearch + sondes logstash/kibana up=docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
+               | jq -e '[.data.activeTargets[] | select(.labels.job == \"elasticsearch\" or (.labels.job == \"probes\" and .labels.probe != \"next\"))] \
+                        | length == 3 and all(.health == \"up\")'" \
+            "sondes blackbox logstash et kibana vertes=docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' \
+               | jq -e '[.data.result[] | select(.metric.probe != \"next\")] | length == 2 and all(.value[1] == \"1\")'"
 
       - name: Logs en cas d'echec
         if: failure()
-        run: docker compose logs
-
-      - name: Arreter la stack
-        if: always()
-        run: docker compose down -v
+        run: |
+          docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' | jq . || true
+          docker logs logstash --tail 50 || true
+          docker compose -f docker-compose.yml -f .github/ci/elk.yml logs
