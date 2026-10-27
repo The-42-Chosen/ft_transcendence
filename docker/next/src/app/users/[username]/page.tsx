@@ -75,8 +75,9 @@ export default async function UserPage({
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-8">
-      <PresenceHeartbeat userId={currentUserId} />
-
+      {currentUserId === user.id && (
+        <PresenceHeartbeat userId={currentUserId} />
+      )}
       <Profile
         username={user.username}
         displayName={user.displayName}
