@@ -78,3 +78,60 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+
+    const parsed = friendshipSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid data",
+          details: parsed.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const { userId, friendId } = parsed.data;
+
+    const friendship = 
+      (await db.orm.public.Friendship
+        .where({
+          userId,
+          friendId,
+        })
+        .first()) ??
+      (await db.orm.public.Friendship
+        .where({
+          userId: friendId,
+          friendId: userId,
+        })
+        .first());
+    
+    if (!friendship) {
+      return NextResponse.json(
+        { error: "Friendship not found"},
+        { status: 404 }
+      );
+    }
+
+    await db.orm.public.Friendship
+      .where({ id: friendship.id })
+      .delete();
+    
+    return NextResponse.json({
+      message: "Friend removed",
+    });
+  }
+  catch (error) {
+    console.error("Friendship deletion failed:", error);
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500}
+    );
+  }
+}
