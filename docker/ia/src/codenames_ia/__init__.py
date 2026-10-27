@@ -10,14 +10,10 @@ Modules :
 """
 from .embeddings import Embeddings, sans_accents
 from .vocabulaire import construire_candidats, charger_dictionnaire, masque_interdits, masque_famille, mot_interdit
-from .maitre_espion import Plateau, Reglages, Indice, MaitreEspion, scorer, choisir_indices, expliquer_candidat, par_cluster
-from .clusters import matrice_similarite
-from .agent import deviner
+from .maitre_espion import Plateau, Reglages, Indice, MaitreEspion, scorer, choisir_indices
 
 __all__ = [
     "Embeddings", "sans_accents",
     "construire_candidats", "charger_dictionnaire", "masque_interdits", "masque_famille", "mot_interdit",
-    "Plateau", "Reglages", "Indice", "MaitreEspion", "scorer", "choisir_indices", "expliquer_candidat", "par_cluster",
-    "matrice_similarite",
-    "deviner",
+    "Plateau", "Reglages", "Indice", "MaitreEspion", "scorer", "choisir_indices"
 ]
