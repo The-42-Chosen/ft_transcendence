@@ -20,7 +20,7 @@ export default function PresenceHeartbeat({
 
     const interval = setInterval(
       updatePresence,
-      10000
+      30000
     );
 
     return () => {
