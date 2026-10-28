@@ -51,14 +51,14 @@ export function publicRoom({ code, language, status }: Room) {
 	return { code, language, status };
 }
 
-// assassin_word must stay the last key for the AI
-// Found words are left out so the AI only sees what is still on the board
 export function aiBoard({ language, words, colors, found, aiTeam }: Room) {
 	const pick = (color: CardColor) => words.filter((_, i) => colors[i] === color && !found[i]).map((w) => w.toUpperCase());
 	return {
 		langue: language,
 		list_red: pick("red"),
+		len_red: pick("red").length,
 		list_blue: pick("blue"),
+		len_blue: pick("blue").length,
 		list_neutral: pick("neutral"),
 		agent_fmotte_team: aiTeam,
 		assassin_word: pick("assassin")[0] ?? null,
