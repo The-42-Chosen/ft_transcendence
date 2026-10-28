@@ -14,6 +14,6 @@ type Parameters = {
 
 export default function BoardTeam ({team}: Parameters) {
 	return (
-		<h3 className={cn("uppercase rounded-4xl py-2 mb-3", teamClasses[team])}>Team {team}</h3>
+		<h3 className={cn("font-display text-2xl tracking-widest uppercase rounded-4xl py-1.5 mb-3", teamClasses[team])}>Team {team}</h3>
 	);
 }
