@@ -6,8 +6,33 @@ const updateUserSchema = z.object({
   email: z.email().optional(),
   username: z.string().min(3).optional(),
   displayName: z.string().nullable().optional(),
+  bio: z.string().nullable().optional(),
   avatarUrl: z.string().nullable().optional(),
 }).strict();
+
+function toPublicUser(user: {
+  id: number;
+  email: string;
+  username: string;
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  lastSeen: string | null;
+  createdAt: string;
+  updatedAt: string;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    displayName: user.displayName,
+    bio: user.bio,
+    avatarUrl: user.avatarUrl,
+    lastSeen: user.lastSeen,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
 
 export async function GET(
   request: Request,
@@ -34,7 +59,7 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(user);
+  return NextResponse.json(toPublicUser(user));
 }
 
 export async function PATCH(
@@ -88,7 +113,7 @@ export async function PATCH(
       .where({ id: userId })
       .update(parsed.data);
 
-    return NextResponse.json(updatedUser);
+    return NextResponse.json(toPublicUser(updatedUser));
 
   } catch (error) {
     console.error(error);
