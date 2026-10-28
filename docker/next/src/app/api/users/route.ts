@@ -12,7 +12,19 @@ const createUserSchema = z.object({
 export async function GET() {
   const users = await db.orm.public.User.all();
 
-  return NextResponse.json(users);
+  const publicUsers = users.map((user) => ({
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    displayName: user.displayName,
+    bio: user.bio,
+    avatarUrl: user.avatarUrl,
+    lastSeen: user.lastSeen,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  }));
+
+  return NextResponse.json(publicUsers);
 }
 
 export async function POST(request: Request) {
@@ -47,7 +59,11 @@ export async function POST(request: Request) {
         email: user.email,
         username: user.username,
         displayName: user.displayName,
+        bio: user.bio,
         avatarUrl: user.avatarUrl,
+        lastSeen: user.lastSeen,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
       { status: 201 }
     );
