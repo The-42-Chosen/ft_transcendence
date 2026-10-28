@@ -1,18 +1,19 @@
 // use prisma-8
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  username    String   @unique
-  displayName String?
-  bio         String?
-  avatarUrl   String?
-  lastSeen    TimestamptzString?
-  createdAt   TimestamptzString @default(now())
-  updatedAt   temporal.updatedAtString()
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  username      String   @unique
+  displayName   String?
+  bio           String?
+  avatarUrl     String?
+  createdAt     TimestamptzString @default(now())
+  updatedAt     temporal.updatedAtString()
+  lastSeen      TimestamptzString?
+  passwordHash  String?
 
-  friends     Friendship[] @relation("UserFriends")
-  friendOf    Friendship[] @relation("FriendOf")
+  friends       Friendship[] @relation("UserFriends")
+  friendOf      Friendship[] @relation("FriendOf")
 }
 
 model Friendship {
