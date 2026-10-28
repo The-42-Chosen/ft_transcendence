@@ -36,6 +36,14 @@
   --rgb-status-online: 55 214 122;
 }
 
+/* FONTS */
+
+@theme inline {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bebas), Impact, sans-serif;
+  --font-agent: var(--font-special-elite), "Courier New", monospace;
+}
+
 /* GLOBALS */
 
 #main-title{

@@ -8,7 +8,7 @@ export default function Home() {
     <main className="min-h-screen text-center">
       <Header/>
       <div id="main-title">
-        <h1 className="text-4xl font-semibold red">All Tutors are Badass</h1>
+        <h1 className="font-display text-6xl tracking-wide">All Tutors are Badass</h1>
       </div>
 	  <Game/>
       <Image
