@@ -5,6 +5,7 @@ import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 import OnlineStatus from "@/app/components/User/OnlineStatus";
 import { db } from "@/prisma/db";
 import Link from "next/link";
+import { auth } from "@/auth";
 
 export default async function UserPage({
   params,
@@ -21,8 +22,21 @@ export default async function UserPage({
     return <p>User not found</p>;
   }
 
-  // Temporaire tant que l'authentification n'est pas faite
-  const currentUserId = 1;
+  const session = await auth();
+  
+  if (!session?.user?.email) {
+    return <p>You must be logged in</p>;
+  }
+  
+  const currentUser = await db.orm.public.User
+    .where({ email: session.user.email })
+    .first();
+  
+  if (!currentUser) {
+    return <p>User not found</p>;
+  }
+  
+  const currentUserId = currentUser.id;
 
   // Amis du profil affiché
   const friendshipsAsUser = await db.orm.public.Friendship
