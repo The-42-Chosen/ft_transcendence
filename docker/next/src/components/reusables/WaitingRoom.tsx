@@ -7,7 +7,7 @@ import RoleSection from '@/components/reusables/RoleSection';
 import RoomCode from '@/components/reusables/RoomCode';
 import Button from './Button';
 import { cn } from '@/lib/cn';
-import { AI_PLAYER, defaultSpectators, defaultTeams, teamStyles, type AiTeam, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
+import { AI_PLAYER, TEAM_COLORS, defaultSpectators, defaultTeams, teamStyles, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
 
 type Parameters = {
 	role: Role;
@@ -29,15 +29,17 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 	const [seat, setSeat] = useState<Seat | null>(role === "spectator" ? "spectator" : null);
 	const [starting, setStarting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [aiTeam, setAiTeam] = useState<AiTeam>("none");
+	const [aiTeams, setAiTeams] = useState<TeamColor[]>([]);
 	const [choosingAiTeam, setChoosingAiTeam] = useState(false);
 	// TODO: Only the game master sees the AI until the rosters come from the backend
-	const teams = aiTeam === "none" ? humanTeams : {
-		...humanTeams,
-		[aiTeam]: { ...humanTeams[aiTeam], spymasters: [...humanTeams[aiTeam].spymasters, AI_PLAYER] },
-	};
+	const teams = aiTeams.reduce((acc, team) => ({
+		...acc,
+		[team]: { ...acc[team], spymasters: [...acc[team].spymasters, AI_PLAYER] },
+	}), humanTeams);
 	const hasSpymaster = (team: TeamColor) => teams[team].spymasters.length > 0 || seat === `${team}-spymaster`;
 	const canStart = hasSpymaster("red") && hasSpymaster("blue");
+	// Teams the AI can still take the spymaster seat in
+	const aiFreeTeams = TEAM_COLORS.filter((team) => !aiTeams.includes(team));
 	const onJoin = role === "spectator" ? undefined : setSeat;
 	const gameUrl = `/room/${roomCode}/game?seat=${seat ?? "spectator"}`;
 
@@ -57,8 +59,12 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 	}, [role, roomCode, gameUrl, router]);
 
 	function addAi(team: TeamColor) {
-		setAiTeam(team);
+		setAiTeams((current) => TEAM_COLORS.filter((t) => t === team || current.includes(t)));
 		setChoosingAiTeam(false);
+	}
+
+	function removeAi(team: TeamColor) {
+		setAiTeams((current) => current.filter((t) => t !== team));
 	}
 
 	async function startGame() {
@@ -67,7 +73,7 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 		const res = await fetch(`/api/rooms/${roomCode}/start`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ aiTeam }),
+			body: JSON.stringify({ aiTeams }),
 		}).catch(() => null);
 		if (!res?.ok) {
 			setError("Could not start the game, try again");
@@ -97,14 +103,19 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 				<footer className="mt-6 flex flex-col items-center gap-2">
 					{role === "game_master" ? (
 						<>
-							{aiTeam !== "none" ? (
-								<Button variant="secondary" className={aiButtonClass} onClick={() => setAiTeam("none")}>
-									Remove AI {AI_PLAYER}
-								</Button>
-							) : choosingAiTeam ? (
+							{aiTeams.length > 0 && (
+								<div className="flex flex-wrap items-center justify-center gap-2">
+									{aiTeams.map((team) => (
+										<Button key={team} variant="secondary" className={aiButtonClass} onClick={() => removeAi(team)}>
+											Remove AI {AI_PLAYER} from {team}
+										</Button>
+									))}
+								</div>
+							)}
+							{aiFreeTeams.length === 0 ? null : choosingAiTeam ? (
 								<div className="flex items-center gap-2 font-agent text-sm">
 									<span className="text-amber-900">Add AI {AI_PLAYER} to</span>
-									{(["red", "blue"] as TeamColor[]).map((team) => (
+									{aiFreeTeams.map((team) => (
 										<Button key={team} variant="secondary" className={cn("rounded-full border-0 font-display text-lg tracking-widest text-white capitalize", aiTeamButtonClass[team])} disabled={hasSpymaster(team)} onClick={() => addAi(team)}>
 											{team}
 										</Button>

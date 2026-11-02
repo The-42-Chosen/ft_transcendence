@@ -13,8 +13,7 @@ export const MAX_SPYMASTERS = 1;
 
 export type Side = TeamColor | "spectator";
 
-// Team the AI plays in, "none" when it did not take a seat
-export type AiTeam = TeamColor | "none";
+export const TEAM_COLORS: TeamColor[] = ["red", "blue"];
 
 // TODO: Name of the AI player in the rosters, until it gets a real account
 export const AI_PLAYER = "Agent Fmotte";

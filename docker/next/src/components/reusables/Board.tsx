@@ -3,6 +3,7 @@ import ClueBar from '@/components/reusables/ClueBar';
 import ClueForm from '@/components/reusables/ClueForm';
 import BoardTeam from '@/components/reusables/BoardTeam';
 import EndTurnButton from '@/components/reusables/EndTurnButton';
+import RemainingWords from '@/components/reusables/RemainingWords';
 import CardLabel from '@/components/reusables/CardLabel';
 import { cn } from '@/lib/cn';
 import { cardColorClasses } from '@/lib/lobby';
@@ -23,19 +24,21 @@ export default function Board({type, team, words, colors, roomCode}: Parameters)
         <section className="bg-amber-100 rounded-2xl p-6 m-4">
 			<BoardTeam team={team}/>
 			<div className="grid grid-cols-5 gap-4">
-				{words.map((word) => (<Word key={word} text={word.toUpperCase()} roomCode={roomCode}/>))}
+				{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} roomCode={roomCode}/>))}
 			</div>
 			<ClueBar/>
 			<EndTurnButton team={team}/>
+			<RemainingWords/>
 		</section>
       )}
 	  {type === "spectator" && (
 		  <section className="bg-amber-100 rounded-2xl p-6 m-4">
 			<BoardTeam team={team}/>
 			<div className="grid grid-cols-5 gap-4">
-          		{words.map((word) => (<Word key={word} text={word.toUpperCase()} readOnly/>))}
+          		{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} readOnly/>))}
         	</div>
 			<ClueBar/>
+			<RemainingWords/>
 		</section>
 
       )}
@@ -50,6 +53,7 @@ export default function Board({type, team, words, colors, roomCode}: Parameters)
           	))}
         	</div>
 			<ClueForm/>
+			<RemainingWords/>
 		</section>
       )}
     </>

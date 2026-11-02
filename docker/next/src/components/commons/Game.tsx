@@ -10,11 +10,6 @@ export default function Game() {
   return (
     <section className="m-2 text-center">
       <GameSetup/>
-      <ClueProvider>
-        <Board type="agent" team="red" words={words} colors={colors}/>
-        <Board type="spectator" team="spectator" words={words} colors={colors}/>
-        <Board type="spymaster" team="red" words={words} colors={colors}/>
-      </ClueProvider>
     </section>
   );
 }

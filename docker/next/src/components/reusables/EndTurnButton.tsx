@@ -8,20 +8,22 @@ type Parameters = {
 };
 
 export default function EndTurnButton({team}: Parameters) {
-	const { clue, turn, endTurn } = useClue();
+	const { clue, turn, endTurn, revealed } = useClue();
 	const isMyTurn = team === turn;
 
 	return (
 		<div className="mt-4 flex flex-col items-center gap-2">
 			<Button
 				onClick={endTurn}
-				disabled={!isMyTurn || !clue}
+				disabled={!isMyTurn || !clue || revealed !== null}
 				variant="action"
 			>
 				End turn
 			</Button>
 			<p className="font-agent text-xs text-black/50">
-				{!isMyTurn
+				{revealed
+					? "The game is over"
+					: !isMyTurn
 					? `Team ${turn} is playing…`
 					: !clue
 						? "Wait for your spymaster's clue"
