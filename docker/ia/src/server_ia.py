@@ -1,6 +1,5 @@
 import socket
 import json
-import sys
 from pathlib import Path
 
 from codenames_ia import (
@@ -44,10 +43,17 @@ def create_SpyMaster(langue: str) -> MaitreEspion:
 def create_clue(message_dict: str) -> Indice:
 
     maitre = create_SpyMaster(message_dict['langue'])
-    
+
+    if message_dict['current_turn'] == 'blue':
+        equipe = message_dict['list_blue']
+        adverses = message_dict['list_red']
+    else:
+        equipe = message_dict['list_red']
+        adverses = message_dict['list_blue']
+
     plateau25 = Plateau(
-        equipe=message_dict['list_team'],
-        adverses=message_dict['list_adverse'],
+        equipe=equipe,
+        adverses=adverses,
         neutres=message_dict['list_neutral'],
         assassin=message_dict['assassin_word'],
     )

@@ -293,9 +293,6 @@ services:
     build:
       context: ./docker/ia
 
-    ports:
-      - "8001:8001"
-
     networks:
       - transcendence
       
