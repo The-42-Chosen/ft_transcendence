@@ -41,8 +41,8 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
 		[team]: { ...acc[team], spymasters: [...acc[team].spymasters, AI_PLAYER] },
 	}), humanTeams);
 	const hasSpymaster = (team: TeamColor) => teams[team].spymasters.length > 0 || seat === `${team}-spymaster`;
-	const canStart = hasSpymaster("red") && hasSpymaster("blue");
-	// Teams the AI can still take the spymaster seat in
+	const hasOperative = (team: TeamColor) => teams[team].operatives.length > 0 || seat === `${team}-operative`;
+	const canStart = TEAM_COLORS.every((team) => hasSpymaster(team) && hasOperative(team));
 	const aiFreeTeams = TEAM_COLORS.filter((team) => !aiTeams.includes(team));
 	const onJoin = role === "spectator" ? undefined : setSeat;
 	const gameUrl = `/room/${roomCode}/game?seat=${seat ?? "spectator"}`;
@@ -168,7 +168,7 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
 							) : !seat ? (
 								<p className="font-agent text-xs text-black/50">Pick your seat first</p>
 							) : !canStart && (
-								<p className="font-agent text-xs text-black/50">Each team needs a spymaster to start</p>
+								<p className="font-agent text-xs text-black/50">Each team needs a spymaster and an operative to start</p>
 							)}
 						</>
 					) : (

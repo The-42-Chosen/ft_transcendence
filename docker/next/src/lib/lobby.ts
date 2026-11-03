@@ -53,11 +53,11 @@ export const LANGUAGE_FLAGS: Record<string, Language> = {
 export const defaultTeams: Teams = {
 	red: {
 		spymasters: [],
-		operatives: ["Benjamin Suger", "Salome Brochard", "Fmotte", "Guillaume Pollastri", "Eric Pascual", "Tom Bagnara", "Tom Lorette"],
+		operatives: ["Benjamin Suger"],
 	},
 	blue: {
 		spymasters: [],
-		operatives: ["Sashouille", "Coco"],
+		operatives: [],
 	},
 };
 
@@ -97,3 +97,37 @@ export const cardColorClasses: Record<CardColor, string> = {
 	neutral: "bg-amber-200 text-black",
 	assassin: "bg-black text-white",
 };
+
+function shuffle<T>(items: T[]): T[] {
+	const copy = [...items];
+	for (let i = copy.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[copy[i], copy[j]] = [copy[j], copy[i]];
+	}
+	return copy;
+}
+
+export type ShuffledLobby<P> = {
+	teams: Record<TeamColor, { spymasters: P[]; operatives: P[] }>;
+	aiTeams: TeamColor[];
+};
+
+export function shuffleLobby<P>(players: P[], aiCount: number): ShuffledLobby<P> {
+	const pool = shuffle(players);
+	const aiTeams = shuffle(TEAM_COLORS).slice(0, Math.min(aiCount, TEAM_COLORS.length));
+	const teams: ShuffledLobby<P>["teams"] = {
+		red: { spymasters: [], operatives: [] },
+		blue: { spymasters: [], operatives: [] },
+	};
+	for (const team of shuffle(TEAM_COLORS)) {
+		if (!aiTeams.includes(team) && pool.length > 0) {
+			teams[team].spymasters.push(pool.pop()!);
+		}
+	}
+	const size = (team: TeamColor) => teams[team].spymasters.length + teams[team].operatives.length;
+	for (const player of pool) {
+		const [first, second] = shuffle(TEAM_COLORS);
+		teams[size(second) < size(first) ? second : first].operatives.push(player);
+	}
+	return { teams, aiTeams: TEAM_COLORS.filter((team) => aiTeams.includes(team)) };
+}
