@@ -5,6 +5,8 @@ import { mkdir, writeFile } from "fs/promises";
 import { randomUUID } from "crypto";
 import path from "path";
 
+import { auth } from "@/auth";
+
 export const runtime = "nodejs";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
@@ -27,6 +29,33 @@ export async function POST(
       return NextResponse.json(
         { error: "Invalid user id" },
         { status: 400 }
+      );
+    }
+
+    const session = await auth();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    
+    const currentUser = await db.orm.public.User
+      .where({ email: session.user.email })
+      .first();
+    
+    if (!currentUser) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    
+    if (currentUser.id !== userId) {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 }
       );
     }
 

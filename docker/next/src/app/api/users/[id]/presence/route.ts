@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 
+import { auth } from "@/auth";
+
 export async function POST(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -14,6 +16,33 @@ export async function POST(
                 { error: "Invalid user id" },
                 { status: 400 }
             );
+        }
+
+        const session = await auth();
+
+        if (!session?.user?.email) {
+          return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+          );
+        }
+        
+        const currentUser = await db.orm.public.User
+          .where({ email: session.user.email })
+          .first();
+        
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+          );
+        }
+        
+        if (currentUser.id !== userId) {
+          return NextResponse.json(
+            { error: "Forbidden" },
+            { status: 403 }
+          );
         }
 
         const user = await db.orm.public.User
