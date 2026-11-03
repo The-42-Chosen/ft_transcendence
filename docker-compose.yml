@@ -284,8 +284,20 @@ services:
     restart: unless-stopped
 
   # ------------------------------------------------------------------
-  # FIN PROMETHEUS + GRAFANA
+  # AI
   # ------------------------------------------------------------------
+
+  ia:
+    container_name: ia
+
+    build:
+      context: ./docker/ia
+
+    networks:
+      - transcendence
+      
+    restart: unless-stopped
+
 
 networks:
   transcendence:
