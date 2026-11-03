@@ -117,6 +117,7 @@ clean: down
 fclean: storage
 	$(DC) down -v --rmi all --remove-orphans
 	podman image prune -a -f
+	rm -rf docker/next/public/uploads/avatars/*
 
 info: storage
 	@echo "store   : $(STORE)"
