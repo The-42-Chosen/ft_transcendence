@@ -29,10 +29,7 @@ export default function FriendButton({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId: currentUserId,
-          friendId: profileUserId,
-        }),
+        body: JSON.stringify({ friendId: profileUserId, })
       });
 
       if (!response.ok) {
