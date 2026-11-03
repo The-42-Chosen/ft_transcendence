@@ -4,10 +4,10 @@ import FriendButton from "@/app/components/User/FriendButton";
 import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 import OnlineStatus from "@/app/components/User/OnlineStatus";
 import LogOutButton from "@/app/components/User/LogOutButton";
+import UserSearch from "@/app/components/User/UserSearch";
 import { db } from "@/prisma/db";
 import Link from "next/link";
 import { auth } from "@/auth";
-
 
 export default async function UserPage({
   params,
@@ -25,22 +25,22 @@ export default async function UserPage({
   }
 
   const session = await auth();
-  
+
   if (!session?.user?.email) {
     return <p>You must be logged in</p>;
   }
-  
+
   const currentUser = await db.orm.public.User
     .where({ email: session.user.email })
     .first();
-  
+
   if (!currentUser) {
     return <p>User not found</p>;
   }
-  
+
   const currentUserId = currentUser.id;
 
-  // Amis du profil affiché
+  // Friends of the displayed profile
   const friendshipsAsUser = await db.orm.public.Friendship
     .where({ userId: user.id })
     .all();
@@ -66,7 +66,6 @@ export default async function UserPage({
     )
   );
 
-  // Amis de l'utilisateur connecté
   const currentUserFriendshipsAsUser =
     await db.orm.public.Friendship
       .where({ userId: currentUserId })
@@ -91,9 +90,12 @@ export default async function UserPage({
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-8">
+      <UserSearch />
+
       {currentUserId === user.id && (
         <PresenceHeartbeat userId={currentUserId} />
       )}
+
       <Profile
         username={user.username}
         displayName={user.displayName}
@@ -109,12 +111,11 @@ export default async function UserPage({
           >
             Edit profile
           </Link>
-      
+
           <LogOutButton />
         </div>
       ) : (
         <FriendButton
-          currentUserId={currentUserId}
           profileUserId={user.id}
           isFriend={isFriend}
         />
