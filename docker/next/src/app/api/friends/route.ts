@@ -32,7 +32,6 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-
     const parsed = friendshipSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -127,7 +126,6 @@ export async function DELETE(request: Request) {
     }
 
     const body = await request.json();
-
     const parsed = friendshipSchema.safeParse(body);
 
     if (!parsed.success) {
