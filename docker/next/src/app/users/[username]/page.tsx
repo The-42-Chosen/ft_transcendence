@@ -3,9 +3,11 @@ import Avatar from "@/app/components/User/Avatar";
 import FriendButton from "@/app/components/User/FriendButton";
 import PresenceHeartbeat from "@/app/components/User/PresenceHeartbeat";
 import OnlineStatus from "@/app/components/User/OnlineStatus";
+import LogOutButton from "@/app/components/User/LogOutButton";
 import { db } from "@/prisma/db";
 import Link from "next/link";
 import { auth } from "@/auth";
+
 
 export default async function UserPage({
   params,
@@ -100,12 +102,16 @@ export default async function UserPage({
       />
 
       {currentUserId === user.id ? (
-        <Link
-          href={`/users/${user.username}/edit`}
-          className="rounded border px-4 py-2"
-        >
-          Edit profile
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href={`/users/${user.username}/edit`}
+            className="rounded border px-4 py-2"
+          >
+            Edit profile
+          </Link>
+      
+          <LogOutButton />
+        </div>
       ) : (
         <FriendButton
           currentUserId={currentUserId}
