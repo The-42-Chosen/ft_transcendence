@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { CardColor } from "@/lib/words";
 
 export type Clue = {
@@ -10,7 +10,6 @@ export type Clue = {
 
 export type TeamTurn = "red" | "blue";
 
-// Words each team still has to find
 export type Remaining = Record<TeamTurn, number>;
 
 type ClueContextValue = {
@@ -34,6 +33,8 @@ type ClueProviderProps = {
   initialRevealed?: CardColor[] | null;
 };
 
+const POLL_INTERVAL = 2000;
+
 const ClueContext = createContext<ClueContextValue | null>(null);
 
 // Shares the current clue and the team whose turn it is between the boards
@@ -43,13 +44,35 @@ export function ClueProvider({ children, roomCode, initialTurn = "red", initialR
   const [remaining, setRemaining] = useState<Remaining>(initialRemaining);
   const [revealed, setRevealed] = useState<CardColor[] | null>(initialRevealed);
 
-  // Applies the turn sent by the server, a new team needs a new clue
   function syncTurn(next: TeamTurn) {
     if (next !== turn) {
       setTurn(next);
       setClue(null);
     }
   }
+
+  // TODO: Replace polling with a websocket once the backend is ready
+  useEffect(() => {
+    if (!roomCode || revealed) {
+      return;
+    }
+    const id = setInterval(async () => {
+      const res = await fetch(`/api/rooms/${roomCode}/state`, { cache: "no-store" }).catch(() => null);
+      const state = res?.ok ? await res.json() : null;
+      if (!state) {
+        return;
+      }
+      setRemaining({ red: state.len_red, blue: state.len_blue });
+      if (state.turn !== turn) {
+        setTurn(state.turn);
+        setClue(null);
+      }
+      if (state.colors) {
+        setRevealed(state.colors);
+      }
+    }, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [roomCode, revealed, turn]);
 
   // Hands over to the other team, the next spymaster has to give a new clue
   async function endTurn() {
