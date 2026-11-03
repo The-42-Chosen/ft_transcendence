@@ -7,7 +7,7 @@ import RoleSection from '@/components/reusables/RoleSection';
 import RoomCode from '@/components/reusables/RoomCode';
 import Button from './Button';
 import { cn } from '@/lib/cn';
-import { AI_PLAYER, TEAM_COLORS, defaultSpectators, defaultTeams, teamStyles, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
+import { AI_PLAYER, TEAM_COLORS, defaultSpectators, defaultTeams, shuffleLobby, teamStyles, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
 
 type Parameters = {
 	role: Role;
@@ -24,8 +24,12 @@ const aiTeamButtonClass: Record<TeamColor, string> = {
 	blue: "bg-(--color-brand-blue) hover:bg-(--color-brand-blue-dark) active:bg-(--color-brand-blue-dark)",
 };
 
-export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spectators = defaultSpectators, roomCode}: Parameters) {
+const YOU = Symbol("you");
+
+export default function WaitingRoom({role, teams: initialTeams = defaultTeams, spectators = defaultSpectators, roomCode}: Parameters) {
 	const router = useRouter();
+	// TODO: Shuffled rosters stay local until they come from the backend
+	const [humanTeams, setHumanTeams] = useState<Teams>(initialTeams);
 	const [seat, setSeat] = useState<Seat | null>(role === "spectator" ? "spectator" : null);
 	const [starting, setStarting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -67,6 +71,32 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 		setAiTeams((current) => current.filter((t) => t !== team));
 	}
 
+	function shuffleSeats() {
+		const players: (string | typeof YOU)[] = TEAM_COLORS.flatMap((team) => [...humanTeams[team].spymasters, ...humanTeams[team].operatives]);
+		const seated = seat !== "spectator";
+		if (seated) {
+			players.push(YOU);
+		}
+		const shuffled = shuffleLobby(players, aiTeams.length);
+		let nextSeat: Seat | null = seated ? null : "spectator";
+		const names = (list: (string | typeof YOU)[]) => list.filter((p): p is string => p !== YOU);
+		const nextTeams = {} as Teams;
+		for (const team of TEAM_COLORS) {
+			const { spymasters, operatives } = shuffled.teams[team];
+			if (spymasters.includes(YOU)) {
+				nextSeat = `${team}-spymaster`;
+			}
+			if (operatives.includes(YOU)) {
+				nextSeat = `${team}-operative`;
+			}
+			nextTeams[team] = { spymasters: names(spymasters), operatives: names(operatives) };
+		}
+		setHumanTeams(nextTeams);
+		setAiTeams(shuffled.aiTeams);
+		setSeat(nextSeat);
+		setChoosingAiTeam(false);
+	}
+
 	async function startGame() {
 		setStarting(true);
 		setError(null);
@@ -103,6 +133,9 @@ export default function WaitingRoom({role, teams: humanTeams = defaultTeams, spe
 				<footer className="mt-6 flex flex-col items-center gap-2">
 					{role === "game_master" ? (
 						<>
+							<Button variant="secondary" className={aiButtonClass} onClick={shuffleSeats}>
+								Shuffle teams
+							</Button>
 							{aiTeams.length > 0 && (
 								<div className="flex flex-wrap items-center justify-center gap-2">
 									{aiTeams.map((team) => (
