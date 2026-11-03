@@ -1,6 +1,7 @@
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
+import { db } from "@/prisma/db";
 
 export default async function LoginPage({
   searchParams,
@@ -15,7 +16,22 @@ export default async function LoginPage({
         action={async (formData) => {
           "use server";
 
-          formData.set("redirectTo", "/");
+          const email = formData.get("email");
+
+          if (typeof email !== "string") {
+            redirect("/login?error=Default");
+          }
+
+          const user = await db.orm.public.User
+            .where({ email })
+            .first();
+
+          if (user) {
+            formData.set(
+              "redirectTo",
+              `/users/${user.username}`
+            );
+          }
 
           try {
             await signIn("credentials", formData);
