@@ -38,7 +38,7 @@ export default function GameOverSetup() {
           <button
             type="button"
             onClick={() => ref.current?.close()}
-            className="font-agent text-sm text-white/80 bg-transparent hover:bg-transparent hover:text-white transition-colors"
+            className="mx-auto mt-3 block font-agent text-sm text-white/80 bg-transparent hover:bg-transparent hover:text-white transition-colors"
           >
             Back to the board
           </button>

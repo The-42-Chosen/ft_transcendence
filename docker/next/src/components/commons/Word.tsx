@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import CardLabel from "@/components/reusables/CardLabel";
 import { useClue, type TeamTurn } from "@/components/reusables/ClueContext";
 import Modal from "@/components/reusables/Modal";
+import WinnerBadge from "@/components/reusables/WinnerBadge";
 import { cardColorClasses } from "@/lib/lobby";
 import type { CardColor } from "@/lib/words";
 
@@ -12,7 +13,6 @@ type WordProps = {
   text: string;
   readOnly?: boolean;
   roomCode?: string;
-  // Position on the board, to find its color once the game is over
   index: number;
 };
 
@@ -50,8 +50,7 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
   const [selected, setSelected] = useState(false);
   const [color, setColor] = useState<CardColor | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [allWordsRevealed, setAllWordsRevealed] = useState(false);
-  const { syncTurn, setRemaining, revealed, setRevealed } = useClue();
+  const { syncTurn, setRemaining, revealed, setRevealed, winner } = useClue();
 
   const shownColor = color ?? revealed?.[index] ?? null;
   const locked = readOnly || shownColor !== null;
@@ -97,7 +96,9 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
           content={`The word ${text} has been discovered`}
           bContent="Close"
           onClose={() => setGameOver(false)}
-        />
+        >
+          {winner && <WinnerBadge winner={winner}/>}
+        </Modal>
       )}
     </article>
   );

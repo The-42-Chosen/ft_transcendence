@@ -20,9 +20,9 @@ type ClueContextValue = {
   syncTurn: (turn: TeamTurn) => void;
   remaining: Remaining;
   setRemaining: (remaining: Remaining) => void;
-  // Colors of the whole board, only known once the game is over
   revealed: CardColor[] | null;
   setRevealed: (colors: CardColor[]) => void;
+  winner: TeamTurn | null;
 };
 
 type ClueProviderProps = {
@@ -37,7 +37,6 @@ const POLL_INTERVAL = 2000;
 
 const ClueContext = createContext<ClueContextValue | null>(null);
 
-// Shares the current clue and the team whose turn it is between the boards
 export function ClueProvider({ children, roomCode, initialTurn = "red", initialRemaining = { red: 0, blue: 0 }, initialRevealed = null }: ClueProviderProps) {
   const [clue, setClue] = useState<Clue | null>(null);
   const [turn, setTurn] = useState<TeamTurn>(initialTurn);
@@ -87,8 +86,13 @@ export function ClueProvider({ children, roomCode, initialTurn = "red", initialR
     }
   }
 
+  const winner: TeamTurn | null = !revealed ? null
+    : remaining.red === 0 ? "red"
+    : remaining.blue === 0 ? "blue"
+    : turn;
+
   return (
-    <ClueContext value={{ clue, setClue, turn, endTurn, syncTurn, remaining, setRemaining, revealed, setRevealed }}>
+    <ClueContext value={{ clue, setClue, turn, endTurn, syncTurn, remaining, setRemaining, revealed, setRevealed, winner }}>
       {children}
     </ClueContext>
   );
