@@ -102,3 +102,9 @@ export function revealWord(room: Room, word: string): CardColor | null {
 	saveAiBoard(room);
 	return room.colors[i];
 }
+
+export function gameState(room: Room) {
+	const { len_red, len_blue } = aiBoard(room);
+	const over = isGameOver(room);
+	return { turn: room.turn, len_red, len_blue, gameOver: over, colors: over ? room.colors : undefined };
+}
