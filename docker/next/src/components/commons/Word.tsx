@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 import CardLabel from "@/components/reusables/CardLabel";
 import { useClue, type TeamTurn } from "@/components/reusables/ClueContext";
@@ -53,10 +53,6 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
   const [allWordsRevealed, setAllWordsRevealed] = useState(false);
   const { syncTurn, setRemaining, revealed, setRevealed } = useClue();
 
-  useEffect(() => {
-    console.log("GameOver:", gameOver);
-  }, [gameOver]);
-
   const shownColor = color ?? revealed?.[index] ?? null;
   const locked = readOnly || shownColor !== null;
   return (
@@ -65,7 +61,8 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
       className={cn(
         "@container relative flex h-24 items-center justify-center overflow-hidden rounded-2xl bg-green-500 px-3 transition",
         locked ? "cursor-default select-none" : "word cursor-pointer",
-        shownColor ? cardColorClasses[shownColor] : selected && "ring-4 ring-amber-400 ring-inset"
+        shownColor ? cardColorClasses[shownColor] : selected && "ring-4 ring-amber-400 ring-inset",
+        color && "animate-flip-horizontal motion-reduce:animate-none"
       )}
     >
       {selected && !shownColor && roomCode && (

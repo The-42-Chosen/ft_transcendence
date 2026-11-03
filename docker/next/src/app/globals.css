@@ -44,6 +44,21 @@
   --font-agent: var(--font-special-elite), "Courier New", monospace;
 }
 
+/* ANIMATIONS */
+
+@theme {
+  --animate-flip-horizontal: flip-horizontal 0.6s ease-out both;
+
+  @keyframes flip-horizontal {
+    from {
+      transform: perspective(600px) rotateY(-180deg);
+    }
+    to {
+      transform: perspective(600px) rotateY(0deg);
+    }
+  }
+}
+
 /* GLOBALS */
 
 #main-title{

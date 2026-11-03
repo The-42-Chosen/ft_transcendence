@@ -8,14 +8,14 @@ export default function Home() {
     <main className="min-h-screen text-center">
       <Header/>
       <div id="main-title">
-        <h1 className="font-display text-6xl tracking-wide">All Tutors are Badass</h1>
+        <h1 className="font-display text-6xl tracking-wide">The Forker Uncles: Happy Ending</h1>
       </div>
 	  <Game/>
       <Image
           src="/assets/images/atab.jpg"
           width={500}
           height={500}
-          className="h-auto w-auto"
+          className="m-auto h-auto w-auto"
           alt="The dear Atab Tutors"
           loading="eager"
       />
