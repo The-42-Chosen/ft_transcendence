@@ -8,6 +8,6 @@ COPY --chmod=100 src .
 
 EXPOSE 8001
 
-RUN python3 telecharger_vecteurs.py
+RUN python3 telecharger_vecteurs.py && rm vecteurs/*.vec
 
 ENTRYPOINT ["python3", "-u", "server_ia.py"]
