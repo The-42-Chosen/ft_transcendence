@@ -9,11 +9,12 @@ Modules :
     agent          le rôle inverse : deviner à partir d'un indice
 """
 from .embeddings import Embeddings, sans_accents
-from .vocabulaire import construire_candidats, charger_dictionnaire, masque_interdits, masque_famille, mot_interdit
+from .vocabulaire import construire_candidats, charger_dictionnaire, masque_interdits, masque_famille, mot_interdit, MOTS_OUTILS_EN, MOTS_OUTILS_ES, MOTS_OUTILS_FR
 from .maitre_espion import Plateau, Reglages, Indice, MaitreEspion, scorer, choisir_indices
 
 __all__ = [
     "Embeddings", "sans_accents",
     "construire_candidats", "charger_dictionnaire", "masque_interdits", "masque_famille", "mot_interdit",
-    "Plateau", "Reglages", "Indice", "MaitreEspion", "scorer", "choisir_indices"
+    "Plateau", "Reglages", "Indice", "MaitreEspion", "scorer", "choisir_indices",
+    MOTS_OUTILS_EN, MOTS_OUTILS_ES, MOTS_OUTILS_FR
 ]
