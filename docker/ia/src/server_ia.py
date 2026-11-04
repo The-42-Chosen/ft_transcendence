@@ -4,17 +4,26 @@ from pathlib import Path
 
 from codenames_ia import (
     Embeddings, MaitreEspion, Plateau, Reglages, Indice,
-    construire_candidats, charger_dictionnaire
+    construire_candidats, charger_dictionnaire,
+    MOTS_OUTILS_EN, MOTS_OUTILS_ES, MOTS_OUTILS_FR
 )
 
 
 def create_candidat(langue: str) ->tuple[list[str], Embeddings]:
 
-    dictionnaire_fr = Path(f"dictionnaires/{langue}.dic")
+    dictionnaire = Path(f"dictionnaires/{langue}.dic")
     chemin = Path(f"vecteurs/cc.{langue}.300.top100000.npz")
     emb = Embeddings.charger(chemin)
-    dictionnaire = charger_dictionnaire(dictionnaire_fr)
-    candidats = construire_candidats(emb, nb_max=30_000, dictionnaire=dictionnaire)
+    dictionnaire = charger_dictionnaire(dictionnaire)
+
+    if langue == 'en':
+        mots_outils = MOTS_OUTILS_EN
+    elif langue == 'es':
+        mots_outils = MOTS_OUTILS_ES
+    else:
+        mots_outils = MOTS_OUTILS_FR
+
+    candidats = construire_candidats(emb, nb_max=30_000, dictionnaire=dictionnaire, mots_outils=mots_outils)
 
     return candidats, emb
 
@@ -40,9 +49,7 @@ def create_SpyMaster(langue: str) -> MaitreEspion:
     return maitre
 
 
-def create_clue(message_dict: str) -> Indice:
-
-    maitre = create_SpyMaster(message_dict['langue'])
+def create_clue(message_dict: str, maitre: MaitreEspion) -> Indice:
 
     if message_dict['current_turn'] == 'blue':
         equipe = message_dict['list_blue']
@@ -63,6 +70,38 @@ def create_clue(message_dict: str) -> Indice:
     return indices
 
 
+def get_message(communication_socket):
+
+    communication_socket.settimeout(5)
+
+    try:
+        chunks = []
+
+        while True:
+            chunk = communication_socket.recv(1024)
+
+            if not chunk:
+                break
+
+            chunks.append(chunk)
+
+            # Fin du message détectée
+            if b"\n" in chunk:
+                break
+
+        message = b"".join(chunks).decode("utf-8").strip()
+
+        if not message:
+            raise ValueError("Message vide")
+
+        data = json.loads(message)
+
+    except:
+        data = None
+
+    return data
+        
+
 def main():
 
     host = "0.0.0.0"
@@ -72,13 +111,27 @@ def main():
     serveur.bind((host, port))
     serveur.listen(5)
 
+    list_SpyMaster = [
+        create_SpyMaster('en'),
+        create_SpyMaster('es'),
+        create_SpyMaster('fr')
+    ]
+
     while True:
 
         communication_socket, _  = serveur.accept()
-        message = communication_socket.recv(1024).decode("utf-8")
-        
-        indice = create_clue(json.loads(message))
-        
+        data = get_message(communication_socket)
+    
+        if data == None:
+            continue
+
+        if data['langue'] == 'en':
+            indice = create_clue(data, list_SpyMaster[0])
+        elif data['langue'] == 'es':
+            indice = create_clue(data, list_SpyMaster[1])
+        else:
+            indice = create_clue(data, list_SpyMaster[2])
+
         response = {
             'clue': indice.mot,
             'number': indice.nombre

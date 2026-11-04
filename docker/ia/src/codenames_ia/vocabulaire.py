@@ -47,6 +47,65 @@ this that these those who whom whose which what where when why how
 not no yes if then than too very just also only even still already again
 here there now then always never often sometimes
 up down out off over under again further once all any both each few more most other some such
+""".split())
+
+MOTS_OUTILS_ES = frozenset("""
+el la los las un una unos unas
+de del al a en con sin por para
+sobre entre desde hasta hacia contra
+durante mediante según tras bajo ante
+y e o u ni pero sino aunque
+porque pues como que si cuando mientras
+donde adonde quien quienes cual cuales
+cuyo cuya cuyos cuyas
+qué quién quiénes cuál cuáles
+cómo cuándo dónde adónde cuánto cuánta cuántos cuántas
+este esta estos estas esto
+ese esa esos esas eso
+aquel aquella aquellos aquellas aquello
+mi mis tu tus su sus nuestro nuestra nuestros nuestras
+vuestro vuestra vuestros vuestras
+yo tú él ella ello nosotros nosotras
+vosotros vosotras ellos ellas usted ustedes
+me te se nos os lo le les
+mí ti sí conmigo contigo consigo
+es soy eres somos sois son
+era eras éramos erais eran
+ser sido siendo
+estoy estás está estamos estáis están
+estaba estabas estábamos estaban
+estar estado estando
+he has ha hemos habéis han
+había habías habíamos habían
+haber habiendo
+hago haces hace hacemos hacéis hacen
+hay había hubo habrá habría
+puedo puedes puede podemos podéis pueden
+quiero quieres quiere queremos quieren
+debo debes debe debemos deben
+tengo tienes tiene tenemos tenéis tienen
+voy vas va vamos vais van
+fui fuiste fue fuimos fueron
+será serán sería serían
+puede podría podrían
+muy más menos mucho poco bastante demasiado
+también tampoco además incluso solamente solo
+ya todavía aún siempre nunca jamás
+aquí ahí allí allá acá
+ahora antes después luego entonces
+hoy ayer mañana pronto tarde temprano
+casi apenas quizás quizá tal vez
+sí no tampoco
+todo toda todos todas cada
+otro otra otros otras mismo misma
+mismos mismas cualquier cualquiera
+alguien nadie algo nada
+uno dos ambos ambas varios varias
+cada cierto cierta ciertos ciertas
+tan tanto tanta tantos tantas
+así bien mal mejor peor
+dentro fuera encima debajo alrededor
+cerca lejos junto aparte
 etc
 """.split())
 
