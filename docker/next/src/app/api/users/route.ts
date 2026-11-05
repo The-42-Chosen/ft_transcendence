@@ -45,6 +45,28 @@ export async function POST(request: Request) {
 
     const { email, username, password } = parsed.data;
 
+    const existingEmail = await db.orm.public.User
+      .where({ email })
+      .first();
+
+    if (existingEmail) {
+      return NextResponse.json(
+        { error: "Email already exists" },
+        { status: 409 }
+      );
+    }
+
+    const existingUsername = await db.orm.public.User
+      .where({ username })
+      .first();
+
+    if (existingUsername) {
+      return NextResponse.json(
+        { error: "Username already exists" },
+        { status: 409 }
+      );
+    }
+
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await db.orm.public.User.create({
