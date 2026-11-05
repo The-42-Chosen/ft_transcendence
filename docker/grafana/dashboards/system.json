@@ -34,10 +34,101 @@
       }
     },
     {
+      "id": 8,
+      "type": "stat",
+      "title": "Alertes",
+      "description": "Nombre d'alertes Prometheus (metrique ALERTS). 0 = tout va bien.",
+      "gridPos": { "h": 7, "w": 4, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "count(ALERTS{alertstate=\"firing\"}) or vector(0)", "legendFormat": "Declenchees", "instant": true, "refId": "A" },
+        { "expr": "count(ALERTS{alertstate=\"pending\"}) or vector(0)", "legendFormat": "En attente", "instant": true, "refId": "B" }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "En attente" },
+            "properties": [
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 } ] } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Alertes en cours",
+      "description": "Alertes en attente (condition vraie, duree 'for' pas encore ecoulee) ou declenchees. Vide = aucune alerte.",
+      "gridPos": { "h": 7, "w": 10, "x": 4, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "ALERTS", "instant": true, "format": "table", "refId": "A" }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true, "Value": true, "__name__": true },
+            "indexByName": { "alertstate": 0, "alertname": 1, "severity": 2 },
+            "renameByName": { "alertstate": "Etat", "alertname": "Alerte", "severity": "Severite" }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Etat" },
+            "properties": [
+              { "id": "mappings", "value": [ { "type": "value", "options": { "firing": { "text": "Declenchee", "color": "red" }, "pending": { "text": "En attente", "color": "orange" } } } ] },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "type": "state-timeline",
+      "title": "Historique des alertes (24 h)",
+      "description": "Une ligne par alerte : orange = en attente, rouge = declenchee. Vide = aucune alerte sur la periode.",
+      "gridPos": { "h": 7, "w": 10, "x": 14, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "timeFrom": "24h",
+      "targets": [
+        { "expr": "max by (alertname, job, probe, mountpoint) (max_over_time(ALERTS{alertstate=\"firing\"}[$__interval]) * 2 or max_over_time(ALERTS{alertstate=\"pending\"}[$__interval]))", "legendFormat": "{{alertname}} {{job}} {{probe}} {{mountpoint}}", "refId": "A" }
+      ],
+      "options": {
+        "showValue": "never",
+        "mergeValues": true,
+        "rowHeight": 0.8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "En attente", "color": "orange" }, "2": { "text": "Declenchee", "color": "red" } } }
+          ],
+          "custom": { "fillOpacity": 80 }
+        },
+        "overrides": []
+      }
+    },
+    {
       "id": 2,
       "type": "timeseries",
       "title": "CPU machine (%)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)", "legendFormat": "cpu", "refId": "A" }
@@ -51,7 +142,7 @@
       "id": 3,
       "type": "timeseries",
       "title": "RAM machine (%)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100", "legendFormat": "ram", "refId": "A" }
@@ -65,7 +156,7 @@
       "id": 4,
       "type": "timeseries",
       "title": "Disque utilise (%)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "(1 - node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay\"}) * 100", "legendFormat": "{{mountpoint}}", "refId": "A" }
@@ -79,7 +170,7 @@
       "id": 5,
       "type": "timeseries",
       "title": "Reseau machine (octets/s)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "sum(rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))", "legendFormat": "reception", "refId": "A" },
@@ -94,7 +185,7 @@
       "id": 6,
       "type": "timeseries",
       "title": "Nginx : requetes/s",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "rate(nginx_http_requests_total[5m])", "legendFormat": "req/s", "refId": "A" }
@@ -108,7 +199,7 @@
       "id": 7,
       "type": "timeseries",
       "title": "Nginx : connexions actives",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         { "expr": "nginx_connections_active", "legendFormat": "actives", "refId": "A" }

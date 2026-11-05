@@ -46,7 +46,10 @@ scrape_configs:
     static_configs:
       - targets: ["elasticsearch-exporter:9114"]
 
-  # Next, Logstash et Kibana via black-box exporter
+  # Next, Logstash, Kibana et l'IA via black-box exporter.
+  # Module par defaut : http_2xx. L'IA n'est pas un serveur HTTP (socket TCP
+  # brut), sa cible surcharge donc le module avec __param_module: tcp_connect
+  # (la sonde verifie seulement que le port accepte une connexion).
   - job_name: "probes"
     metrics_path: /probe
     params:
@@ -61,6 +64,10 @@ scrape_configs:
       - targets: ["http://kibana:5601/kibana/login"]
         labels:
           probe: kibana
+      - targets: ["ia:8001"]
+        labels:
+          probe: ia
+          __param_module: tcp_connect
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

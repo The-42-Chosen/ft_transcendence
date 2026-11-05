@@ -41,7 +41,7 @@ groups:
           summary: "RAM de la machine > 90% depuis 5 minutes"
 
       - alert: DiskAlmostFull
-        expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 > 85
+        expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay", mountpoint!="/boot"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay", mountpoint!="/boot"}) * 100 > 85
         for: 10m
         labels:
           severity: warning
