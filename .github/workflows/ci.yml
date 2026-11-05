@@ -172,10 +172,10 @@ jobs:
             "kibana derriere nginx (https + sous-chemin + login kibana_user)=curl -fsk -o /dev/null \
                -u \"kibana_user:$KIBANA_USER_PASSWORD\" https://localhost:8443/kibana/api/status" \
             "cibles prometheus elasticsearch + sondes logstash/kibana up=docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
-               | jq -e '[.data.activeTargets[] | select(.labels.job == \"elasticsearch\" or (.labels.job == \"probes\" and .labels.probe != \"next\"))] \
+               | jq -e '[.data.activeTargets[] | select(.labels.job == \"elasticsearch\" or (.labels.job == \"probes\" and (.labels.probe == \"logstash\" or .labels.probe == \"kibana\")))] \
                         | length == 3 and all(.health == \"up\")'" \
             "sondes blackbox logstash et kibana vertes=docker exec prometheus wget -qO- 'localhost:9090/api/v1/query?query=probe_success' \
-               | jq -e '[.data.result[] | select(.metric.probe != \"next\")] | length == 2 and all(.value[1] == \"1\")'"
+               | jq -e '[.data.result[] | select(.metric.probe == \"logstash\" or .metric.probe == \"kibana\")] | length == 2 and all(.value[1] == \"1\")'"
 
       - name: Logs en cas d'echec
         if: failure()
