@@ -116,6 +116,10 @@ tests:
         values: '1000x80'
       - series: 'node_filesystem_avail_bytes{job="node", instance="node-exporter:9100", device="tmpfs", fstype="tmpfs", mountpoint="/run"}'
         values: '0x80'
+      - series: 'node_filesystem_size_bytes{job="node", instance="node-exporter:9100", device="/dev/sda2", fstype="ext4", mountpoint="/boot"}'
+        values: '1000x80'
+      - series: 'node_filesystem_avail_bytes{job="node", instance="node-exporter:9100", device="/dev/sda2", fstype="ext4", mountpoint="/boot"}'
+        values: '120x80'
     alert_rule_test:
       - eval_time: 5m
         alertname: DiskAlmostFull
