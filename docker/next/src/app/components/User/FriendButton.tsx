@@ -4,13 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type FriendButtonProps = {
-  currentUserId: number;
   profileUserId: number;
   isFriend: boolean;
 };
 
 export default function FriendButton({
-  currentUserId,
   profileUserId,
   isFriend,
 }: FriendButtonProps) {

@@ -3,53 +3,68 @@
 import { useEffect, useState } from "react";
 
 type OnlineStatusProps = {
-  lastSeen: string | null;
+  userId: number;
 };
 
 export default function OnlineStatus({
-  lastSeen,
+  userId,
 }: OnlineStatusProps) {
-  const [isOnline, setIsOnline] = useState(false);
+  const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    function updateStatus() {
-      if (!lastSeen) {
-        setIsOnline(false);
-        return;
+    async function checkStatus() {
+      try {
+        const response = await fetch(
+          `/api/users/${userId}/presence`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          setOnline(false);
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!data.lastSeen) {
+          setOnline(false);
+          return;
+        }
+
+        const lastSeenTime = new Date(
+          data.lastSeen
+        ).getTime();
+
+        const difference =
+          Date.now() - lastSeenTime;
+
+        setOnline(difference < 60_000);
+      } catch {
+        setOnline(false);
       }
-
-      const lastSeenTime = new Date(lastSeen).getTime();
-
-      setIsOnline(
-        Date.now() - lastSeenTime < 60_000
-      );
     }
 
-    updateStatus();
+    checkStatus();
 
     const interval = setInterval(
-      updateStatus,
-      5000
+      checkStatus,
+      5_000
     );
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [lastSeen]);
+    return () => clearInterval(interval);
+  }, [userId]);
 
   return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`h-2 w-2 rounded-full ${
-          isOnline
-            ? "bg-green-500"
-            : "bg-gray-400"
-        }`}
-      />
-
-      <span className="text-sm">
-        {isOnline ? "Online" : "Offline"}
-      </span>
-    </div>
+    <span
+      className={
+        online
+          ? "text-green-500"
+          : "text-gray-500"
+      }
+    >
+      {online ? "Online" : "Offline"}
+    </span>
   );
 }
