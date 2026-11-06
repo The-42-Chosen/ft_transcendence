@@ -96,6 +96,7 @@ export async function PATCH(
         { status: 401 }
       );
     }
+
     if (currentUser.id !== userId) {
       return NextResponse.json(
         { error: "Forbidden" },
@@ -139,8 +140,14 @@ export async function PATCH(
       .where({ id: userId })
       .update(parsed.data);
 
-    return NextResponse.json(toPublicUser(updatedUser));
+    if (!updatedUser) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
 
+    return NextResponse.json(toPublicUser(updatedUser));
   } catch (error) {
     console.error(error);
 

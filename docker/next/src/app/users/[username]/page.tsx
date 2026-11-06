@@ -92,9 +92,7 @@ export default async function UserPage({
     <main className="min-h-screen flex flex-col items-center justify-center gap-8">
       <UserSearch />
 
-      {currentUserId === user.id && (
-        <PresenceHeartbeat userId={currentUserId} />
-      )}
+      <PresenceHeartbeat userId={currentUserId} />
 
       <Profile
         username={user.username}
@@ -155,7 +153,7 @@ export default async function UserPage({
                     </p>
 
                     <OnlineStatus
-                      lastSeen={friend!.lastSeen}
+                      userId={friend!.id}
                     />
                   </div>
                 </Link>

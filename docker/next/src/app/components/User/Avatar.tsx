@@ -15,25 +15,15 @@ const colors = [
   "bg-orange-500",
 ];
 
-function getInitials(username: string) {
-  return username.slice(0, 2).toUpperCase();
-}
-
 function getAvatarColor(username: string) {
-  let hash = 0;
+  let sum = 0;
 
-  for (let i = 0; i < username.length; i++) {
-    hash += username.charCodeAt(i);
+  for (const char of username) {
+    sum += char.charCodeAt(0);
   }
 
-  return colors[hash % colors.length];
+  return colors[sum % colors.length];
 }
-
-type AvatarProps = {
-  username: string;
-  avatarUrl: string | null;
-  size?: number;
-};
 
 export default function Avatar({
   username,
@@ -56,12 +46,15 @@ export default function Avatar({
     );
   }
 
+  const avatarColor = getAvatarColor(username);
+
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-full bg-gray-300 font-semibold"
+      className={`flex shrink-0 items-center justify-center rounded-full font-semibold text-white ${avatarColor}`}
       style={{
         width: size,
         height: size,
+        fontSize: size * 0.35,
       }}
     >
       {username.slice(0, 2).toUpperCase()}
