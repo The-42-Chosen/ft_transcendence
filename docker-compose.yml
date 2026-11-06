@@ -49,6 +49,8 @@ services:
     build:
       context: ./docker/next
     container_name: next
+    env_file:
+      - ./docker/next/.env
     environment:
       NODE_ENV: production
     healthcheck:
