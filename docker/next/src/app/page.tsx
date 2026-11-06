@@ -7,16 +7,22 @@ import Game from '@/components/commons/Game';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export default function Home() {
+  const { t } = useLanguage();
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center text-center">
+    <main className="min-h-screen text-center">
+      <Header/>
       <div id="main-title">
-        <h1 className="text-4xl font-semibold red">All Tutors are Badass</h1>
+        <h1 className="font-display text-6xl tracking-wide">{t.home.title}</h1>
       </div>
+      <Game/>
       <Image
           src="/assets/images/atab.jpg"
           width={500}
           height={500}
-          alt="The dear Atab Tutors"
+          className="m-auto h-auto w-auto"
+          alt={t.home.imageAlt}
+          loading="eager"
       />
       <Footer/>
     </main>
