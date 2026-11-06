@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/cn";
 import type { TeamTurn } from "@/components/reusables/ClueContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type WinnerBadgeProps = {
   winner: TeamTurn;
@@ -11,16 +14,20 @@ const winnerStyles: Record<TeamTurn, string> = {
 };
 
 export default function WinnerBadge({ winner }: WinnerBadgeProps) {
+  const { t } = useLanguage();
+  const g = t.game;
+  const wr = t.waitingRoom;
+
   return (
     <div className="my-6 flex flex-col items-center gap-2">
-      <p className="font-agent text-sm uppercase tracking-[0.3em] text-black/60">Winner</p>
+      <p className="font-agent text-sm uppercase tracking-[0.3em] text-black/60">{g.winner}</p>
       <p
         className={cn(
           "animate-pulse rounded-full px-8 py-2 font-display text-3xl tracking-widest text-white uppercase shadow-xl motion-reduce:animate-none",
           winnerStyles[winner]
         )}
       >
-        🏆 {winner} team 🏆
+        🏆 {wr.team.replace("{team}", wr[winner])} 🏆
       </p>
     </div>
   );

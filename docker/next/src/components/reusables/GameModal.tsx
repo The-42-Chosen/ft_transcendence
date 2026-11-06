@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import Button from "./Button";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type Items = {
   title: string;
@@ -15,8 +16,9 @@ type Items = {
   error?: string | null;
 };
 
-export default function GameModal ({title, text1, text2, text3, action = "Continue", onConfirm, pending = false, error}: Items) {
+export default function GameModal ({title, text1, text2, text3, action, onConfirm, pending = false, error}: Items) {
   const [selected, setSelected] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   return (
     <div className="bg-amber-100 p-6 m-4 rounded-2xl shadow-xl">
@@ -43,12 +45,12 @@ export default function GameModal ({title, text1, text2, text3, action = "Contin
       </ul>
       <footer className="mt-6 flex flex-col items-center gap-2">
         <Button variant="action" disabled={!selected || pending} onClick={() => selected && onConfirm?.(selected)}>
-          {action}
+          {action || t.setup.continue}
         </Button>
         {error ? (
           <p role="alert" className="font-agent text-xs text-(--color-brand-red)">{error}</p>
         ) : !selected && (
-          <p className="font-agent text-xs text-black/50">Pick an option first</p>
+          <p className="font-agent text-xs text-black/50">{t.setup.pickOption}</p>
         )}
       </footer>
     </div>

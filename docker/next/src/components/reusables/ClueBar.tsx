@@ -1,14 +1,17 @@
 "use client";
 
 import { useClue } from "@/components/reusables/ClueContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function ClueBar() {
   const { clue } = useClue();
+  const { t } = useLanguage();
+  const g = t.game;
 
   return (
     <div className="mt-6 flex flex-col gap-2 text-left">
       <p className="pl-4 text-xs font-semibold uppercase tracking-widest text-amber-900/70">
-        Current clue
+        {g.currentClue}
       </p>
       <div
         aria-live="polite"
@@ -20,14 +23,14 @@ export default function ClueBar() {
               {clue.word}
             </span>
             <span
-              aria-label={`${clue.count} words`}
+              aria-label={g.wordsCount.replace("{count}", String(clue.count))}
               className="flex h-11 w-16 items-center justify-center rounded-full bg-amber-500 text-lg font-bold text-white"
             >
               {clue.count}
             </span>
           </>
         ) : (
-          <span className="px-4 italic text-amber-900/40">Waiting for the spymaster…</span>
+          <span className="px-4 italic text-amber-900/40">{g.waitingSpymaster}</span>
         )}
       </div>
     </div>
