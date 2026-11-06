@@ -3,6 +3,7 @@
 import { useId, type FormEvent } from "react";
 import Button from "./Button";
 import { ROOM_CODE_LENGTH } from "@/lib/lobby";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type Items = {
   title: string;
@@ -15,6 +16,7 @@ type Items = {
 
 export default function GameInput ({title, label, info, onSubmit, error, pending = false}: Items) {
   const inputId = useId();
+  const { t } = useLanguage();
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,7 +40,7 @@ export default function GameInput ({title, label, info, onSubmit, error, pending
             className="min-w-0 flex-1 rounded-2xl border-2 border-dashed border-amber-400 bg-white/70 px-4 py-3 text-center font-display text-3xl uppercase tracking-[0.4em] text-amber-900 placeholder:text-amber-300 outline-none transition focus:border-solid focus:border-amber-600 focus:bg-white"
           />
           <Button type="submit" disabled={pending} className="rounded-2xl bg-amber-500 px-6 font-display text-2xl tracking-widest shadow-md hover:bg-amber-600 active:bg-amber-700">
-            Go
+            {t.setup.go}
           </Button>
         </div>
         {error ? (

@@ -8,6 +8,7 @@ import Modal from "@/components/reusables/Modal";
 import WinnerBadge from "@/components/reusables/WinnerBadge";
 import { cardColorClasses } from "@/lib/lobby";
 import type { CardColor } from "@/lib/words";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type WordProps = {
   text: string;
@@ -51,6 +52,8 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
   const [color, setColor] = useState<CardColor | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const { syncTurn, setRemaining, revealed, setRevealed, winner } = useClue();
+  const { t } = useLanguage();
+  const g = t.game;
 
   const shownColor = color ?? revealed?.[index] ?? null;
   const locked = readOnly || shownColor !== null;
@@ -91,10 +94,10 @@ export default function Word({ text, readOnly = false, roomCode, index }: WordPr
       <CardLabel text={text}/>
       {gameOver && (
         <Modal
-          title="Game Over"
-          subtitle={color === "assassin" ? "Assassin word found" : "All words revealed"}
-          content={`The word ${text} has been discovered`}
-          bContent="Close"
+          title={g.gameOverTitle}
+          subtitle={color === "assassin" ? g.assassinFound : g.allWordsRevealed}
+          content={g.wordDiscovered.replace("{word}", text)}
+          bContent={g.close}
           onClose={() => setGameOver(false)}
         >
           {winner && <WinnerBadge winner={winner}/>}

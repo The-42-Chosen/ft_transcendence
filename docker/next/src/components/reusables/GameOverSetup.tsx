@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import GameSetup from "@/components/commons/GameSetup";
 import Button from "@/components/reusables/Button";
 import { useClue } from "@/components/reusables/ClueContext";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // Once the game is over, leaves the revealed board in sight and offers a new game on demand
 export default function GameOverSetup() {
   const { revealed } = useClue();
+  const { t } = useLanguage();
+  const g = t.game;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -25,7 +28,7 @@ export default function GameOverSetup() {
     <>
       <footer className="mb-6 flex justify-center">
         <Button variant="action" onClick={() => setOpen(true)}>
-          New game
+          {g.newGame}
         </Button>
       </footer>
       {open && (
@@ -40,7 +43,7 @@ export default function GameOverSetup() {
             onClick={() => ref.current?.close()}
             className="mx-auto mt-3 block font-agent text-sm text-white/80 bg-transparent hover:bg-transparent hover:text-white transition-colors"
           >
-            Back to the board
+            {g.backToBoard}
           </button>
         </dialog>
       )}
