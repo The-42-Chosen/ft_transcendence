@@ -8,7 +8,6 @@ const updateUserSchema = z.object({
   username: z.string().min(3).optional(),
   displayName: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
-  avatarUrl: z.string().nullable().optional(),
 }).strict();
 
 function toPublicUser(user: {
@@ -90,13 +89,13 @@ export async function PATCH(
     const currentUser = await db.orm.public.User
       .where({ email: session.user.email })
       .first();
-      
+
     if (!currentUser) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
-    }   
+    }
     if (currentUser.id !== userId) {
       return NextResponse.json(
         { error: "Forbidden" },
