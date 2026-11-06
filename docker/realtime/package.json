@@ -1,0 +1,14 @@
+{
+  "name": "transcendence-realtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.4"
+  },
+  "packageManager": "pnpm@12.9.1"
+}

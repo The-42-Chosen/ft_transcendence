@@ -35,6 +35,7 @@ services:
       - nginx_logs:/var/log/nginx
     depends_on:
       - next
+      - realtime
       - grafana
       - kibana
     networks:
@@ -71,12 +72,42 @@ services:
     container_name: next-dev
     environment:
       NODE_ENV: development
+      # en dev on parle directement au service realtime (pas de nginx devant)
+      NEXT_PUBLIC_SOCKET_URL: "http://localhost:${REALTIME_DEV_PORT:-3001}"
+      # IP de la machine, autorisee dans allowedDevOrigins (next.config.ts)
+      SERVER_IP: "${SERVER_IP:-}"
     ports:
       - "${NEXT_DEV_PORT:-3000}:3000"
     volumes:
       - ./docker/next:/app
       - next_dev_node_modules:/app/node_modules
       - next_dev_build:/app/.next
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # Realtime (Socket.IO), servi par nginx sur /socket.io/
+  # ------------------------------------------------------------------
+
+  realtime:
+    build:
+      context: ./docker/realtime
+    container_name: realtime
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      # autorise next-dev (http://localhost:3000) a se connecter en direct
+      CORS_ORIGINS: "http://localhost:${NEXT_DEV_PORT:-3000},http://${SERVER_IP:-localhost}:${NEXT_DEV_PORT:-3000}"
+    ports:
+      # uniquement sur la machine locale, pour `make dev`
+      - "127.0.0.1:${REALTIME_DEV_PORT:-3001}:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - transcendence
     restart: unless-stopped
