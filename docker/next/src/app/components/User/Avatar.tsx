@@ -29,33 +29,42 @@ function getAvatarColor(username: string) {
   return colors[hash % colors.length];
 }
 
+type AvatarProps = {
+  username: string;
+  avatarUrl: string | null;
+  size?: number;
+};
+
 export default function Avatar({
   username,
   avatarUrl,
-  size = 80,
+  size = 64,
 }: AvatarProps) {
   if (avatarUrl) {
     return (
       <img
         src={avatarUrl}
-        alt={`Avatar de ${username}`}
+        alt={`${username} avatar`}
         width={size}
         height={size}
-        className="rounded-full object-cover"
+        className="shrink-0 rounded-full object-cover"
+        style={{
+          width: size,
+          height: size,
+        }}
       />
     );
   }
 
   return (
     <div
-      className={`${getAvatarColor(username)} rounded-full flex items-center justify-center text-white font-bold`}
+      className="flex shrink-0 items-center justify-center rounded-full bg-gray-300 font-semibold"
       style={{
         width: size,
         height: size,
-        fontSize: size * 0.35,
       }}
     >
-      {getInitials(username)}
+      {username.slice(0, 2).toUpperCase()}
     </div>
   );
 }
