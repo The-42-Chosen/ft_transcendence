@@ -123,6 +123,29 @@ info: storage
 	@echo "store   : $(STORE)"
 	@podman info --format 'graphroot: {{.Store.GraphRoot}}{{"\n"}}volumes  : {{.Store.VolumePath}}'
 
+#################################################################
+##################### CRISIS ####################################
+#################################################################
+
+# Coupe un service, montre que Prometheus le voit down, puis le relance.
+#
+#   make crisis                 chaque service, un par un
+#   make crisis S=next          next seulement (next kibana grafana ia postgres)
+#   make crisis S="ia kibana"   plusieurs
+#   make crisis S=postgres ALERT=1   garde coupe jusqu'a l'alerte "firing" (1-2 min)
+#   make crisis-restore         relance tout service reste coupe
+
+S ?=
+ALERT ?= 0
+
+crisis: check_env storage
+	@ALERT=$(ALERT) bash crisis/outage.sh $(S)
+
+# nginx memorise l'IP de ses upstreams : reload apres toute relance
+crisis-restore: storage
+	podman start next kibana grafana ia postgres
+	podman exec nginx nginx -s reload
+
 ##################### PRISMA ##########################
 
 prisma-emit:
@@ -139,4 +162,5 @@ prisma: prisma-emit prisma-migrate
 
 
 .PHONY: storage check_env up down re build pull logs ps clean fclean info \
-        next-shell next-logs dev dev-logs dev-down next-reload
+        next-shell next-logs dev dev-logs dev-down next-reload \
+        crisis crisis-restore
