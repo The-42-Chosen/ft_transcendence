@@ -13,4 +13,4 @@ COPY src ./src
 USER node
 EXPOSE 3001
 
-CMD ["node", "src/server.js"]
+CMD ["node", "src/server.ts"]

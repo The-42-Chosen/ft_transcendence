@@ -2,7 +2,13 @@ import type { NextConfig } from "next";
 
 const serverIp = process.env.SERVER_IP?.trim();
 
-const nextConfig: NextConfig = {
+type NextConfigAgentFeedback = NextConfig & {
+  experimental?: NonNullable<NextConfig["experimental"] > & {
+    agentFeedback?: boolean;
+  };
+};
+
+const nextConfig: NextConfigAgentFeedback = {
   allowedDevOrigins: serverIp ? [serverIp] : [],
   experimental: {
     agentFeedback: true,
