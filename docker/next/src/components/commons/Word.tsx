@@ -24,9 +24,7 @@ export default function Word({ text, readOnly = false, index }: WordProps) {
   const { t } = useLanguage();
   const g = t.game;
 
-  // The color comes from the server state, so a word revealed by a teammate flips here too
   const shownColor = cards[index] ?? null;
-  // Words already revealed when the page loaded do not play the flip animation
   const [revealedOnLoad] = useState(shownColor !== null);
   const isMyTurn = seat === `${turn}-operative`;
   const locked = readOnly || shownColor !== null || !isMyTurn;
