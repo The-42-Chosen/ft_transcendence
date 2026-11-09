@@ -7,7 +7,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cod
   const body = await request.json().catch(() => null);
   const requested: unknown[] = Array.isArray(body?.aiTeams) ? body.aiTeams : [];
   const aiTeams = TEAM_COLORS.filter((team: TeamColor) => requested.includes(team));
-  const room = startRoom(code, aiTeams);
+  const room = await startRoom(code, aiTeams);
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 });
