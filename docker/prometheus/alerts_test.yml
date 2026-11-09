@@ -137,6 +137,32 @@ tests:
             exp_annotations:
               summary: "Disque / rempli a plus de 85%"
 
+  # --------------------------------------------------------------- PostgresDown
+  - interval: 15s
+    input_series:
+      # l'exporter repond toujours (up = 1), seul pg_up tombe
+      - series: 'up{job="postgres", instance="postgres-exporter:9187"}'
+        values: '1x20'
+      - series: 'pg_up{job="postgres", instance="postgres-exporter:9187"}'
+        values: '1 1 0x20'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: PostgresDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: PostgresDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: postgres
+              instance: postgres-exporter:9187
+            exp_annotations:
+              summary: "PostgreSQL ne repond plus depuis 1 minute"
+      # et ServiceDown reste muet : c'est bien pour ca que PostgresDown existe
+      - eval_time: 3m
+        alertname: ServiceDown
+        exp_alerts: []
+
   # -------------------------------------------------- PostgresTooManyConnections
   - interval: 15s
     input_series:
