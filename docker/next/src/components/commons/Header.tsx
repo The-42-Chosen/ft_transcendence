@@ -7,7 +7,7 @@ import Logo from '@/components/commons/Logo';
 export default class Header extends Component {
   render() {
     return (
-      <header className="flex flex-wrap items-center justify-between gap-2 px-2 text-amber-50">
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-4 px-4 py-2.5 text-(--color-text-primary) shadow-md">
         <Logo />
         <Nav />
       </header>
