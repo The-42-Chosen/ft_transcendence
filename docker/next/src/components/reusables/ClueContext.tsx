@@ -15,7 +15,6 @@ export type TeamTurn = "red" | "blue";
 
 export type Remaining = Record<TeamTurn, number>;
 
-// Answer of a move: an error if the server refused it, otherwise what the move did
 export type MoveResult = {
   error?: string;
   color?: CardColor;
@@ -27,9 +26,9 @@ type ClueContextValue = {
   clue: Clue | null;
   turn: TeamTurn;
   remaining: Remaining;
-  // Color of each card the player is allowed to see, null when still hidden
   cards: (CardColor | null)[];
-  // Whole board once the game is over
+  found: boolean[];
+  lastFound: number | null;
   revealed: CardColor[] | null;
   winner: TeamTurn | null;
   connected: boolean;
@@ -70,6 +69,8 @@ export function ClueProvider({ children, roomCode, seat, initialState }: CluePro
     turn: state.turn,
     remaining: state.remaining,
     cards: state.cards,
+    found: state.found,
+    lastFound: state.lastFound,
     revealed: state.gameOver ? (state.cards as CardColor[]) : null,
     winner: state.winner,
     connected,

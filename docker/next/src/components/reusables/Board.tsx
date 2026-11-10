@@ -4,9 +4,7 @@ import ClueForm from '@/components/reusables/ClueForm';
 import BoardTeam from '@/components/reusables/BoardTeam';
 import EndTurnButton from '@/components/reusables/EndTurnButton';
 import RemainingWords from '@/components/reusables/RemainingWords';
-import CardLabel from '@/components/reusables/CardLabel';
-import { cn } from '@/lib/cn';
-import { cardColorClasses } from '@/lib/lobby';
+import SpymasterCard from '@/components/reusables/SpymasterCard';
 import type { CardColor } from '@/lib/words';
 
 type Parameters = {
@@ -46,9 +44,7 @@ export default function Board({type, team, words, colors}: Parameters) {
 			<BoardTeam team={team}/>
 			<div className="grid grid-cols-5 gap-4">
           		{words.map((word, i) => (
-            	<article key={word} className={cn("@container flex h-24 items-center justify-center overflow-hidden rounded-2xl px-3", cardColorClasses[colors[i]])}>
-              		<CardLabel text={word.toUpperCase()}/>
-            	</article>
+            	<SpymasterCard key={word} index={i} text={word.toUpperCase()} color={colors[i]}/>
           	))}
         	</div>
 			<ClueBar/>
