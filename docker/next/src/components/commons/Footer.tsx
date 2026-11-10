@@ -1,14 +1,11 @@
 "use client";
 
-import { Component } from 'react';
+import { useContext } from 'react';
 import { LanguageContext } from '@/i18n/LanguageContext';
 
-export default class Footer extends Component {
-  static contextType = LanguageContext;
-  declare context: React.ContextType<typeof LanguageContext>;
+export default function Footer() {
+  const context = useContext(LanguageContext);
+  const text = context?.t?.footer?.text || "Footer will be here";
 
-  render() {
-    const text = this.context?.t?.footer?.text || "Footer will be here";
-    return <footer className="text">{text}</footer>;
-  }
+  return <footer className="text">{text}</footer>;
 }
