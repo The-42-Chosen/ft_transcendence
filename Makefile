@@ -1,3 +1,5 @@
+MAKEFLAGS += --no-print-directory
+.SILENT:
 #################################################################
 ##################### PODMAN DOCKER COMPABILITY #################
 #################################################################
@@ -37,11 +39,11 @@ NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
                 $(DC) up -d --no-deps next nginx nginx-exporter
 
 all:
-	$(MAKE) up
-	@printf 'https://%b:8443\n' '$(SERVER_IP)'
+	@$(MAKE) up 
+	@printf '\e[1;42mPublic IP: https://%b:8443\e[m\n' '$(SERVER_IP)'
 
 check_env:
-	@test -f .env || { echo "Erreur : File .env missing"; exit 1; }
+	@test -f .env || { echo -e "\033[1;101mErreur : File .env missing\033[0m"; exit 1; } 
 
 storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
@@ -98,7 +100,8 @@ dev: check_env storage
 
 	podman exec next-dev pnpm prisma db migrate
 
-	@echo "Mode developpement : http://localhost:$(NEXT_DEV_PORT)"
+	@echo -e "\033[1;102mMode developpement : http://localhost:$(NEXT_DEV_PORT)\033[0m"
+
 
 dev-logs: storage
 	$(DC) --profile dev logs -f --tail=200 next-dev
