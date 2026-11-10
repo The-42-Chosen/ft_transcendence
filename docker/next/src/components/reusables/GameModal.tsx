@@ -22,7 +22,7 @@ export default function GameModal ({title, text1, text2, text3, action, onConfir
 
   return (
     <div className="bg-amber-100 p-6 m-4 rounded-2xl shadow-xl">
-      <h3 className="mb-5 font-display text-4xl tracking-wide">{title}</h3>
+      <h3 className="mb-5 font-display text-4xl text-black tracking-wide">{title}</h3>
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[text1, text2, text3].map((text) => (
           <li key={text}>
