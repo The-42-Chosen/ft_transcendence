@@ -52,7 +52,7 @@ services:
       context: ./docker/next
     container_name: next
     env_file:
-      - ./docker/next/.env
+      - ./.env
     environment:
       NODE_ENV: production
     healthcheck:
@@ -73,6 +73,8 @@ services:
       context: ./docker/next
       target: dev
     container_name: next-dev
+    env_file:
+      - ./.env
     environment:
       NODE_ENV: development
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
