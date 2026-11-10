@@ -62,13 +62,14 @@
 /* GLOBALS */
 
 #main-title{
-	padding: 2em;
-	color: var(--color-text-primary);
+  padding: 2em;
+  color: var(--color-text-primary);
 }
 
 @layer base {
   html, body{
     background: var(--color-bg-subtle);
+    color: var(--color-text-primary);
   }
 
   main{
@@ -77,11 +78,20 @@
 
   header{
     background: var(--color-bg-canvas);
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  footer.text {
+    padding: 1.5rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-agent);
+    font-size: 0.875rem;
   }
 
   button{
     background: var(--color-bg-elevated);
     border-radius: 15%;
+    cursor: pointer;
   }
 
   button:hover{
