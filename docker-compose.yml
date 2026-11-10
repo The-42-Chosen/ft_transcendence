@@ -227,12 +227,35 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SERVER_ROOT_URL: "https://localhost:${NGINX_SSL_PORT:-8443}/grafana/"
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      # Notifications d'alerte : envoyees a mailpit (SMTP interne, sans TLS)
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: "mailpit:1025"
+      GF_SMTP_FROM_ADDRESS: "grafana@transcendence.local"
+      GF_SMTP_FROM_NAME: "Grafana Transcendence"
+      GF_SMTP_STARTTLS_POLICY: "NoStartTLS"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  # Boite mail de test : capture les mails d'alerte de Grafana (rien ne sort).
+  # SMTP (1025) joignable uniquement sur le reseau interne ; l'interface web
+  # (8025) est servie par nginx sur /mailpit/ en HTTPS, avec login obligatoire.
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.33.1
+    container_name: mailpit
+    environment:
+      MP_WEBROOT: /mailpit
+      MP_UI_AUTH: "${MAILPIT_UI_USER:-admin}:${MAILPIT_UI_PASSWORD}"
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: "500"
+    volumes:
+      - mailpit_data:/data
     networks:
       - transcendence
     restart: unless-stopped
@@ -341,6 +364,7 @@ volumes:
   postgres_data:
   prometheus_data:
   grafana_data:
+  mailpit_data:
   es_data:
   logstash_data:
   nginx_logs:
