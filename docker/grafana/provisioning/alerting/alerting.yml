@@ -1,0 +1,58 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: mailpit
+    receivers:
+      - uid: mailpit-email
+        type: email
+        settings:
+          addresses: alerts@transcendence.local
+          singleEmail: true
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: mailpit
+    group_by: ["alert"]
+    group_wait: 10s
+    group_interval: 30s
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: prometheus-relay
+    folder: Alerting
+    interval: 10s
+    rules:
+      - uid: prometheus-alert-firing
+        title: Prometheus alert
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: label_replace(ALERTS{alertstate="firing"}, "alert", "$1", "alertname", "(.*)")
+              instant: true
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: >-
+            {{ $labels.alert }} ({{ $labels.severity }}) :
+            {{ if $labels.probe }}{{ $labels.probe }} - {{ end }}{{ if $labels.instance }}{{ $labels.instance }}{{ else }}{{ $labels.job }}{{ end }}
+          description: Alerte Prometheus relayee par Grafana, voir docker/prometheus/alerts.yml.
