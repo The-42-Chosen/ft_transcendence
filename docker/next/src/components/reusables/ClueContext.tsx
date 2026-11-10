@@ -1,7 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import type { CardColor } from "@/lib/words";
+import type { GameView } from "@/lib/game";
+import type { Seat } from "@/lib/lobby";
+import { useGame } from "@/lib/useGame";
 
 export type Clue = {
   word: string;
@@ -12,90 +15,70 @@ export type TeamTurn = "red" | "blue";
 
 export type Remaining = Record<TeamTurn, number>;
 
+// Answer of a move: an error if the server refused it, otherwise what the move did
+export type MoveResult = {
+  error?: string;
+  color?: CardColor;
+  gameOver?: boolean;
+};
+
 type ClueContextValue = {
+  seat: Seat;
   clue: Clue | null;
-  setClue: (clue: Clue) => void;
   turn: TeamTurn;
-  endTurn: () => Promise<void>;
-  syncTurn: (turn: TeamTurn) => void;
   remaining: Remaining;
-  setRemaining: (remaining: Remaining) => void;
+  // Color of each card the player is allowed to see, null when still hidden
+  cards: (CardColor | null)[];
+  // Whole board once the game is over
   revealed: CardColor[] | null;
-  setRevealed: (colors: CardColor[]) => void;
   winner: TeamTurn | null;
+  connected: boolean;
+  giveClue: (word: string, count: number) => Promise<MoveResult>;
+  guess: (word: string) => Promise<MoveResult>;
+  endTurn: () => Promise<MoveResult>;
 };
 
 type ClueProviderProps = {
   children: ReactNode;
-  roomCode?: string;
-  initialTurn?: TeamTurn;
-  initialRemaining?: Remaining;
-  initialRevealed?: CardColor[] | null;
+  roomCode: string;
+  seat: Seat;
+  initialState: GameView;
 };
-
-const POLL_INTERVAL = 2000;
 
 const ClueContext = createContext<ClueContextValue | null>(null);
 
-export function ClueProvider({ children, roomCode, initialTurn = "red", initialRemaining = { red: 0, blue: 0 }, initialRevealed = null }: ClueProviderProps) {
-  const [clue, setClue] = useState<Clue | null>(null);
-  const [turn, setTurn] = useState<TeamTurn>(initialTurn);
-  const [remaining, setRemaining] = useState<Remaining>(initialRemaining);
-  const [revealed, setRevealed] = useState<CardColor[] | null>(initialRevealed);
+export function ClueProvider({ children, roomCode, seat, initialState }: ClueProviderProps) {
+  const { state, applyState, connected } = useGame(roomCode, seat, initialState);
 
-  function syncTurn(next: TeamTurn) {
-    if (next !== turn) {
-      setTurn(next);
-      setClue(null);
+  // Sends a move to the server, the new state then comes back to everybody through the socket
+  async function play(move: string, body: object = {}): Promise<MoveResult> {
+    const res = await fetch(`/api/rooms/${roomCode}/${move}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...body, seat }),
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => null) : null;
+    if (data?.state) {
+      applyState(data.state);
     }
+    return data ?? { error: "Server unreachable" };
   }
 
-  // TODO: Replace polling with a websocket once the backend is ready
-  useEffect(() => {
-    if (!roomCode || revealed) {
-      return;
-    }
-    const id = setInterval(async () => {
-      const res = await fetch(`/api/rooms/${roomCode}/state`, { cache: "no-store" }).catch(() => null);
-      const state = res?.ok ? await res.json() : null;
-      if (!state) {
-        return;
-      }
-      setRemaining({ red: state.len_red, blue: state.len_blue });
-      if (state.turn !== turn) {
-        setTurn(state.turn);
-        setClue(null);
-      }
-      if (state.colors) {
-        setRevealed(state.colors);
-      }
-    }, POLL_INTERVAL);
-    return () => clearInterval(id);
-  }, [roomCode, revealed, turn]);
+  const value: ClueContextValue = {
+    seat,
+    clue: state.clue,
+    turn: state.turn,
+    remaining: state.remaining,
+    cards: state.cards,
+    revealed: state.gameOver ? (state.cards as CardColor[]) : null,
+    winner: state.winner,
+    connected,
+    giveClue: (word, count) => play("clue", { word, count }),
+    guess: (word) => play("guess", { word }),
+    endTurn: () => play("end-turn"),
+  };
 
-  // Hands over to the other team, the next spymaster has to give a new clue
-  async function endTurn() {
-    if (!roomCode) {
-      syncTurn(turn === "red" ? "blue" : "red");
-      return;
-    }
-    const res = await fetch(`/api/rooms/${roomCode}/end-turn`, { method: "POST" }).catch(() => null);
-    const room = res?.ok ? await res.json() : null;
-    if (room?.turn) {
-      syncTurn(room.turn);
-    }
-  }
-
-  const winner: TeamTurn | null = !revealed ? null
-    : remaining.red === 0 ? "red"
-    : remaining.blue === 0 ? "blue"
-    : turn;
-
-  return (
-    <ClueContext value={{ clue, setClue, turn, endTurn, syncTurn, remaining, setRemaining, revealed, setRevealed, winner }}>
-      {children}
-    </ClueContext>
-  );
+  return <ClueContext value={value}>{children}</ClueContext>;
 }
 
 export function useClue() {

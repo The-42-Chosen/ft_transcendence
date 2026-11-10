@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import { endTurn, getRoom } from "@/lib/rooms";
+import { parseSeat } from "@/lib/lobby";
+import { getRoom, playMove } from "@/lib/rooms";
 
-// TODO: Check that it is the caller team turn once auth is done
-export async function POST(_request: Request, { params }: { params: Promise<{ code: string }> }) {
+// TODO: Take the seat from the logged user once seats are saved, the client can lie about it
+export async function POST(request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
+  const body = await request.json().catch(() => null);
   const room = getRoom(code);
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
-  if (room.status !== "playing") {
-    return NextResponse.json({ error: "Game not started" }, { status: 409 });
-  }
-  return NextResponse.json({ turn: endTurn(room) });
+  const seat = parseSeat(body?.seat);
+  return playMove(room, seat, () => ({ turn: room.endTurn(seat) }));
 }

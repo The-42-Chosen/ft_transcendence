@@ -16,6 +16,9 @@ DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
  
 NEXT_DEV_PORT ?= $(or $(shell sed -n 's/^NEXT_DEV_PORT=//p' .env 2>/dev/null),3000)
 
+SERVER_IP ?= $(shell ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($$i=="src") {print $$(i+1); exit}}')
+export SERVER_IP
+
 UID   := $(shell id -u)
 LOGIN := $(shell id -un)
 

@@ -14,17 +14,16 @@ type Parameters = {
   team: "red" | "blue" | "spectator";
   words: string[];
   colors: CardColor[];
-  roomCode?: string;
 };
 
-export default function Board({type, team, words, colors, roomCode}: Parameters) {
+export default function Board({type, team, words, colors}: Parameters) {
   return (
     <>
       {type === "agent" && (
         <section className="bg-amber-100 rounded-2xl p-6 m-4">
 			<BoardTeam team={team}/>
 			<div className="grid grid-cols-5 gap-4">
-				{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} roomCode={roomCode}/>))}
+				{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()}/>))}
 			</div>
 			<ClueBar/>
 			<EndTurnButton team={team}/>
@@ -52,6 +51,7 @@ export default function Board({type, team, words, colors, roomCode}: Parameters)
             	</article>
           	))}
         	</div>
+			<ClueBar/>
 			<ClueForm/>
 			<RemainingWords/>
 		</section>
