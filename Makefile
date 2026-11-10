@@ -38,6 +38,7 @@ NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
 
 all:
 	$(MAKE) up
+	@printf 'https://%b:8443\n' '$(SERVER_IP)'
 
 check_env:
 	@test -f .env || { echo "Erreur : File .env missing"; exit 1; }
