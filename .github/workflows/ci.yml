@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Creer le .env (valeurs factices pour la CI)
-        run: cp .env.example .env && cp docker/next/.env.example docker/next/.env
+        run: cp .env.example .env
 
       - name: Preparer buildx (necessaire pour exporter le cache de build)
         uses: docker/setup-buildx-action@v3
@@ -110,7 +110,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Creer le .env (valeurs factices pour la CI)
-        run: cp .env.example .env && cp docker/next/.env.example docker/next/.env
+        run: cp .env.example .env
 
 
       # next et kibana sont des stubs ; postgres est necessaire a postgres-exporter.
@@ -152,7 +152,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Creer le .env (valeurs factices pour la CI)
-        run: cp .env.example .env && cp docker/next/.env.example docker/next/.env
+        run: cp .env.example .env
 
       - name: Augmenter vm.max_map_count pour Elasticsearch
         run: sudo sysctl -w vm.max_map_count=262144
