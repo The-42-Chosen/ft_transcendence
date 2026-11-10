@@ -27,6 +27,7 @@ services:
     container_name: nginx
     environment:
       NGINX_SSL_PORT: "${NGINX_SSL_PORT:-8443}"
+      NGINX_ENTRYPOINT_LOCAL_RESOLVERS: "1"
     ports:
       - "${NGINX_PORT:-8080}:80"
       - "${NGINX_SSL_PORT:-8443}:443"
