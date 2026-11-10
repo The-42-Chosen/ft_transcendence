@@ -84,11 +84,11 @@ ps: storage
 # Use `make dev` to lauch the front end without passing throught Nginx and with auto-update on
 # (change the static website, it will be update without compiling again)
 dev: check_env storage
-	$(DC) --profile dev build next-dev
+	$(DC) --profile dev build realtime next-dev
 	podman rm -f -i next-dev
 	@# volumes recreated
 	podman volume rm -f $(PROJECT)_next_dev_node_modules
-	$(DC) --profile dev up -d postgres next-dev
+	$(DC) --profile dev up -d postgres realtime next-dev
 
 	@echo "Waiting for PostgreSQL..."
 	@until $(DC) exec -T postgres pg_isready -U transcendence -d transcendence >/dev/null 2>&1; do \
