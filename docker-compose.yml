@@ -243,9 +243,6 @@ services:
       - transcendence
     restart: unless-stopped
 
-  # Boite mail de test : capture les mails d'alerte de Grafana (rien ne sort).
-  # SMTP (1025) joignable uniquement sur le reseau interne ; l'interface web
-  # (8025) est servie par nginx sur /mailpit/ en HTTPS, avec login obligatoire.
   mailpit:
     image: docker.io/axllent/mailpit:v1.33.1
     container_name: mailpit
