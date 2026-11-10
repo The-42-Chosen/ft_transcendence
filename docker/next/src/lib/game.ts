@@ -21,6 +21,7 @@ export type GameView = {
 	clue: Clue | null;
 	cards: (CardColor | null)[];
 	found: boolean[];
+	lastFound: number | null;
 	remaining: Record<TeamColor, number>;
 	gameOver: boolean;
 	winner: TeamColor | null;
@@ -38,6 +39,7 @@ export class Game {
 	words: string[] = [];
 	colors: CardColor[] = [];
 	found: boolean[] = [];
+	lastFound: number | null = null;
 	aiTeams: TeamColor[] = [];
 	turn: TeamColor = "red";
 	clue: Clue | null = null;
@@ -52,6 +54,7 @@ export class Game {
 		this.words = pickRandomWords(this.language);
 		this.colors = pickCardColors();
 		this.found = this.words.map(() => false);
+		this.lastFound = null;
 		this.aiTeams = aiTeams;
 		// The team with 9 cards starts
 		this.turn = this.colors.filter((c) => c === "red").length > 8 ? "red" : "blue";
@@ -97,6 +100,7 @@ export class Game {
 			throw new GameError("Word not on the board or already found", 409);
 		}
 		this.found[i] = true;
+		this.lastFound = i;
 		if (this.colors[i] !== this.turn) {
 			this.passTurn();
 		}
@@ -147,6 +151,7 @@ export class Game {
 			clue: this.clue,
 			cards: this.colors.map((c, i) => (seesAll || this.found[i] ? c : null)),
 			found: [...this.found],
+			lastFound: this.lastFound,
 			remaining: { red: this.remaining("red"), blue: this.remaining("blue") },
 			gameOver: over,
 			winner: this.winner(),
