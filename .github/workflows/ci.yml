@@ -19,9 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: management of .env
-        run: cp docker/next/.env.example docker/next/.env
-
       - name: Valider la syntaxe du docker-compose et des overrides CI
         run: |
           docker compose -f docker-compose.yml config -q
