@@ -48,6 +48,7 @@ server {
     resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
     set $next_upstream     http://next:3000;
     set $realtime_upstream http://realtime:3001;
+    set $mailpit_upstream  http://mailpit:8025;
 
     location / {
         proxy_pass $next_upstream;
@@ -107,6 +108,25 @@ server {
 
     location = /kibana {
         return 301 /kibana/;
+    }
+
+    # Mailpit (boite des mails d'alerte), servi en sous-chemin. Le login
+    # (basic auth) est exige par mailpit lui-meme, UI comme API.
+    location /mailpit/ {
+        proxy_pass $mailpit_upstream;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        $connection_upgrade;
+    }
+
+    location = /mailpit {
+        return 301 https://$http_host/mailpit/;
     }
 }
 
