@@ -13,21 +13,28 @@ const winnerStyles: Record<TeamTurn, string> = {
   blue: "bg-(--color-brand-blue) shadow-(--color-brand-blue)/50",
 };
 
+function fitFontSize(text: string) {
+  const em = 0.5 * Math.max(text.length, 1) + 2.6;
+  return `min(1.875rem, calc((100cqi - 3rem) / ${em.toFixed(1)}))`;
+}
+
 export default function WinnerBadge({ winner }: WinnerBadgeProps) {
   const { t } = useLanguage();
   const g = t.game;
   const wr = t.waitingRoom;
+  const teamName = wr.team.replace("{team}", wr[winner]);
 
   return (
-    <div className="my-6 flex flex-col items-center gap-2">
+    <div className="@container my-6 flex w-full flex-col items-center gap-2">
       <p className="font-agent text-sm uppercase tracking-[0.3em] text-black/60">{g.winner}</p>
       <p
         className={cn(
-          "animate-pulse rounded-full px-8 py-2 font-display text-3xl tracking-widest text-white uppercase shadow-xl motion-reduce:animate-none",
+          "max-w-full animate-pulse whitespace-nowrap rounded-full px-6 py-2 font-display tracking-widest text-white uppercase shadow-xl motion-reduce:animate-none",
           winnerStyles[winner]
         )}
+        style={{ fontSize: fitFontSize(teamName) }}
       >
-        🏆 {wr.team.replace("{team}", wr[winner])} 🏆
+        🏆 {teamName} 🏆
       </p>
     </div>
   );

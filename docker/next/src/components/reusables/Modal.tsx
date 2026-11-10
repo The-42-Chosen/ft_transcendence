@@ -19,7 +19,7 @@ export default function Modal({title, subtitle, content, bContent, onClose, chil
 	}, []);
 
 	return (
-		<dialog className="m-auto text-center p-10 bg-amber-100 rounded-2xl align-middle" ref={ref} onClose={onClose} onClick={(e) => e.stopPropagation()}>
+		<dialog className="m-auto w-[min(28rem,calc(100vw-2rem))] text-center p-6 sm:p-10 bg-amber-100 rounded-2xl align-middle" ref={ref} onClose={onClose} onClick={(e) => e.stopPropagation()}>
 			<h2 className="mb-5 font-display text-4xl tracking-wide">{title}</h2>
 			<h3 className="mb-2 tracking-wide">{subtitle}</h3>
 			{children}
