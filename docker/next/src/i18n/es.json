@@ -81,6 +81,9 @@
     "close": "Cerrar"
   },
   "footer": {
-    "text": "El pie de página estará aquí"
+    "text": "El pie de página estará aquí",
+    "about": "Sobre nosotros",
+    "privacy": "Política de privacidad",
+    "gdpr": "RGPD"
   }
 }
