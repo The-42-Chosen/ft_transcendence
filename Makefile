@@ -44,6 +44,8 @@ all:
 
 check_env:
 	@test -f .env || { echo -e "\033[1;101mErreur : File .env missing\033[0m"; exit 1; } 
+	@missing=$$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' .env.example | while read k; do grep -q "^$$k=" .env || echo $$k; done); \
+        [ -z "$$missing" ] || { echo -e "\033[1;101mErreur : variables manquantes dans .env : $$missing\033[0m"; exit 1; }
 
 storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
