@@ -16,25 +16,25 @@ export default function Footer() {
 
 
   return (
-    <footer className="text">
-      <ul  className="grid grid-cols-3">
-        <li>
+    <footer className="text fixed inset-x-0 bottom-0 z-40 flex flex-col items-center gap-1 center">
+      <ul className="grid w-full max-w-3xl grid-cols-3">
+        <li className="text-center">
           <Link
           href="/about"
           className={footerLinkClass}>{t.about}</Link>
         </li>
-        <li>
+        <li className="text-center">
           <Link
           href="/policy"
           className={footerLinkClass}>{t.privacy}</Link>
         </li>
-        <li>
+        <li className="text-center">
           <Link
           href="/gdpr"
           className={footerLinkClass}>{t.gdpr}</Link>
         </li>
       </ul>
-      <p>Copyright© Tonton&apos;s Forkers & Cie</p>
+      <p className="text-xs text-(--color-text-muted)">Copyright© Tonton&apos;s Forkers & Cie</p>
     </footer>
   );
 }
