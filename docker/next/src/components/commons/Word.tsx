@@ -4,11 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import CardLabel from "@/components/reusables/CardLabel";
 import { useClue } from "@/components/reusables/ClueContext";
-import Modal from "@/components/reusables/Modal";
-import WinnerBadge from "@/components/reusables/WinnerBadge";
 import { cardColorClasses } from "@/lib/lobby";
-import type { CardColor } from "@/lib/words";
-import { useLanguage } from "@/i18n/LanguageContext";
 
 type WordProps = {
   text: string;
@@ -18,11 +14,7 @@ type WordProps = {
 
 export default function Word({ text, readOnly = false, index }: WordProps) {
   const [selected, setSelected] = useState(false);
-  const [color, setColor] = useState<CardColor | null>(null);
-  const [gameOver, setGameOver] = useState(false);
-  const { seat, turn, cards, guess, winner } = useClue();
-  const { t } = useLanguage();
-  const g = t.game;
+  const { seat, turn, cards, guess } = useClue();
 
   const shownColor = cards[index] ?? null;
   const [revealedOnLoad] = useState(shownColor !== null);
@@ -44,29 +36,14 @@ export default function Word({ text, readOnly = false, index }: WordProps) {
           className="absolute top-1.5 right-2 z-10"
           onClick={async (e) => {
             e.stopPropagation();
-            const result = await guess(text);
+            await guess(text);
             setSelected(false);
-            setColor(result.color ?? null);
-            if (result.gameOver) {
-              setGameOver(true);
-            }
           }}
         >
           ✔
         </p>
       )}
       <CardLabel text={text}/>
-      {gameOver && (
-        <Modal
-          title={g.gameOverTitle}
-          subtitle={color === "assassin" ? g.assassinFound : g.allWordsRevealed}
-          content={g.wordDiscovered.replace("{word}", text)}
-          bContent={g.close}
-          onClose={() => setGameOver(false)}
-        >
-          {winner && <WinnerBadge winner={winner}/>}
-        </Modal>
-      )}
     </article>
   );
 }

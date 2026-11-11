@@ -81,6 +81,9 @@
     "close": "Close"
   },
   "footer": {
-    "text": "Footer will be here"
+    "text": "Footer will be here",
+    "about": "About us",
+    "privacy": "Privacy policy",
+    "gdpr": "GDPR"
   }
 }

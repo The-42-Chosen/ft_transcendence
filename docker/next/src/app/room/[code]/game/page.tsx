@@ -3,6 +3,7 @@ import Footer from '@/components/commons/Footer';
 import Header from '@/components/commons/Header';
 import Board from '@/components/reusables/Board';
 import { ClueProvider } from '@/components/reusables/ClueContext';
+import GameOverModal from '@/components/reusables/GameOverModal';
 import GameOverSetup from '@/components/reusables/GameOverSetup';
 import { audienceOf } from '@/lib/game';
 import { parseSeat, seatBoard } from '@/lib/lobby';
@@ -35,6 +36,7 @@ export default async function GamePage({ params, searchParams }: Parameters) {
       <ClueProvider roomCode={room.code} seat={playerSeat} initialState={room.viewFor(audienceOf(playerSeat))}>
         <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
         <GameOverSetup/>
+        <GameOverModal words={room.words}/>
       </ClueProvider>
       <Footer/>
     </main>

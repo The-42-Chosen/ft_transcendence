@@ -1,14 +1,40 @@
 "use client";
 
-import { Component } from 'react';
+import { useContext } from 'react';
 import { LanguageContext } from '@/i18n/LanguageContext';
+import Link from "next/link";
 
-export default class Footer extends Component {
-  static contextType = LanguageContext;
-  declare context: React.ContextType<typeof LanguageContext>;
 
-  render() {
-    const text = this.context?.t?.footer?.text || "Footer will be here";
-    return <footer className="text">{text}</footer>;
-  }
+export default function Footer() {
+  const context = useContext(LanguageContext);
+  const t = context?.t?.footer || {
+    about: "About us",
+    privacy: "Privacy policy",
+    gdpr: "GDPR",
+  };
+  const footerLinkClass = "cursor-pointer rounded-lg px-3 py-1.5 text-sm uppercase tracking-wider text-(--color-text-primary) transition-colors hover:bg-(--color-bg-elevated) hover:text-(--color-accent-gold) font-agent";
+
+
+  return (
+    <footer className="text">
+      <ul  className="grid grid-cols-3">
+        <li>
+          <Link
+          href="/about"
+          className={footerLinkClass}>{t.about}</Link>
+        </li>
+        <li>
+          <Link
+          href="/policy"
+          className={footerLinkClass}>{t.privacy}</Link>
+        </li>
+        <li>
+          <Link
+          href="/gdpr"
+          className={footerLinkClass}>{t.gdpr}</Link>
+        </li>
+      </ul>
+      <p>Copyright© Tonton&apos;s Forkers & Cie</p>
+    </footer>
+  );
 }
