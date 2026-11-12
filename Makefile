@@ -17,7 +17,7 @@ DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
 #################################################################
  
 NEXT_DEV_PORT ?= $(or $(shell sed -n 's/^NEXT_DEV_PORT=//p' .env 2>/dev/null),3000)
-
+NGINX_SSL_PORT ?= $(or $(shell sed -n 's/^NGINX_SSL_PORT=//p' .env 2>/dev/null),8443)
 SERVER_IP ?= $(shell ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($$i=="src") {print $$(i+1); exit}}')
 export SERVER_IP
 
@@ -39,8 +39,8 @@ NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
                 $(DC) up -d --no-deps next nginx nginx-exporter
 
 all:
-	@$(MAKE) up 
-	@printf '\e[1;42mPublic IP: https://%b:8443\e[m\n' '$(SERVER_IP)'
+	@$(MAKE) up
+	@printf '\e[1;42mPublic IP: https://%b:%s\e[m\n' '$(SERVER_IP)' '$(NGINX_SSL_PORT)'
 
 check_env:
 	@test -f .env || { echo -e "\033[1;101mErreur : File .env missing\033[0m"; exit 1; } 
