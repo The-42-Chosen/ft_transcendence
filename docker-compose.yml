@@ -109,6 +109,7 @@ services:
     environment:
       NODE_ENV: development
       AUTH_SECRET: "${AUTH_SECRET}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
       AUTH_TRUST_HOST: "true"
