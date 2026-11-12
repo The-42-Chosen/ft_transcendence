@@ -10,6 +10,7 @@ services:
       POSTGRES_USER: "${POSTGRES_USER:-transcendence}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_MONITORING_PASSWORD: "${POSTGRES_MONITORING_PASSWORD}"
+      PGPORT: "${POSTGRES_PORT:-5432}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -55,6 +56,7 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 15s
@@ -77,6 +79,7 @@ services:
       - ./.env
     environment:
       NODE_ENV: development
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
     ports:
@@ -289,7 +292,7 @@ services:
     image: quay.io/prometheuscommunity/postgres-exporter:v0.16.0
     container_name: postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://monitoring:${POSTGRES_MONITORING_PASSWORD}@postgres:5432/${POSTGRES_DB:-transcendence}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://monitoring:${POSTGRES_MONITORING_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}?sslmode=disable"
     depends_on:
       postgres:
         condition: service_healthy
