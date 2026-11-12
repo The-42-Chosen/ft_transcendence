@@ -47,6 +47,14 @@ check_env:
 	@missing=$$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' .env.example | while read k; do grep -q "^$$k=" .env || echo $$k; done); \
         [ -z "$$missing" ] || { echo -e "\033[1;101mErreur : variables manquantes dans .env : $$missing\033[0m"; exit 1; }
 
+auth_secret: check_env
+	@current=$$(sed -n 's/^AUTH_SECRET=//p' .env | sed 's/[[:space:]]*#.*$$//; s/^"\(.*\)"$$/\1/'); \
+	if [ -z "$$current" ] || [ "$$current" = "replace-with-a-random-secret" ]; then \
+		secret=$$(head -c 32 /dev/urandom | base64 | tr -d '\n'); \
+		sed -i "s|^AUTH_SECRET=.*|AUTH_SECRET=\"$$secret\"|" .env; \
+		printf '\033[1;102mAUTH_SECRET genere dans .env\033[0m\n'; \
+	fi
+
 storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
 	@printf '[storage]\ndriver = "overlay"\nrunroot = "/run/user/%s"\ngraphroot = "%s"\n' \
@@ -56,7 +64,7 @@ storage:
 
 # pull (reseau) et build (CPU) en parallele via make -j2 : les images
 # distantes (ELK, Prometheus...) se telechargent pendant que next se compile.
-up: check_env storage
+up: check_env auth_secret storage
 	@$(MAKE) --no-print-directory -j2 pull build
 	@if [ -n "$$(podman ps -aq -f name='^next$$')" ] && \
 	   [ "$$(podman inspect -f '{{.Image}}' next)" != "$$(podman image inspect -f '{{.Id}}' $(PROJECT)_next)" ]; then \
@@ -88,7 +96,7 @@ ps: storage
 
 # Use `make dev` to lauch the front end without passing throught Nginx and with auto-update on
 # (change the static website, it will be update without compiling again)
-dev: check_env storage
+dev: check_env auth_secret storage
 	$(DC) --profile dev build realtime next-dev
 	podman rm -f -i next-dev
 	@# volumes recreated
@@ -170,6 +178,6 @@ prisma-status:
 prisma: prisma-emit prisma-migrate
 
 
-.PHONY: storage check_env up down re build pull logs ps clean fclean info \
+.PHONY: storage check_env auth_secret up down re build pull logs ps clean fclean info \
         next-shell next-logs dev dev-logs dev-down next-reload \
         crisis crisis-restore
