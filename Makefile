@@ -59,6 +59,14 @@ kibana_encryption_key: check_env
 		printf '\033[1;102mKIBANA_ENCRYPTION_KEY genere dans .env\033[0m\n'; \
 	fi
 
+kibana_encryption_key: check_env
+	@current=$$(sed -n 's/^KIBANA_ENCRYPTION_KEY=//p' .env | sed 's/[[:space:]]*#.*$$//; s/^"\(.*\)"$$/\1/'); \
+	if [ -z "$$current" ] || [ "$$current" = "changeme_changeme_changeme_change" ]; then \
+		secret=$$(head -c 32 /dev/urandom | base64 | tr -d '\n'); \
+		sed -i "s|^KIBANA_ENCRYPTION_KEY=.*|KIBANA_ENCRYPTION_KEY=\"$$secret\"|" .env; \
+		printf '\033[1;102mKIBANA_ENCRYPTION_KEY genere dans .env\033[0m\n'; \
+	fi
+
 storage:
 	@mkdir -p $(dir $(STORAGE_CONF)) $(STORE)
 	@printf '[storage]\ndriver = "overlay"\nrunroot = "/run/user/%s"\ngraphroot = "%s"\n' \
