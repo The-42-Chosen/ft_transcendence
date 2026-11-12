@@ -1,4 +1,4 @@
-import socket
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from pathlib import Path
 
@@ -7,6 +7,46 @@ from codenames_ia import (
     construire_candidats, charger_dictionnaire,
     MOTS_OUTILS_EN, MOTS_OUTILS_ES, MOTS_OUTILS_FR
 )
+
+class Server(BaseHTTPRequestHandler):
+
+    def __init__(self, list_SpyMaster):
+        self.list_SpyMaster = list_SpyMaster
+
+    def __call__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def do_POST(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode())
+
+            print(json.dumps(data, indent=4))
+
+            if data['langue'] == 'en':
+                indice = create_clue(data, self.list_SpyMaster[0])
+            elif data['langue'] == 'es':
+                indice = create_clue(data, self.list_SpyMaster[1])
+            else:
+                indice = create_clue(data, self.list_SpyMaster[2])
+
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+
+            response = {
+                'clue': indice.mot,
+                'number': indice.nombre
+            }
+
+            self.wfile.write(json.dumps(response).encode())
+
+        except Exception as e:
+            print(str(e))
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write("Error".encode())
 
 
 def create_candidat(langue: str) ->tuple[list[str], Embeddings]:
@@ -70,46 +110,10 @@ def create_clue(message_dict: str, maitre: MaitreEspion) -> Indice:
     return indices
 
 
-def get_message(communication_socket):
-
-    communication_socket.settimeout(5)
-
-    try:
-        chunks = []
-
-        while True:
-            chunk = communication_socket.recv(1024)
-
-            if not chunk:
-                break
-
-            chunks.append(chunk)
-
-            # Fin du message détectée
-            if b"\n" in chunk:
-                break
-
-        message = b"".join(chunks).decode("utf-8").strip()
-
-        if not message:
-            raise ValueError("Message vide")
-
-        data = json.loads(message)
-
-    except:
-        data = None
-
-    return data
-        
-
 def main():
 
     host = "0.0.0.0"
     port = 8001
-
-    serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serveur.bind((host, port))
-    serveur.listen(5)
 
     list_SpyMaster = [
         create_SpyMaster('en'),
@@ -117,28 +121,17 @@ def main():
         create_SpyMaster('fr')
     ]
 
-    while True:
+    # list_SpyMaster = [
+    #     'en'
+    #     'es'
+    #     'fr'
+    # ]
 
-        communication_socket, _  = serveur.accept()
-        data = get_message(communication_socket)
-    
-        if data == None:
-            continue
-
-        if data['langue'] == 'en':
-            indice = create_clue(data, list_SpyMaster[0])
-        elif data['langue'] == 'es':
-            indice = create_clue(data, list_SpyMaster[1])
-        else:
-            indice = create_clue(data, list_SpyMaster[2])
-
-        response = {
-            'clue': indice.mot,
-            'number': indice.nombre
-        }
-
-        communication_socket.send(json.dumps(response).encode("utf-8"))
-        communication_socket.close()
+    try:
+        httpd = HTTPServer((host,port), Server(list_SpyMaster))
+        httpd.serve_forever()
+    except:
+        httpd.server_close()
 
 
 main()
