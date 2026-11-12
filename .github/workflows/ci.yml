@@ -34,7 +34,7 @@ jobs:
         run: |
           docker run --rm --entrypoint promtool \
             -v "$PWD/docker/prometheus:/etc/prometheus:ro" \
-            docker.io/prom/prometheus:v3.2.1 \
+            docker.io/prom/prometheus:v3.16.0 \
             check config /etc/prometheus/prometheus.yml
 
       # Rejoue des series fictives contre alerts.yml, sans demarrer de conteneur
@@ -42,7 +42,7 @@ jobs:
         run: |
           docker run --rm --entrypoint promtool \
             -v "$PWD/docker/prometheus:/etc/prometheus:ro" \
-            docker.io/prom/prometheus:v3.2.1 \
+            docker.io/prom/prometheus:v3.16.0 \
             test rules /etc/prometheus/alerts_test.yml
 
       - name: Valider les JSON des dashboards Grafana
