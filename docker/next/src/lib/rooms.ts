@@ -3,6 +3,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { Game, GameError, audienceOf } from "@/lib/game";
 import { generateRoomCode, type Language, type Seat, type TeamColor } from "@/lib/lobby";
+import { log } from "@/lib/log";
 
 // TODO: In-memory store until rooms are saved in Postgres.
 const store = globalThis as unknown as { rooms?: Map<string, Game> };
@@ -17,6 +18,7 @@ export function createRoom(language: Language): Game {
 	}
 	const room = new Game(code, language);
 	rooms.set(code, room);
+	log.info({ service: "game", msg: "room created", room_code: code, language });
 	return room;
 }
 
@@ -27,8 +29,8 @@ export function getRoom(code: string): Game | null {
 export async function startRoom(code: string, aiTeams: TeamColor[] = []): Promise<Game | null> {
 	const room = getRoom(code);
 	if (room?.start(aiTeams)) {
-		const response = await publish(room);
-		console.log("startRoom response: ", response);
+		log.info({ service: "game", msg: "game started", room_code: room.code, language: room.language, ai_teams: aiTeams, turn: room.turn });
+		await publish(room);
 	}
 	return room;
 }
@@ -39,54 +41,40 @@ export function publicRoom({ code, language, status }: Game) {
 
 export async function publish(room: Game) {
 	saveAiBoard(room);
-	console.log("PUBLISH");
-	console.log(room.aiBoard());
-	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent"), ai: room.aiBoard()} };
-	
-	console.log("BEFORE BODY: ", body);
-	console.log("BEFORE CLUE: ", body.views.agent.clue);
-
-	body.views.agent.clue = { word: 'multijoueur', count: 2, team: 'red' };
-	body.views.spymaster.clue = { word: 'multijoueur', count: 2, team: 'red' };
-
-	console.log("AFTER BODY: ", body);
-	console.log("AFTER CLUE: ", body.views.agent.clue);
-	console.log("AFTER BODY BEFORE SEND:", JSON.stringify(body, null, 2));
-
-	try {
-		const response = await fetch(`${REALTIME_URL}/broadcast`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(body),
-			signal: AbortSignal.timeout(2000),
+	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent") } };
+	await fetch(`${REALTIME_URL}/broadcast`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+		signal: AbortSignal.timeout(2000),
+	})
+		.then((res) => {
+			if (!res.ok) {
+				console.error("Realtime broadcast failed: HTTP", res.status);
+				log.error({ service: "game", msg: "realtime broadcast failed", error: `HTTP ${res.status}`, room_code: room.code });
+			}
+		})
+		.catch((error) => {
+			console.error("Realtime broadcast failed:", error);
+			log.error({ service: "game", msg: "realtime broadcast failed", error: String(error), room_code: room.code });
 		});
-
-		console.log("RESPONSE STATUS:", response.status);
-
-		if (!response.ok) {
-			console.error("Broadcast failed:", response.status);
-		}
-	} catch (error) {
-		console.error("Broadcast error:", error);
-	}
 }
 
 export async function playMove(room: Game, seat: Seat, move: () => object) {
 	try {
 		const result = move();
-		const response = await publish(room);
-		const gameview = room.viewFor(audienceOf(seat))
-		console.log("playMove Seat: ", gameview);
-		console.log("playMove result: ", result);
-		console.log("playMove response: ", response);
-		gameview.clue = { word: 'incursion', count: 2, team: 'blue' };
-		console.log("playMove Seat: ", gameview);
-
-		return NextResponse.json({ ...result, state: gameview });
+		log.info({ service: "game", msg: "move played", room_code: room.code, seat, ...result });
+		if (room.isOver()) {
+			log.info({ service: "game", msg: "game over", room_code: room.code, winner: room.winner(), remaining_red: room.remaining("red"), remaining_blue: room.remaining("blue"), duration_ms: Date.now() - room.createdAt });
+		}
+		await publish(room);
+		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
 	} catch (error) {
 		if (error instanceof GameError) {
+			log.info({ service: "game", msg: "move refused", room_code: room.code, seat, reason: error.message, status: error.status });
 			return NextResponse.json({ error: error.message }, { status: error.status });
 		}
+		log.error({ service: "game", msg: "move failed", error: String(error), room_code: room.code, seat });
 		throw error;
 	}
 }
