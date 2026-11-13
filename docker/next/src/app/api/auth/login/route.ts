@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { log } from "@/lib/log";
 
 const loginSchema = z.object({
     email: z.email(),
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
             .first();
 
         if (!user || !user.passwordHash) {
+            log.warn({ service: "auth", msg: "login failed", reason: "unknown_user" });
             return NextResponse.json(
                 { error: "Invalid email or password" },
                 { status: 401 }
@@ -43,12 +45,14 @@ export async function POST(request: Request) {
         );
 
         if (!passwordIsValid) {
+            log.warn({ service: "auth", msg: "login failed", reason: "bad_password", user_id: user.id });
             return NextResponse.json(
                 { error: "Invalid email or password" },
                 { status: 401 }
             );
         }
 
+        log.info({ service: "auth", msg: "login successful", user_id: user.id });
         return NextResponse.json({
             message: "Login successful",
             user: {
@@ -63,6 +67,7 @@ export async function POST(request: Request) {
     }
     catch(error) {
         console.error("Login failed:", error);
+        log.error({ service: "auth", msg: "login route failed", error: String(error) });
 
         return NextResponse.json(
             { error: "Internal server errror"},

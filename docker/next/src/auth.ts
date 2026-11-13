@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 import { z } from "zod";
+import { log } from "@/lib/log";
 
 const loginSchema = z.object({
   email: z.email(),
@@ -32,6 +33,7 @@ export const {
         const parsed = loginSchema.safeParse(credentials);
 
         if (!parsed.success) {
+          log.warn({ service: "auth", msg: "login failed", reason: "invalid_input" });
           return null;
         }
 
@@ -42,6 +44,7 @@ export const {
           .first();
 
         if (!user || !user.passwordHash) {
+	  log.warn({service: 'auth', msg: 'login failed', error: 'unknown_user' , email});
           return null;
         }
 
@@ -51,9 +54,10 @@ export const {
         );
 
         if (!passwordIsValid) {
+	  log.warn({service: 'auth', msg: 'login failed', error: 'bad_password', email});
           return null;
         }
-
+	log.info({service: 'auth', msg: 'login successful', user_id: user.id });
         return {
           id: String(user.id),
           email: user.email,
