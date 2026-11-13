@@ -7,7 +7,7 @@ type Level = 'debug' | 'info' | 'warn' | 'error';
 // Regle d'equipe : un meme nom d'extra doit garder le meme type partout
 // (ex. `score` toujours un nombre), sinon le document est rejete.
 export interface LogFields {
-  service: 'auth' | 'game' | 'api';
+  service: 'auth' | 'game' | 'api' | 'user';
   msg: string;
   user_id?: number;
   request_id?: string;
