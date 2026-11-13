@@ -43,7 +43,7 @@ export const {
           .first();
 
         if (!user || !user.passwordHash) {
-	  log.info({service: 'auth', msg: 'login failed', email});
+	  log.warn({service: 'auth', msg: 'login failed', error: 'unknown_user' , email});
           return null;
         }
 
@@ -53,7 +53,7 @@ export const {
         );
 
         if (!passwordIsValid) {
-	  log.info({service: 'auth', msg: 'login failed', email});
+	  log.warn({service: 'auth', msg: 'login failed', error: 'bad_password', email});
           return null;
         }
 	log.info({service: 'auth', msg: 'login successful', user_id: user.id });
