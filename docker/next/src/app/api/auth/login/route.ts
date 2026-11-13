@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { log } from "@/lib/log";
 
 const loginSchema = z.object({
     email: z.email(),
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
     }
     catch(error) {
         console.error("Login failed:", error);
+        log.error({ service: "auth", msg: "login route failed", error: String(error) });
 
         return NextResponse.json(
             { error: "Internal server errror"},
