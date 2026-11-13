@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { auth } from "@/auth";
+import { log } from "@/lib/log";
 
 // GET
 
@@ -79,6 +80,7 @@ export async function POST(
   }
 
   if (currentUser.id !== userId) {
+    log.warn({ service: "user", msg: "presence update refused", reason: "forbidden", user_id: currentUser.id, target_user_id: userId });
     return NextResponse.json(
       { error: "Forbidden" },
       { status: 403 }

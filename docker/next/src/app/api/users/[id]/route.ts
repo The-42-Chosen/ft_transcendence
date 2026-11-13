@@ -2,6 +2,7 @@ import { z } from "zod";
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { auth } from "@/auth";
+import { log } from "@/lib/log";
 
 const updateUserSchema = z.object({
   email: z.email().optional(),
@@ -91,6 +92,7 @@ export async function PATCH(
       .first();
 
     if (!currentUser) {
+      log.warn({ service: "user", msg: "user update refused", reason: "session_user_not_found", target_user_id: userId });
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -98,6 +100,7 @@ export async function PATCH(
     }
 
     if (currentUser.id !== userId) {
+      log.warn({ service: "user", msg: "user update refused", reason: "forbidden", user_id: currentUser.id, target_user_id: userId });
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -109,6 +112,7 @@ export async function PATCH(
     const parsed = updateUserSchema.safeParse(body);
 
     if (!parsed.success) {
+      log.info({ service: "user", msg: "user update refused", reason: "invalid_body", user_id: userId });
       return NextResponse.json(
         {
           error: "Invalid request body",
@@ -119,6 +123,7 @@ export async function PATCH(
     }
 
     if (Object.keys(parsed.data).length === 0) {
+      log.info({ service: "user", msg: "user update refused", reason: "no_fields", user_id: userId });
       return NextResponse.json(
         { error: "No fields to update" },
         { status: 400 }
@@ -147,9 +152,11 @@ export async function PATCH(
       );
     }
 
+    log.info({ service: "user", msg: "user updated", user_id: userId, fields: Object.keys(parsed.data) });
     return NextResponse.json(toPublicUser(updatedUser));
   } catch (error) {
     console.error(error);
+    log.error({ service: "user", msg: "user update failed", error: String(error) });
 
     return NextResponse.json(
       { error: "Internal server error" },
