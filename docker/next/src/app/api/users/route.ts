@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { log } from "@/lib/log";
 
 const createUserSchema = z.object({
   email: z.email(),
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
       .first();
 
     if (existingEmail) {
+      log.info({ service: "user", msg: "registration refused", reason: "email_taken" });
       return NextResponse.json(
         { error: "Email already exists" },
         { status: 409 }
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
       .first();
 
     if (existingUsername) {
+      log.info({ service: "user", msg: "registration refused", reason: "username_taken" });
       return NextResponse.json(
         { error: "Username already exists" },
         { status: 409 }
@@ -74,6 +77,7 @@ export async function POST(request: Request) {
       username,
       passwordHash,
     });
+    log.info({ service: "user", msg: "user registered", user_id: user.id });
 
     return NextResponse.json(
       {
@@ -91,6 +95,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("User creation failed:", error);
+    log.error({ service: "user", msg: "user creation failed", error: String(error) });
 
     return NextResponse.json(
       { error: "Internal server error" },

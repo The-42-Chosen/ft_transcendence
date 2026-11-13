@@ -32,6 +32,7 @@ export async function POST(request: Request) {
             .first();
 
         if (!user || !user.passwordHash) {
+            log.warn({ service: "auth", msg: "login failed", reason: "unknown_user" });
             return NextResponse.json(
                 { error: "Invalid email or password" },
                 { status: 401 }
@@ -44,12 +45,14 @@ export async function POST(request: Request) {
         );
 
         if (!passwordIsValid) {
+            log.warn({ service: "auth", msg: "login failed", reason: "bad_password", user_id: user.id });
             return NextResponse.json(
                 { error: "Invalid email or password" },
                 { status: 401 }
             );
         }
 
+        log.info({ service: "auth", msg: "login successful", user_id: user.id });
         return NextResponse.json({
             message: "Login successful",
             user: {
