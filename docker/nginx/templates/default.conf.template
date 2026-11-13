@@ -21,6 +21,8 @@ log_format json_logs escape=json '{'
     '"user_agent":"$http_user_agent"'
 '}';
 
+server_tokens off;
+
 server {
     listen 80;
     server_name _;
@@ -50,6 +52,8 @@ server {
     set $realtime_upstream http://realtime:3001;
     set $mailpit_upstream  http://mailpit:8025;
 
+    proxy_hide_header X-Powered-By;
+
     location / {
         proxy_pass $next_upstream;
 
@@ -62,10 +66,24 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade           $http_upgrade;
         proxy_set_header Connection        $connection_upgrade;
+
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+        add_header Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+
+        # Envoi d'avatar : l'application accepte 3 Mo
+        location ~ ^/api/users/[0-9]+/avatar$ {
+            client_max_body_size 3m;
+            proxy_pass $next_upstream;
+        }
     }
 
     # Socket.IO (service realtime) : WebSocket + long-polling.
     location /socket.io/ {
+        add_header X-Content-Type-Options "nosniff" always;
+
         proxy_pass $realtime_upstream;
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;
@@ -75,6 +93,10 @@ server {
         proxy_set_header Upgrade           $http_upgrade;
         proxy_set_header Connection        $connection_upgrade;
         proxy_read_timeout 1h;
+    }
+
+    location = /grafana/metrics {
+        return 404;
     }
 
     # Grafana, servi en sous-chemin

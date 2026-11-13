@@ -10,6 +10,7 @@ services:
       POSTGRES_USER: "${POSTGRES_USER:-transcendence}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_MONITORING_PASSWORD: "${POSTGRES_MONITORING_PASSWORD}"
+      PGPORT: "${POSTGRES_PORT:-5432}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -55,6 +56,8 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
+      AUTH_SECRET: "${AUTH_SECRET}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 15s
@@ -77,6 +80,8 @@ services:
       - ./.env
     environment:
       NODE_ENV: development
+      AUTH_SECRET: "${AUTH_SECRET}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
     ports:
@@ -118,7 +123,7 @@ services:
   # ------------------------------------------------------------------
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-8.17.4}
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.25
     container_name: elasticsearch
     environment:
       discovery.type: single-node
@@ -143,7 +148,7 @@ services:
   # Conteneur temporaire : attend ES puis pousse toute la configuration par API
   # (mots de passe, role Logstash, politique ILM, snapshots + SLM), puis s'arrete.
   elk-setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-8.17.4}
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.25
     container_name: elk-setup
     environment:
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD}"
@@ -161,7 +166,7 @@ services:
     restart: "no"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-8.17.4}
+    image: docker.elastic.co/logstash/logstash:8.19.25
     container_name: logstash
     environment:
       LOGSTASH_INTERNAL_PASSWORD: "${LOGSTASH_INTERNAL_PASSWORD}"
@@ -179,7 +184,7 @@ services:
     restart: unless-stopped
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-8.17.4}
+    image: docker.elastic.co/kibana/kibana:8.19.25
     container_name: kibana
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
@@ -203,7 +208,7 @@ services:
   # ------------------------------------------------------------------
 
   prometheus:
-    image: docker.io/prom/prometheus:v3.2.1
+    image: docker.io/prom/prometheus:v3.16.0
     container_name: prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -219,7 +224,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: docker.io/grafana/grafana:11.6.0
+    image: docker.io/grafana/grafana:12.4.15
     container_name: grafana
     environment:
       GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
@@ -258,7 +263,7 @@ services:
     restart: unless-stopped
 
   node-exporter:
-    image: docker.io/prom/node-exporter:v1.9.0
+    image: docker.io/prom/node-exporter:v1.12.1
     container_name: node-exporter
     command:
       - "--path.procfs=/host/proc"
@@ -273,7 +278,7 @@ services:
     restart: unless-stopped
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: ghcr.io/google/cadvisor:v0.60.6
     container_name: cadvisor
     privileged: true
     volumes:
@@ -286,10 +291,10 @@ services:
     restart: unless-stopped
 
   postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter:v0.16.0
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.20.1
     container_name: postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://monitoring:${POSTGRES_MONITORING_PASSWORD}@postgres:5432/${POSTGRES_DB:-transcendence}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://monitoring:${POSTGRES_MONITORING_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}?sslmode=disable"
     depends_on:
       postgres:
         condition: service_healthy
@@ -298,7 +303,7 @@ services:
     restart: unless-stopped
 
   nginx-exporter:
-    image: docker.io/nginx/nginx-prometheus-exporter:1.3.0
+    image: docker.io/nginx/nginx-prometheus-exporter:1.5.3
     container_name: nginx-exporter
     command:
       - "--nginx.scrape-uri=http://nginx:8081/stub_status"
@@ -309,7 +314,7 @@ services:
     restart: unless-stopped
 
   elasticsearch-exporter:
-    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.11.0
     container_name: elasticsearch-exporter
     command:
       - "--es.uri=http://elasticsearch:9200"
@@ -326,7 +331,7 @@ services:
 
   # Logstash et Kibana exporter
   blackbox-exporter:
-    image: docker.io/prom/blackbox-exporter:v0.25.0
+    image: docker.io/prom/blackbox-exporter:v0.29.1
     container_name: blackbox-exporter
     depends_on:
       - logstash
