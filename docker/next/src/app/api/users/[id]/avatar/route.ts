@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
+import { log } from "@/lib/log";
 
 import { mkdir, writeFile } from "fs/promises";
 import { randomUUID } from "crypto";
@@ -26,6 +27,7 @@ export async function POST(
     const userId = Number(id);
 
     if (!Number.isInteger(userId) || userId <= 0) {
+      log.warn({service:'user', msg:'error avatar', error: 'Invalid user id'})
       return NextResponse.json(
         { error: "Invalid user id" },
         { status: 400 }
@@ -34,7 +36,8 @@ export async function POST(
 
     const session = await auth();
 
-    if (!session?.user?.email) {
+    if (!session?.user?.email) { 
+      log.warn({service:'user', msg:'error avatar', error: 'Unauthorized'})
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -46,6 +49,7 @@ export async function POST(
       .first();
     
     if (!currentUser) {
+      log.warn({service:'user', msg:'error avatar', error: 'Unauthorized'})
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -53,6 +57,7 @@ export async function POST(
     }
     
     if (currentUser.id !== userId) {
+      log.warn({service:'user', msg:'error avatar', error: 'Forbidden', user_id: currentUser.id})
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -64,6 +69,7 @@ export async function POST(
       .first();
 
     if (!user) {
+      log.warn({service:'user', msg:'error avatar', error: 'user not found'})
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
@@ -74,6 +80,7 @@ export async function POST(
     const file = formData.get("avatar");
 
     if (!(file instanceof File)) {
+      log.info({service:'user', msg:'error avatar', error: 'no file', user_id: currentUser.id})
       return NextResponse.json(
         { error: "Avatar file is required" },
         { status: 400 }
@@ -83,6 +90,7 @@ export async function POST(
     const extension = ALLOWED_TYPES[file.type];
 
     if (!extension) {
+      log.info({service:'user', msg:'error avatar', error: 'unknown extension', user_id: currentUser.id})
       return NextResponse.json(
         { error: "Only JPEG, PNG and WebP are allowed" },
         { status: 400 }
@@ -90,6 +98,7 @@ export async function POST(
     }
 
     if (file.size === 0 || file.size > MAX_FILE_SIZE) {
+      log.info({service:'user', msg:'error avatar', error: 'size avatar too big', user_id: currentUser.id})
       return NextResponse.json(
         { error: "Avatar must be between 1 byte and 2 MB" },
         { status: 400 }
@@ -119,11 +128,10 @@ export async function POST(
     const updatedUser = await db.orm.public.User
       .where({ id: userId })
       .update({ avatarUrl });
-
+    log.info({service: 'user', msg: 'new avatar uploaded', userId, extension});	
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("Avatar upload failed:", error);
-
+    log.error({service:'user', msg: 'error avatar', error: String(error)});
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
