@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 import { z } from "zod";
+import { log } from "@/lib/log";
 
 const loginSchema = z.object({
   email: z.email(),
@@ -42,6 +43,7 @@ export const {
           .first();
 
         if (!user || !user.passwordHash) {
+	  log.info({service: 'auth', msg: 'login failed', email});
           return null;
         }
 
@@ -51,9 +53,10 @@ export const {
         );
 
         if (!passwordIsValid) {
+	  log.info({service: 'auth', msg: 'login failed', email});
           return null;
         }
-
+	log.info({service: 'auth', msg: 'login successful', user_id: user.id });
         return {
           id: String(user.id),
           email: user.email,
