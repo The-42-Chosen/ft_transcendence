@@ -33,6 +33,7 @@ export const {
         const parsed = loginSchema.safeParse(credentials);
 
         if (!parsed.success) {
+          log.warn({ service: "auth", msg: "login failed", reason: "invalid_input" });
           return null;
         }
 
