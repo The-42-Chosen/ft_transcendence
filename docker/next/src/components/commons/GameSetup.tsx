@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import GameModal from '@/components/reusables/GameModal';
 import GameInput from '@/components/reusables/GameInput';
 import { LANGUAGE_FLAGS, type Role } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
 
-type Step = "mode" | "language" | "room_code";
+type Step = "mode" | "connexion" | "language" | "room_code";
 
 const [EN, FR, ES] = Object.keys(LANGUAGE_FLAGS);
 
@@ -21,6 +21,15 @@ export default function GameSetup() {
   const [role, setRole] = useState<Role>("player");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userLogged, setUserLogged] = useState(true);
+  const [afterLogin, setAfterLogin] = useState<Step>("language");
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((session) => setUserLogged(!!session?.user))
+      .catch(() => setUserLogged(false));
+  }, []);
 
   function goTo(next: Step) {
     setError(null);
@@ -32,8 +41,22 @@ export default function GameSetup() {
       choice === s.createGame ? "game_master" :
         choice === s.joinGame ? "player" :
           "spectator";
+    const next: Step = choice === s.createGame ? "language" : "room_code";
     setRole(nextRole);
-    goTo(choice === s.createGame ? "language" : "room_code");
+    if (userLogged) {
+      goTo(next);
+    } else {
+      setAfterLogin(next);
+      goTo("connexion");
+    }
+  }
+
+  function pickConnexion(choice: string) {
+    if (choice === s.connexion) {
+      router.push("/login");
+    } else {
+      goTo(afterLogin);
+    }
   }
 
   async function createRoom(flag: string) {
@@ -86,6 +109,15 @@ export default function GameSetup() {
           text3={s.spectator}
           action={s.next}
           onConfirm={pickMode}
+        />
+      )}
+      {step === "connexion" && (
+        <GameModal
+          title={s.notLogged}
+          text1={s.connexion}
+          text2={s.guest}
+          action={s.next}
+          onConfirm={pickConnexion}
         />
       )}
       {step === "language" && (
