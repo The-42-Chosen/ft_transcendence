@@ -329,7 +329,7 @@
       },
       "10": {
         "title": "10. Confidentialité des enfants",
-        "content": "Si nos services sont destinés aux enfants ou peuvent collecter des données personnelles d'enfants, nous fournirons les garanties appropriées et nous conformerons aux exigences légales applicables concernant la confidentialité des enfants et le consentement parental."
+        "content": "Si nos services sont destinés aux enfants ou peuvent collecter des données personnelles d'enfants, nous fournirons les garanties appropriées et nous nous conformerons aux exigences légales applicables concernant la confidentialité des enfants et le consentement parental."
       },
       "11": {
         "title": "11. Modifications de cette Politique de confidentialité",
@@ -390,28 +390,13 @@
       },
       "4": {
         "title": "4. Bases légales du traitement",
-        "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base legal appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
+        "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base légale appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
         "points": [
-          {
-            "bold": "Consentement :",
-            "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique."
-          },
-          {
-            "bold": "Contrat :",
-            "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées."
-          },
-          {
-            "bold": "Obligation légale :",
-            "text": "Lorsque le traitement est requis pour se conformer à la loi applicable."
-          },
-          {
-            "bold": "Intérêts légitimes :",
-            "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne."
-          },
-          {
-            "bold": "Intérêts vitaux ou mission d'intérêt public :",
-            "text": "Lorsque les conditions légales applicables à ces bases sont remplies."
-          }
+          { "bold": "Consentement :", "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique." },
+          { "bold": "Contrat :", "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées." },
+          { "bold": "Obligation légale :", "text": "Lorsque le traitement est requis pour se conformer à la loi applicable." },
+          { "bold": "Intérêts légitimes :", "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne." },
+          { "bold": "Intérêts vitaux ou mission d'intérêt public :", "text": "Lorsque les conditions légales applicables à ces bases sont remplies." }
         ],
         "outro": "La base légale applicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
       },
@@ -429,7 +414,7 @@
           "Droit de retirer son consentement lorsque le traitement est fondé sur celui-ci."
         ],
         "contactIntro": "Les demandes peuvent être envoyées à",
-        "outro": "Nous répondrons dans les délais impartis par la loi applicable. En vertu du RGPD, le délai habituel est d'un mois, sous réserve des prolongations autorisées et a los requisitos de notificación."
+        "outro": "Nous répondrons dans les délais impartis par la loi applicable. En vertu du RGPD, le délai habituel est d'un mois, sous réserve des prolongations autorisées et des exigences de notification."
       },
       "6": {
         "title": "6. Sécurité des données",

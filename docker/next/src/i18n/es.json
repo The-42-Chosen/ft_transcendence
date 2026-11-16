@@ -310,7 +310,7 @@
       },
       "8": {
         "title": "8. Seguridad de los datos",
-        "content": "Implementamos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra el acceso no autorisé, pérdida, alteración, divulgación o destrucción. Estas medidas se adaptan a nuestra infraestructura y a la naturaleza de los datos que se procesan."
+        "content": "Implementamos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra el acceso no autorizado, pérdida, alteración, divulgación o destrucción. Estas medidas se adaptan a nuestra infraestructura y a la naturaleza de los datos que se procesan."
       },
       "9": {
         "title": "9. Tus derechos de privacidad",
@@ -429,11 +429,11 @@
           "Derecho a retirar el consentimiento cuando el procesamiento se base en él."
         ],
         "contactIntro": "Las solicitudes pueden enviarse a",
-        "outro": "Responderemos dentro de los plazos exigidos por la ley applicable. En virtud del RGPD, el plazo habitual es de un mes, sujeto a las prórrogas permitidas y a los requisitos de notificación."
+        "outro": "Responderemos dentro de los plazos exigidos por la ley aplicable. En virtud del RGPD, el plazo habitual es de un mes, sujeto a las prórrogas permitidas y a los requisitos de notificación."
       },
       "6": {
         "title": "6. Seguridad de los datos",
-        "content": "Implementamos y mantenemos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra la destrucción, pérdida, alteración accidental o ilícita, divulgación no autorizada o acceso no autorizado. Dependiendo de los riesgos involucrados, estas medidas pueden incluir controles de acceso, cifrado, copias de seguridad seguras, capacitación del personal y revisiones periódicas de la seguridad. Las medidas implementadas deben reflejar nuestros sistemas y prácticas reales."
+        "content": "Implementamos y mantenemos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra la destrucción, pérdida, alteración accidental o ilícita, divulgación no autorizada o acceso no autorizado. Dependiendo de los riesgos involucrados, estas medidas pueden incluir controles de acceso, cifrado, copias de seguridad seguras, capacitación del personal y revisiones periódicas de seguridad. Las medidas implementadas deben reflejar nuestros sistemas y prácticas reales."
       },
       "7": {
         "title": "7. Retención de datos",
@@ -469,7 +469,7 @@
       },
       "15": {
         "title": "15. Responsabilidades y rendición de cuentas",
-        "content": "The 42 Chosen es responsable de implementar las medidas de protección de datos aplicables a sus actividades. Las responsabilidades pueden inclure mantener registros de las actividades de procesamiento cuando sea necesario, revisar las medidas de seguridad, gestionar las solicitudes de los interesados, evaluar a los proveedores y proporcionar la capacitación pertinente al personal. Se nombrará un Delegado de Protección de Datos (DPD) cuando la ley lo exija."
+        "content": "The 42 Chosen es responsable de implementar las medidas de protección de datos aplicables a sus actividades. Las responsabilidades pueden incluir mantener registros de las actividades de procesamiento cuando sea necesario, revisar las medidas de seguridad, gestionar las solicitudes de los interesados, evaluar a los proveedores y proporcionar la capacitación pertinente al personal. Se nombrará un Delegado de Protección de Datos (DPD) cuando la ley lo exija."
       },
       "16": {
         "title": "16. Quejas y autoridades de control",
