@@ -310,7 +310,7 @@
       },
       "8": {
         "title": "8. Seguridad de los datos",
-        "content": "Implementamos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra el acceso no autorizado, pérdida, alteración, divulgación o destrucción. Estas medidas se adaptan a nuestra infraestructura y a la naturaleza de los datos que se procesan."
+        "content": "Implementamos medidas técnicas y organizativas adecuadas diseñadas para proteger los datos personales contra el acceso no autorisé, pérdida, alteración, divulgación o destrucción. Estas medidas se adaptan a nuestra infraestructura y a la naturaleza de los datos que se procesan."
       },
       "9": {
         "title": "9. Tus derechos de privacidad",
@@ -425,11 +425,11 @@
           "Derecho a la limitación del tratamiento.",
           "Derecho a la portabilidad de los datos, cuando corresponda.",
           "Derecho a oponerse a ciertas actividades de procesamiento.",
-          "Droits relatifs aux décisions fondées exclusivement sur un traitement automatisé, y compris le profilage, le cas échéant.",
+          "Derechos relacionados con decisiones basadas únicamente en el procesamiento automatizado, incluida la elaboración de perfiles, cuando corresponda.",
           "Derecho a retirar el consentimiento cuando el procesamiento se base en él."
         ],
         "contactIntro": "Las solicitudes pueden enviarse a",
-        "outro": "Responderemos dentro de los plazos exigidos por la ley aplicable. En virtud del RGPD, el plazo habitual es de un mes, sujeto a las prórrogas permitidas y a los requisitos de notificación."
+        "outro": "Responderemos dentro de los plazos exigidos por la ley applicable. En virtud del RGPD, el plazo habitual es de un mes, sujeto a las prórrogas permitidas y a los requisitos de notificación."
       },
       "6": {
         "title": "6. Seguridad de los datos",
@@ -449,11 +449,11 @@
       },
       "10": {
         "title": "10. Violaciones de datos personales",
-        "content": "Mantenemos procedimientos para identificar, evaluar, documenter y responder a las violaciones de datos personales. Cuando lo exija el RGPD, notificamos a la autoridad de control competente sin demora indebida y, cuando sea factible, dentro de las 72 horas posteriores a haber tenido conocimiento de la violación. Se informa a las personas afectadas sin demora indebida cuando es probable que la violación resulte en un alto riesgo para sus derechos y libertades, sujeto a las excepciones aplicables."
+        "content": "Mantenemos procedimientos para identificar, evaluar, documentar y responder a las violaciones de datos personales. Cuando lo exija el RGPD, notificamos a la autoridad de control competente sin demora indebida y, cuando sea factible, dentro de las 72 horas posteriores a haber tenido conocimiento de la violación. Se informa a las personas afectadas sin demora indebida cuando es probable que la violación resulte en un alto riesgo para sus derechos y libertades, sujeto a las excepciones aplicables."
       },
       "11": {
         "title": "11. Protección de datos desde el diseño y por defecto",
-        "content": "Nuestro objetivo es incorporar la protección de datos en el diseño y desarrollo de nuestros productos, servicios y procesos. Cuando corresponda, aplicamos la minimización de datos, restricciones de acceso, configuraciones amigables con la privacidad y otras garantías desde las primeras etapas de desarrollo y durante todo el ciclo de vida de los datos."
+        "content": "Nuestro objetivo es incorporar la protección de datos en el diseño y desarrollo de nuestros productos, servicios y procesos. Cuando corresponda, aplicamos la minimización de datos, las restricciones de acceso, configuraciones amigables con la privacidad y otras garantías desde las primeras etapas de desarrollo y durante todo el ciclo de vida de los datos."
       },
       "12": {
         "title": "12. Evaluaciones de impacto relativas a la protección de datos",
@@ -469,7 +469,7 @@
       },
       "15": {
         "title": "15. Responsabilidades y rendición de cuentas",
-        "content": "The 42 Chosen es responsable de implementar las medidas de protección de datos aplicables à sus actividades. Las responsabilidades pueden incluir mantener registros de las actividades de procesamiento cuando sea necesario, revisar las medidas de seguridad, gestionar las solicitudes de los interesados, evaluar a los proveedores y proporcionar la capacitación pertinente al personal. Se nombrará un Delegado de Protección de Datos (DPD) cuando la ley lo exija."
+        "content": "The 42 Chosen es responsable de implementar las medidas de protección de datos aplicables a sus actividades. Las responsabilidades pueden inclure mantener registros de las actividades de procesamiento cuando sea necesario, revisar las medidas de seguridad, gestionar las solicitudes de los interesados, evaluar a los proveedores y proporcionar la capacitación pertinente al personal. Se nombrará un Delegado de Protección de Datos (DPD) cuando la ley lo exija."
       },
       "16": {
         "title": "16. Quejas y autoridades de control",
