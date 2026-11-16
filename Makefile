@@ -140,8 +140,8 @@ next-logs: storage
 clean: down
 
 fclean: storage
-	$(DC) down -v --rmi all --remove-orphans
-	podman image prune -a -f
+	-$(DC) --profile dev down -v --rmi all --remove-orphans
+	-podman rm -f next-dev 2>/dev/null
 	rm -rf docker/next/public/uploads/avatars/*
 
 info: storage
