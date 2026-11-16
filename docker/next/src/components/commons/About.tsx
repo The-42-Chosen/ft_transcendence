@@ -10,9 +10,9 @@ export default function About() {
   return (
     <LegalDocument
       id="about"
-      label="About Us"
-      title="Les Tontons Forkers & Cie."
-      intro="A lovely group of tutors. Thanks Tonton!"
+      label={t.aboutPage.label}
+      title={t.aboutPage.title}
+      intro={t.aboutPage.intro}
       lastUpdated="28/10/2026"
       sections={[]}
     >
