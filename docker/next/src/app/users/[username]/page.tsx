@@ -9,6 +9,8 @@ import { db } from "@/prisma/db";
 import Link from "next/link";
 import { auth } from "@/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function UserPage({
   params,
 }: {
@@ -25,7 +27,7 @@ export default async function UserPage({
   }
 
   const session = await auth();
-
+  
   if (!session?.user?.email) {
     return <p>You must be logged in</p>;
   }
