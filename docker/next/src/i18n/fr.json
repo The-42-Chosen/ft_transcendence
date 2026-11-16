@@ -149,7 +149,7 @@
         ]
       },
       {
-        "title": "5. Règles d'utilisation",
+        "title": "5. Règles de utilisation",
         "blocks": [
           {
             "p": "En utilisant le service, vous vous engagez à ne pas :"
@@ -249,5 +249,207 @@
         ]
       }
     ]
+  },
+  "aboutPage": {
+    "label": "À propos de nous",
+    "title": "Les Tontons Forkers & Cie.",
+    "intro": "Un adorable groupe de tuteurs. Merci Tonton !"
+  },
+  "privacyPage": {
+    "label": "Informations légales",
+    "title": "Politique de confidentialité",
+    "intro": "Découvrez comment nous collectons, utilisons, stockons et protégeons vos informations personnelles.",
+    "sections": {
+      "1": {
+        "title": "1. Responsable du traitement des données",
+        "intro": "Le responsable du traitement des données à caractère personnel collectées via ce site web ou cette application est :",
+        "company": "Société / Nom :",
+        "address": "Adresse :",
+        "email": "E-mail :"
+      },
+      "2": {
+        "title": "2. Données personnelles que nous collectons",
+        "intro": "Selon la façon dont vous utilisez nos services, nous pouvons collecter les catégories de données personnelles suivantes :",
+        "points": [
+          "Informations d'identité, telles que votre nom et prénom.",
+          "Coordonnées, telles que votre adresse e-mail et votre numéro de téléphone.",
+          "Informations de compte nécessaires pour créer et gérer votre compte utilisateur.",
+          "Informations techniques, telles que votre adresse IP, votre type de navigateur, les informations de votre appareil et les journaux techniques, le cas échéant.",
+          "Informations que vous fournissez volontairement via des formulaires ou des messages."
+        ],
+        "outro": "Nous ne collectons que les données personnelles nécessaires aux fins décrites dans la présente Politique de confidentialité."
+      },
+      "3": {
+        "title": "3. Comment et pourquoi nous utilisons vos données",
+        "intro": "Nous pouvons utiliser vos données personnelles pour :",
+        "points": [
+          "Fournir et exploiter nos services.",
+          "Créer et gérer les comptes utilisateurs.",
+          "Répondre aux demandes et fournir un support client.",
+          "Maintenir la sécurité et prévenir la fraude ou les abus.",
+          "Nous conformer aux obligations légales applicables.",
+          "Envoyer des communications marketing lorsque la loi l'autorise et, si nécessaire, avec votre consentement."
+        ],
+        "outro": "Selon l'activité de traitement, notre base légale peut être l'exécution d'un contrat, votre consentement, le respect d'une obligation légale ou nos intérêts légitimes."
+      },
+      "4": {
+        "title": "4. Conservation des données",
+        "content": "Nous ne conservons les données personnelles que le temps nécessaire à l'accomplissement des finalités pour lesquelles elles ont été collectées, sous réserve des obligations légales de conservation applicables. Les durées de conservation dépendent de la catégorie de données et de la finalité du traitement."
+      },
+      "5": {
+        "title": "5. Partage des données personnelles",
+        "content": "Vos données personnelles peuvent être consultées par le personnel autorisé et les prestataires de services techniques agissant en notre nom, dans la mesure nécessaire à l'exécution de leurs services. Nous ne vendons pas vos données personnelles à des tiers, à condition que cette déclaration reflète fidèlement nos pratiques réelles. Toute divulgation supplémentaire ne sera effectuée que s'il existe une base légale appropriée."
+      },
+      "6": {
+        "title": "6. Hébergement des données et transferts internationaux",
+        "content": "Vos données personnelles sont hébergées par 42.paris.fr en France. Si des données personnelles sont transférées en dehors de l'Espace économique européen, nous mettrons en œuvre les garanties applicables requises par la législation sur la protection des données. Des informations sur ces garanties seront mises à disposition le cas échéant."
+      },
+      "7": {
+        "title": "7. Cookies et technologies similaires",
+        "content": "Ce site web peut utiliser des cookies et des technologies similaires pour garantir son bon fonctionnement, mémoriser vos préférences ou mesurer l'activité de l'audience. Lorsque le consentement est requis, les technologies concernées ne seront activées qu'après avoir obtenu votre accord."
+      },
+      "8": {
+        "title": "8. Sécurité des données",
+        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées conçues pour protéger les données personnelles contre l'accès non autorisé, la perte, l'altération, la divulgation ou la destruction. Ces mesures sont adaptées à notre infrastructure et à la nature des données traitées."
+      },
+      "9": {
+        "title": "9. Vos droits en matière de confidentialité",
+        "intro": "Selon les lois applicables sur la protection des données, vous pouvez avoir le droit de :",
+        "points": [
+          "Demander l'accès à vos données personnelles.",
+          "Demander la correction de données inexactes ou incomplètes.",
+          "Demander la suppression de vos données personnelles.",
+          "Demander la limitation de certaines activités de traitement.",
+          "Demander la portabilité des données, le cas échéant.",
+          "Vous opposer à certaines activités de traitement.",
+          "Retirer votre consentement à tout moment lorsque le traitement est fondé sur le consentement."
+        ],
+        "contactIntro": "Pour exercer vos droits, contactez-nous à",
+        "outro": "Vous pouvez également déposer une plainte auprès de votre autorité de protection des données compétente, telle que la CNIL en France."
+      },
+      "10": {
+        "title": "10. Confidentialité des enfants",
+        "content": "Si nos services sont destinés aux enfants ou peuvent collecter des données personnelles d'enfants, nous fournirons les garanties appropriées et nous conformerons aux exigences légales applicables concernant la confidentialité des enfants et le consentement parental."
+      },
+      "11": {
+        "title": "11. Modifications de cette Politique de confidentialité",
+        "content": "Nous pouvons mettre à jour cette Politique de confidentialité de temps à autre pour refléter les modifications apportées à nos services, à nos pratiques de traitement des données ou aux lois applicables. La date de la dernière révision sera indiquée ci-dessous."
+      },
+      "12": {
+        "title": "12. Nous contacter",
+        "content": "Si vous avez des questions sur cette Politique de confidentialité ou sur la façon dont nous traitons vos données personnelles, veuillez nous contacter à"
+      }
+    }
+  },
+  "gdprPage": {
+    "label": "Légal & Conformité",
+    "title": "Politique de conformité RGPD",
+    "intro": "Notre approche de la protection des données personnelles, des droits à la vie privée et de la conformité au Règlement Général sur la Protection des Données.",
+    "sections": {
+      "1": {
+        "title": "1. Introduction",
+        "content": "The 42 Chosen s'engage à protéger les données personnelles et à respecter les droits à la vie privée des individus. Cette Politique de conformité RGPD décrit les principes et procédures que nous suivons pour protéger les données personnelles conformément au Règlement Général sur la Protection des Données (UE) 2016/679 (RGPD), le cas échéant."
+      },
+      "2": {
+        "title": "2. Champ d'application de cette politique",
+        "content": "Cette politique s'applique aux données personnelles traitées par The 42 Chosen en lien avec notre site web, application, produits, services et opérations commerciales. Elle s'applique aux employés, sous-traitants et prestataires de services qui traitent des données personnelles en notre nom, dans la mesure où cela concerne leurs rôles et obligations contractuelles."
+      },
+      "3": {
+        "title": "3. Principes du traitement des données",
+        "intro": "Nous nous efforçons de traiter les données personnelles conformément aux principes suivants du RGPD :",
+        "points": [
+          { "bold": "Licéité, loyauté et transparence :", "text": "Les données sont traitées de manière licite, loyale et transparente." },
+          { "bold": "Limitation des finalités :", "text": "Les données sont collectées pour des finalités déterminées, explicites et légitimes." },
+          { "bold": "Minimisation des données :", "text": "Seules les données nécessaires à la finalité prévue sont collectées." },
+          { "bold": "Exactitude :", "text": "Des mesures raisonnables sont prises pour garder les données personnelles exactes et à jour." },
+          { "bold": "Limitation de la conservation :", "text": "Les données ne sont pas conservées plus longtemps que nécessaire, sous réserve des exigences légales." },
+          { "bold": "Intégrité et confidentialité :", "text": "Des garanties appropriées sont utilisées pour protéger les données personnelles." },
+          { "bold": "Responsabilité :", "text": "Nous visons à démontrer notre conformité avec les exigences applicables en matière de protection des données." }
+        ]
+      },
+      "4": {
+        "title": "4. Bases légales du traitement",
+        "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base légale appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
+        "points": [
+          { "bold": "Consentement :", "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique." },
+          { "bold": "Contrat :", "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées." },
+          { "bold": "Obligation légale :", "text": "Lorsque le traitement est requis pour se conformer à la loi applicable." },
+          { "bold": "Intérêts légitimes :", "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne." },
+          { "bold": "Intérêts vitaux ou mission d'intérêt public :", "text": "Lorsque les conditions légales applicables à ces bases sont remplies." }
+        ],
+        "outro": "La base légale applicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
+      },
+      "5": {
+        "title": "5. Droits des personnes concernées",
+        "intro": "Sous réserve des conditions et exceptions prévues par le RGPD, les personnes peuvent exercer les droits suivants :",
+        "points": [
+          "Droit d'accès aux données personnelles.",
+          "Droit de rectification des données inexactes.",
+          "Droit à l'effacement, également connu sous le nom de droit à l'oubli.",
+          "Droit à la limitation du traitement.",
+          "Droit à la portabilité des données, le cas échéant.",
+          "Droit de s'opposer à certaines activités de traitement.",
+          "Droits relatifs aux décisions fondées exclusivement sur un traitement automatisé, y compris le profilage, le cas échéant.",
+          "Droit de retirer son consentement lorsque le traitement est fondé sur celui-ci."
+        ],
+        "contactIntro": "Les demandes peuvent être envoyées à",
+        "outro": "Nous répondrons dans les délais impartis par la loi applicable. En vertu du RGPD, le délai habituel est d'un mois, sous réserve des prolongations autorisées et des exigences de notification."
+      },
+      "6": {
+        "title": "6. Sécurité des données",
+        "content": "Nous mettons en œuvre et maintenons des mesures techniques et organisationnelles appropriées conçues pour protéger les données personnelles contre la destruction, la perte, l'altération accidentelle ou illicite, la divulgation non autorisée ou l'accès non autorisé. Selon les risques encourus, ces mesures peuvent inclure des contrôles d'accès, le chiffrement, des sauvegardes sécurisées, la formation du personnel et des examens réguliers de la sécurité. Les mesures mises en œuvre doivent refléter nos systèmes et pratiques réels."
+      },
+      "7": {
+        "title": "7. Conservation des données",
+        "content": "Les données personnelles ne sont conservées que le temps nécessaire aux fins pour lesquelles elles ont été collectées, à moins qu'une période plus longue ne soit requise ou autorisée par la loi. Les durées de conservation sont déterminées en fonction du type de données, de la finalité du traitement, des obligations légales applicables et des délais de prescription pertinents. Les données qui ne sont plus nécessaires sont supprimées de manière sécurisée ou anonymisées, le cas échéant."
+      },
+      "8": {
+        "title": "8. Sous-traitants et tiers",
+        "content": "Nous pouvons faire appel à des prestataires de services tiers pour soutenir nos opérations, tels que des fournisseurs d'hébergement, d'infrastructure, d'analyse, d'assistance client ou de traitement des paiements. Lorsqu'un prestataire agit en tant que sous-traitant en notre nom, nous mettons en œuvre les dispositions contractuelles requises par l'article 28 du RGPD, le cas échéant. Nous prenons des mesures appropriées pour évaluer les prestataires et limiter leur accès aux seules données personnelles nécessaires à l'exécution de leurs services."
+      },
+      "9": {
+        "title": "9. Transferts internationaux de données",
+        "content": "Lorsque des données personnelles sont transférées en dehors de l'Espace économique européen, nous nous assurons qu'un mécanisme de transfert approprié et des garanties sont en place lorsque le chapitre V du RGPD l'exige. Selon les circonstances, cela peut inclure une décision d'adéquation, des clauses contractuelles types et des mesures supplémentaires si nécessaire."
+      },
+      "10": {
+        "title": "10. Violations de données personnelles",
+        "content": "Nous maintenons des procédures pour identifier, évaluer, documenter et réagir aux violations de données personnelles. Lorsque le RGPD l'exige, nous notifions l'autorité de contrôle compétente dans les meilleurs délais et, si possible, dans les 72 heures après en avoir pris connaissance. Les personnes concernées sont informées dans les meilleurs délais lorsque la violation est susceptible d'engendrer un risque élevé pour leurs droits et libertés, sous réserve des exceptions applicables."
+      },
+      "11": {
+        "title": "11. Protection des données dès la conception et par défaut",
+        "content": "Nous visons à intégrer la protection des données dans la conception et le développement de nos produits, services et processus. Le cas échéant, nous appliquons la minimisation des données, les restrictions d'accès, des paramètres respectueux de la vie privée et d'autres garanties dès les premières étapes du développement et tout au long du cycle de vie des données."
+      },
+      "12": {
+        "title": "12. Analyses d'impact sur la protection des données",
+        "content": "Lorsqu'un type de traitement est susceptible d'engendrer un risque élevé pour les droits et libertés des personnes, nous évaluons si une Analyse d'Impact sur la Protection des Données (AIPD) est requise en vertu de l'article 35 du RGPD. Si nécessaire, l'évaluation est réalisée avant le début du traitement concerné."
+      },
+      "13": {
+        "title": "13. Données personnelles des enfants",
+        "content": "Lorsque nos services impliquent les données personnelles d'enfants, nous appliquons des garanties appropriées et nous conformons aux exigences légales supplémentaires applicables aux enfants. Lorsque le consentement est utilisé pour un service en ligne offert directement à un enfant, les règles applicables sur l'autorisation parentale et l'âge du consentement sont prises en compte."
+      },
+      "14": {
+        "title": "14. Cookies et consentement",
+        "content": "Lorsque les cookies ou technologies similaires nécessitent un consentement, nous fournissons des informations appropriées et obtenons un consentement valide avant d'activer les technologies concernées. Toute exemption de consentement est évaluée selon les règles applicables."
+      },
+      "15": {
+        "title": "15. Responsabilités et obligation de rendre des comptes",
+        "content": "The 42 Chosen est responsable de la mise en œuvre des mesures de protection des données applicables à ses activités. Les responsabilités peuvent inclure la tenue de registres de traitement le cas échéant, la révision des mesures de sécurité, la gestion des demandes des personnes concernées, l'évaluation des fournisseurs et la formation pertinente du personnel. Un Délégué à la Protection des Données (DPO) sera nommé lorsque la loi l'exige."
+      },
+      "16": {
+        "title": "16. Plaintes et autorités de contrôle",
+        "content": "Les personnes qui estiment que leurs données personnelles ont été traitées de manière illicite peuvent nous contacter en utilisant les coordonnées ci-dessous. Elles ont également le droit de déposer une plainte auprès d'une autorité de contrôle compétente, en particulier dans l'État membre de l'UE de leur résidence habituelle, de leur lieu de travail ou du lieu de l'infraction présumée, sous réserve des règles applicables. En France, l'autorité de contrôle est la Commission Nationale de l'Informatique et des Libertés (CNIL)."
+      },
+      "17": {
+        "title": "17. Mises à jour de la politique",
+        "content": "Nous pouvons mettre à jour cette politique pour refléter les changements dans nos opérations, mesures techniques ou exigences légales. La dernière version sera publiée sur cette page avec sa date de révision."
+      },
+      "18": {
+        "title": "18. Coordonnées",
+        "intro": "Pour toute question concernant cette politique ou nos pratiques de protection des données personnelles, veuillez contacter :",
+        "company": "Société :",
+        "address": "Adresse :",
+        "email": "Contact vie privée :"
+      }
+    }
   }
 }
