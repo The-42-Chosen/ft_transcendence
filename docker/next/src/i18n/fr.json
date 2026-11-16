@@ -133,7 +133,7 @@
         "title": "3. Conditions d'âge",
         "blocks": [
           {
-            "p": "Vous devez avoir au moins 15 ans pour créer un compte, ce qui correspond à l'âge de la majorité numérique en France. Si vous êtes plus jeune, vous ne pouvez utiliser le service qu'avec l'autorisation d'un parent ou d'un représentant légal, qui accepte les présentes CGU en votre nom."
+            "p": "Vous devez avoir au moins 15 ans pour créer un compte, qui correspond à l'âge de la majorité numérique en France. Si vous êtes plus jeune, vous ne pouvez utiliser le service qu'avec l'autorisation d'un parent ou d'un représentant légal, qui accepte les présentes CGU en votre nom."
           }
         ]
       },
@@ -149,7 +149,7 @@
         ]
       },
       {
-        "title": "5. Règles de utilisation",
+        "title": "5. Règles d'utilisation",
         "blocks": [
           {
             "p": "En utilisant le service, vous vous engagez à ne pas :"
@@ -277,7 +277,7 @@
           "Informations techniques, telles que votre adresse IP, votre type de navigateur, les informations de votre appareil et les journaux techniques, le cas échéant.",
           "Informations que vous fournissez volontairement via des formulaires ou des messages."
         ],
-        "outro": "Nous ne collectons que les données personnelles nécessaires aux fins décrites dans la présente Politique de confidentialité."
+        "outro": "Nous ne collectons que les données personnelles qui sont nécessaires aux fins décrites dans la présente Politique de confidentialité."
       },
       "3": {
         "title": "3. Comment et pourquoi nous utilisons vos données",
@@ -298,7 +298,7 @@
       },
       "5": {
         "title": "5. Partage des données personnelles",
-        "content": "Vos données personnelles peuvent être consultées par le personnel autorisé et les prestataires de services techniques agissant en notre nom, dans la mesure nécessaire à l'exécution de leurs services. Nous ne vendons pas vos données personnelles à des tiers, à condition que cette déclaration reflète fidèlement nos pratiques réelles. Toute divulgation supplémentaire ne sera effectuée que s'il existe une base legal appropriée."
+        "content": "Vos données personnelles peuvent être consultées par le personnel autorisé et les prestataires de services techniques agissant en notre nom, dans la mesure nécessaire à l'exécution de leurs services. Nous ne vendons pas vos données personnelles à des tiers, à condition que cette déclaration reflète fidèlement nos pratiques réelles. Toute divulgation supplémentaire ne sera effectuée que s'il existe une base légale appropriée."
       },
       "6": {
         "title": "6. Hébergement des données et transferts internationaux",
@@ -306,10 +306,10 @@
       },
       "7": {
         "title": "7. Cookies et technologies similaires",
-        "content": "Ce site web peut utiliser des cookies et des technologies similaires pour garantir son bon fonctionnement, mémoriser vos préférences ou mesurer la activité de l'audience. Lorsque le consentement est requis, les technologies concernées ne seront activées qu'après avoir obtenu votre accord."
+        "content": "Ce site web peut utiliser des cookies et des technologies similaires pour garantir son bon fonctionnement, mémoriser vos préférences ou mesurer l'activité de l'audience. Lorsque le consentement est requis, les technologies concernées ne seront activées qu'après avoir obtenu votre accord."
       },
       "8": {
-        "title": "8. Sécurité de los données",
+        "title": "8. Sécurité des données",
         "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées conçues pour protéger les données personnelles contre l'accès non autorisé, la perte, l'altération, la divulgation ou la destruction. Ces mesures sont adaptées à notre infrastructure et à la nature des données traitées."
       },
       "9": {
@@ -390,7 +390,7 @@
       },
       "4": {
         "title": "4. Bases légales du traitement",
-        "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base légale appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
+        "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base legal appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
         "points": [
           {
             "bold": "Consentement :",
@@ -401,7 +401,7 @@
             "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées."
           },
           {
-            "bold": "Obligación legal :",
+            "bold": "Obligation légale :",
             "text": "Lorsque le traitement est requis pour se conformer à la loi applicable."
           },
           {
@@ -413,7 +413,7 @@
             "text": "Lorsque les conditions légales applicables à ces bases sont remplies."
           }
         ],
-        "outro": "La base légale aplicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
+        "outro": "La base légale applicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
       },
       "5": {
         "title": "5. Droits des personnes concernées",
@@ -429,11 +429,11 @@
           "Droit de retirer son consentement lorsque le traitement est fondé sur celui-ci."
         ],
         "contactIntro": "Les demandes peuvent être envoyées à",
-        "outro": "Nous répondrons dans les délais impartis par la loi applicable. En vertu du RGPD, le délai habituel est d'un mois, sous réserve des prolongations autorisées et des exigences de notification."
+        "outro": "Nous répondrons dans les délais impartis par la loi applicable. En vertu du RGPD, le délai habituel est d'un mois, sous réserve des prolongations autorisées et a los requisitos de notificación."
       },
       "6": {
         "title": "6. Sécurité des données",
-        "content": "Nous mettons en œuvre et maintenons des mesures techniques et organisationnelles appropriées conçues pour protéger les données personnelles contre la destruction, la perte, l'altération accidentelle ou illicite, la divulgation non autorisée ou l'accès non autorisé. Dependiendo de los riesgos encourus, ces mesures peuvent inclure des contrôles d'accès, le chiffrement, des sauvegardes sécurisées, la formation du personnel et des examens réguliers de la sécurité. Les mesures mises en œuvre doivent refléter nos systèmes et pratiques réels."
+        "content": "Nous mettons en œuvre et maintenons des mesures techniques et organisationnelles appropriées conçues pour protéger les données personnelles contre la destruction, la perte, l'altération accidentelle ou illicite, la divulgation non autorisée ou l'accès non autorisé. Selon les risques encourus, ces mesures peuvent inclure des contrôles d'accès, le chiffrement, des sauvegardes sécurisées, la formation du personnel et des examens réguliers de la sécurité. Les mesures mises en œuvre doivent refléter nos systèmes et pratiques réels."
       },
       "7": {
         "title": "7. Conservation des données",
@@ -465,15 +465,15 @@
       },
       "14": {
         "title": "14. Cookies et consentement",
-        "content": "Lorsque les cookies ou technologies similaires nécessitent un consentement, nous fournissons des informations appropriées et obtenons un consentement válido avant d'activer les technologies concernées. Toute exemption de consentement est évaluée selon les règles applicables."
+        "content": "Lorsque les cookies ou technologies similaires nécessitent un consentement, nous fournissons des informations appropriées et obtenons un consentement valide avant d'activer les technologies concernées. Toute exemption de consentement est évaluée selon les règles applicables."
       },
       "15": {
-        "title": "15. Responsabilidades y rendición de cuentas",
+        "title": "15. Responsabilités et obligation de rendre des comptes",
         "content": "The 42 Chosen est responsable de la mise en œuvre des mesures de protection des données applicables à ses activités. Les responsabilités peuvent inclure la tenue de registres de traitement le cas échéant, la révision des mesures de sécurité, la gestion des demandes des personnes concernées, l'évaluation des fournisseurs et la formation pertinente du personnel. Un Délégué à la Protection des Données (DPO) sera nommé lorsque la loi l'exige."
       },
       "16": {
         "title": "16. Plaintes et autorités de contrôle",
-        "content": "Les personnes qui estiment que leurs données personnelles ont été traitées de manière illicite peuvent nous contacter en utilisant les coordonnées ci-dessous. Elles ont également le droit de déposer une plainte auprès d'une autoridad de contrôle compétente, en particular dans l'État membre de l'UE de leur résidence habituelle, de leur lieu de travail ou du lieu de l'infraction présumée, sous réserve des règles applicables. En France, l'autorité de contrôle est la Commission Nationale de l'Informatique et des Libertés (CNIL)."
+        "content": "Les personnes qui estiment que leurs données personnelles ont été traitées de manière illicite peuvent nous contacter en utilisant les coordonnées ci-dessous. Elles ont également le droit de déposer une plainte auprès d'une autorité de contrôle compétente, en particulier dans l'État membre de l'UE de leur résidence habituelle, de leur lieu de travail ou du lieu de l'infraction présumée, sous réserve des règles applicables. En France, l'autorité de contrôle est la Commission Nationale de l'Informatique et des Libertés (CNIL)."
       },
       "17": {
         "title": "17. Mises à jour de la politique",
@@ -481,7 +481,7 @@
       },
       "18": {
         "title": "18. Coordonnées",
-        "intro": "Pour toute question concernant cette politique ou nos pratiques de protection de datos personales, veuillez contacter :",
+        "intro": "Pour toute question concernant cette politique ou nos pratiques de protection des données personnelles, veuillez contacter :",
         "company": "Société :",
         "address": "Adresse :",
         "email": "Contact vie privée :"
