@@ -22,23 +22,23 @@ services:
       - transcendence
     restart: unless-stopped
 
-prisma-migrate:
-  build:
-    context: ./docker/next
-    target: dev
-  container_name: prisma-migrate
-  env_file:
-    - ./.env
-  command: ["pnpm", "prisma", "db", "migrate"]
-  volumes:
-    - ./docker/next:/app
-    - prisma_migrate_node_modules:/app/node_modules
-  depends_on:
-    postgres:
-      condition: service_healthy
-  networks:
-    - transcendence
-  restart: "no"
+  prisma-migrate:
+    build:
+      context: ./docker/next
+      target: dev
+    container_name: prisma-migrate
+    env_file:
+      - ./.env
+    command: ["pnpm", "prisma", "db", "migrate"]
+    volumes:
+      - ./docker/next:/app
+      - prisma_migrate_node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - transcendence
+    restart: "no"
 
   nginx:
     build:
