@@ -22,23 +22,23 @@ services:
       - transcendence
     restart: unless-stopped
 
-  prisma-migrate:
-    build:
-      context: ./docker/next
-      target: dev
-    container_name: prisma-migrate
-    env_file:
-      - ./.env
-    command: ["pnpm", "prisma", "db", "migrate"]
-    volumes:
-      - ./docker/next:/app
-      - next_dev_node_modules:/app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - transcendence
-    restart: "no"
+prisma-migrate:
+  build:
+    context: ./docker/next
+    target: dev
+  container_name: prisma-migrate
+  env_file:
+    - ./.env
+  command: ["pnpm", "prisma", "db", "migrate"]
+  volumes:
+    - ./docker/next:/app
+    - prisma_migrate_node_modules:/app/node_modules
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - transcendence
+  restart: "no"
 
   nginx:
     build:
@@ -74,6 +74,7 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
+      AUTH_URL: "https://localhost:${NGINX_SSL_PORT:-8443}"
     depends_on:
       prisma-migrate:
         condition: service_completed_successfully
@@ -105,6 +106,7 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
+      AUTH_URL: "http://localhost:${NEXT_DEV_PORT:-3000}"
     depends_on:
       prisma-migrate:
         condition: service_completed_successfully
@@ -381,6 +383,7 @@ networks:
 
 volumes:
   next_dev_node_modules:
+  prisma_migrate_node_modules:
   next_dev_build:
   postgres_data:
   prometheus_data:
