@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export type LegalSection = {
   title: string;
@@ -30,18 +33,20 @@ export function ContactEmail() {
 }
 
 export default function LegalDocument({ id, label, title, intro, lastUpdated, sections, children }: Parameters) {
+  const { t } = useLanguage();
+
   return (
     <article className="mx-auto my-8 max-w-3xl rounded-2xl border border-(--color-border-default) bg-(--color-bg-surface) p-6 text-left leading-relaxed shadow-2xl sm:my-16 sm:p-12">
       <header className="p-6 border-b border-(--color-border-default) pb-8 !bg-transparent">
         <span className="font-agent text-xs uppercase tracking-[0.2em] text-(--color-accent-gold)">{label}</span>
         <h1 className="my-4 font-display text-4xl tracking-wide sm:text-5xl">{title}</h1>
         <p className="text-(--color-text-secondary)">{intro}</p>
-        <p className="mt-5 text-sm text-(--color-text-muted)">Last updated: {lastUpdated}</p>
+        <p className="mt-5 text-sm text-(--color-text-muted)">{t.commons.lastUpdated} {lastUpdated}</p>
       </header>
 
       {sections.length > 0 && (
       <nav aria-label="Table of contents" className="my-8 rounded-xl bg-(--color-bg-elevated) p-6">
-        <h2 className="mb-3 font-display text-2xl tracking-wide">Table of Contents</h2>
+        <h2 className="mb-3 font-display text-2xl tracking-wide">{t.commons.tableOfContents}</h2>
         <ol className="grid list-decimal gap-x-6 gap-y-2 pl-5 sm:grid-cols-2">
           {sections.map((section, index) => (
             <li key={section.title}>
