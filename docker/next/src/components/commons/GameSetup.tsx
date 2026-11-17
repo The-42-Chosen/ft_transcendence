@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GameModal from '@/components/reusables/GameModal';
 import GameInput from '@/components/reusables/GameInput';
-import { LANGUAGE_FLAGS, type Role } from '@/lib/lobby';
+import { GUEST_NAME_KEY, GUEST_NAME_MAX, LANGUAGE_FLAGS, type Role } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
 
-type Step = "mode" | "connexion" | "language" | "room_code";
+type Step = "mode" | "connexion" | "guest_name" | "language" | "room_code";
 
 const [EN, FR, ES] = Object.keys(LANGUAGE_FLAGS);
 
-// Walks the player through the setup modals, one at a time, then sends them to the waiting room
 export default function GameSetup() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -21,14 +20,14 @@ export default function GameSetup() {
   const [role, setRole] = useState<Role>("player");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userLogged, setUserLogged] = useState(true);
   const [afterLogin, setAfterLogin] = useState<Step>("language");
+  const sessionCheck = useRef<Promise<boolean> | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/session")
+    sessionCheck.current = fetch("/api/auth/session")
       .then((res) => (res.ok ? res.json() : null))
-      .then((session) => setUserLogged(!!session?.user))
-      .catch(() => setUserLogged(false));
+      .then((session) => !!session?.user)
+      .catch(() => false);
   }, []);
 
   function goTo(next: Step) {
@@ -36,13 +35,14 @@ export default function GameSetup() {
     setStep(next);
   }
 
-  function pickMode(choice: string) {
+  async function pickMode(choice: string) {
     const nextRole: Role =
       choice === s.createGame ? "game_master" :
         choice === s.joinGame ? "player" :
           "spectator";
     const next: Step = choice === s.createGame ? "language" : "room_code";
     setRole(nextRole);
+    const userLogged = await (sessionCheck.current ?? Promise.resolve(false));
     if (userLogged) {
       goTo(next);
     } else {
@@ -55,8 +55,16 @@ export default function GameSetup() {
     if (choice === s.connexion) {
       router.push("/login");
     } else {
-      goTo(afterLogin);
+      goTo("guest_name");
     }
+  }
+
+  function pickGuestName(name: string) {
+    try {
+      sessionStorage.setItem(GUEST_NAME_KEY, name);
+    } catch {
+    }
+    goTo(afterLogin);
   }
 
   async function createRoom(flag: string) {
@@ -118,6 +126,16 @@ export default function GameSetup() {
           text2={s.guest}
           action={s.next}
           onConfirm={pickConnexion}
+        />
+      )}
+      {step === "guest_name" && (
+        <GameInput
+          title={s.guestNameTitle}
+          label={s.guestNameLabel}
+          info={s.guestNameInfo}
+          variant="text"
+          maxLength={GUEST_NAME_MAX}
+          onSubmit={pickGuestName}
         />
       )}
       {step === "language" && (

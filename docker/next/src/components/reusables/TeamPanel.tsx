@@ -10,10 +10,11 @@ type Parameters = {
 	team: TeamColor;
 	roster: TeamRoster;
 	seat: Seat | null;
+	myName?: string | null;
 	onJoin?: (seat: Seat) => void;
 };
 
-export default function TeamPanel({ team, roster, seat, onJoin }: Parameters) {
+export default function TeamPanel({ team, roster, seat, myName, onJoin }: Parameters) {
 	const { t } = useLanguage();
 	const wr = t.waitingRoom;
 
@@ -25,6 +26,7 @@ export default function TeamPanel({ team, roster, seat, onJoin }: Parameters) {
 				team={team}
 				players={roster.spymasters}
 				isYou={seat === `${team}-spymaster`}
+				myName={myName}
 				max={MAX_SPYMASTERS}
 				onJoin={onJoin && (() => onJoin(`${team}-spymaster`))}
 			/>
@@ -34,6 +36,7 @@ export default function TeamPanel({ team, roster, seat, onJoin }: Parameters) {
 				team={team}
 				players={roster.operatives}
 				isYou={seat === `${team}-operative`}
+				myName={myName}
 				onJoin={onJoin && (() => onJoin(`${team}-operative`))}
 			/>
 		</div>
