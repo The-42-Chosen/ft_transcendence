@@ -358,24 +358,60 @@
         "title": "3. Principles of Data Processing",
         "intro": "We aim to process personal data in accordance with the following GDPR principles:",
         "points": [
-          { "bold": "Lawfulness, fairness, and transparency:", "text": "Data is processed lawfully, fairly, and transparently." },
-          { "bold": "Purpose limitation:", "text": "Data is collected for specified, explicit, and legitimate purposes." },
-          { "bold": "Data minimization:", "text": "Only data that is necessary for the intended purpose is collected." },
-          { "bold": "Accuracy:", "text": "Reasonable steps are taken to keep personal data accurate and up to date." },
-          { "bold": "Storage limitation:", "text": "Data is not retained longer than necessary, subject to legal requirements." },
-          { "bold": "Integrity and confidentiality:", "text": "Appropriate safeguards are used to protect personal data." },
-          { "bold": "Accountability:", "text": "We aim to demonstrate compliance with applicable data protection requirements." }
+          {
+            "bold": "Lawfulness, fairness, and transparency:",
+            "text": "Data is processed lawfully, fairly, and transparently."
+          },
+          {
+            "bold": "Purpose limitation:",
+            "text": "Data is collected for specified, explicit, and legitimate purposes."
+          },
+          {
+            "bold": "Data minimization:",
+            "text": "Only data that is necessary for the intended purpose is collected."
+          },
+          {
+            "bold": "Accuracy:",
+            "text": "Reasonable steps are taken to keep personal data accurate and up to date."
+          },
+          {
+            "bold": "Storage limitation:",
+            "text": "Data is not retained longer than necessary, subject to legal requirements."
+          },
+          {
+            "bold": "Integrity and confidentiality:",
+            "text": "Appropriate safeguards are used to protect personal data."
+          },
+          {
+            "bold": "Accountability:",
+            "text": "We aim to demonstrate compliance with applicable data protection requirements."
+          }
         ]
       },
       "4": {
         "title": "4. Lawful Bases for Processing",
         "intro": "We process personal data only where an appropriate legal basis exists under Article 6 of the GDPR. Depending on the purpose, this may include:",
         "points": [
-          { "bold": "Consent:", "text": "Where an individual has freely given consent to a specific processing activity." },
-          { "bold": "Contract:", "text": "Where processing is necessary to perform a contract or take requested pre-contractual steps." },
-          { "bold": "Legal obligation:", "text": "Where processing is required to comply with applicable law." },
-          { "bold": "Legitimate interests:", "text": "Where our legitimate interests do not override the individual's rights and freedoms." },
-          { "bold": "Vital interests or public task:", "text": "Where the applicable legal conditions for these bases are met." }
+          {
+            "bold": "Consent:",
+            "text": "Where an individual has freely given consent to a specific processing activity."
+          },
+          {
+            "bold": "Contract:",
+            "text": "Where processing is necessary to perform a contract or take requested pre-contractual steps."
+          },
+          {
+            "bold": "Legal obligation:",
+            "text": "Where processing is required to comply with applicable law."
+          },
+          {
+            "bold": "Legitimate interests:",
+            "text": "Where our legitimate interests do not override the individual's rights and freedoms."
+          },
+          {
+            "bold": "Vital interests or public task:",
+            "text": "Where the applicable legal conditions for these bases are met."
+          }
         ],
         "outro": "The applicable legal basis is determined for each processing purpose and communicated where required."
       },
@@ -451,5 +487,9 @@
         "email": "Privacy contact:"
       }
     }
+  },
+  "commons": {
+    "lastUpdated": "Last updated:",
+    "tableOfContents": "Table of Contents"
   }
 }

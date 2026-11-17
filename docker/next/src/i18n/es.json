@@ -358,24 +358,60 @@
         "title": "3. Principios del procesamiento de datos",
         "intro": "Nuestro objetivo es procesar los datos personales de acuerdo con los siguientes principios del RGPD:",
         "points": [
-          { "bold": "Licitud, lealtad y transparencia:", "text": "Los datos se procesan de manera lícita, leal y transparente." },
-          { "bold": "Limitación de la finalidad:", "text": "Los datos se recopilan con fines determinados, explícitos y legítimos." },
-          { "bold": "Minimización de datos:", "text": "Solo se recopilan los datos que son necesarios para el fin previsto." },
-          { "bold": "Exactitud:", "text": "Se toman medidas razonables para mantener los datos personales exactos y actualizados." },
-          { "bold": "Limitación del plazo de conservación:", "text": "Los datos no se conservan más tiempo del necesario, sujeto a los requisitos legales." },
-          { "bold": "Integridad y confidencialidad:", "text": "Se utilizan medidas de seguridad adecuadas para proteger los datos personales." },
-          { "bold": "Responsabilidad proactiva:", "text": "Nuestro objetivo es demostrar el cumplimiento de los requisitos de protección de datos aplicables." }
+          {
+            "bold": "Licitud, lealtad y transparencia:",
+            "text": "Los datos se procesan de manera lícita, leal y transparente."
+          },
+          {
+            "bold": "Limitación de la finalidad:",
+            "text": "Los datos se recopilan con fines determinados, explícitos y legítimos."
+          },
+          {
+            "bold": "Minimización de datos:",
+            "text": "Solo se recopilan los datos que son necesarios para el fin previsto."
+          },
+          {
+            "bold": "Exactitud:",
+            "text": "Se toman medidas razonables para mantener los datos personales exactos y actualizados."
+          },
+          {
+            "bold": "Limitación del plazo de conservación:",
+            "text": "Los datos no se conservan más tiempo del necesario, sujeto a los requisitos legales."
+          },
+          {
+            "bold": "Integridad y confidencialidad:",
+            "text": "Se utilizan medidas de seguridad adecuadas para proteger los datos personales."
+          },
+          {
+            "bold": "Responsabilidad proactiva:",
+            "text": "Nuestro objetivo es demostrar el cumplimiento de los requisitos de protección de datos aplicables."
+          }
         ]
       },
       "4": {
         "title": "4. Bases legales para el procesamiento",
         "intro": "Procesamos datos personales solo cuando existe una base legal adecuada en virtud del artículo 6 del RGPD. Dependiendo del propósito, esto puede incluir:",
         "points": [
-          { "bold": "Consentimiento:", "text": "Cuando un individuo ha dado su consentimiento libremente para una actividad de procesamiento específica." },
-          { "bold": "Contrato:", "text": "Cuando el procesamiento es necesario para ejecutar un contrato o tomar medidas precontractuales solicitadas." },
-          { "bold": "Obligación legal:", "text": "Cuando el procesamiento es necesario para cumplir con la ley aplicable." },
-          { "bold": "Intereses legítimos:", "text": "Cuando nuestros intereses legítimos no prevalecen sobre los derechos y libertades del individuo." },
-          { "bold": "Intereses vitales o misión de interés público:", "text": "Cuando se cumplen las condiciones legales aplicables para estas bases." }
+          {
+            "bold": "Consentimiento:",
+            "text": "Cuando un individuo ha dado su consentimiento libremente para una actividad de procesamiento específica."
+          },
+          {
+            "bold": "Contrato:",
+            "text": "Cuando el procesamiento es necesario para ejecutar un contrato o tomar medidas precontractuales solicitadas."
+          },
+          {
+            "bold": "Obligación legal:",
+            "text": "Cuando el procesamiento es necesario para cumplir con la ley aplicable."
+          },
+          {
+            "bold": "Intereses legítimos:",
+            "text": "Cuando nuestros intereses legítimos no prevalecen sobre los derechos y libertades del individuo."
+          },
+          {
+            "bold": "Intereses vitales o misión de interés público:",
+            "text": "Cuando se cumplen las condiciones legales aplicables para estas bases."
+          }
         ],
         "outro": "La base legal aplicable se determina para cada propósito de procesamiento y se comunica cuando es necesario."
       },
@@ -451,5 +487,9 @@
         "email": "Contacto de privacidad:"
       }
     }
+  },
+  "commons": {
+    "lastUpdated": "Última actualización:",
+    "tableOfContents": "Tabla de contenido"
   }
 }
