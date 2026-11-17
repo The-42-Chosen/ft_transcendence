@@ -43,8 +43,10 @@ export default function LegalDocument({
   tableOfContentsLabel,
 }: Parameters) {
   const { t } = useLanguage();
-  const resolvedLastUpdatedLabel = t.terms?.lastUpdated ?? lastUpdatedLabel ?? "Last updated";
-  const resolvedTocLabel = t.terms?.tableOfContents ?? tableOfContentsLabel ?? "Table of Contents";
+  const resolvedLastUpdatedLabel =
+    t.commons?.lastUpdated ?? t.terms?.lastUpdated ?? lastUpdatedLabel ?? "Last updated";
+  const resolvedTocLabel =
+    t.commons?.tableOfContents ?? t.terms?.tableOfContents ?? tableOfContentsLabel ?? "Table of Contents";
 
   return (
     <article className="mx-auto my-8 max-w-3xl rounded-2xl border border-(--color-border-default) bg-(--color-bg-surface) p-6 text-left leading-relaxed shadow-2xl sm:my-16 sm:p-12">
@@ -52,7 +54,9 @@ export default function LegalDocument({
         <span className="font-agent text-xs uppercase tracking-[0.2em] text-(--color-accent-gold)">{label}</span>
         <h1 className="my-4 font-display text-4xl tracking-wide sm:text-5xl">{title}</h1>
         <p className="text-(--color-text-secondary)">{intro}</p>
-        <p className="mt-5 text-sm text-(--color-text-muted)">{resolvedLastUpdatedLabel}: {lastUpdated}</p>
+        <p className="mt-5 text-sm text-(--color-text-muted)">
+          {resolvedLastUpdatedLabel} {lastUpdated}
+        </p>
       </header>
 
       {sections.length > 0 && (
