@@ -392,11 +392,26 @@
         "title": "4. Bases légales du traitement",
         "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base légale appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
         "points": [
-          { "bold": "Consentement :", "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique." },
-          { "bold": "Contrat :", "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées." },
-          { "bold": "Obligation légale :", "text": "Lorsque le traitement est requis pour se conformer à la loi applicable." },
-          { "bold": "Intérêts légitimes :", "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne." },
-          { "bold": "Intérêts vitaux ou mission d'intérêt public :", "text": "Lorsque les conditions légales applicables à ces bases sont remplies." }
+          {
+            "bold": "Consentement :",
+            "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique."
+          },
+          {
+            "bold": "Contrat :",
+            "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées."
+          },
+          {
+            "bold": "Obligation légale :",
+            "text": "Lorsque le traitement est requis pour se conformer à la loi applicable."
+          },
+          {
+            "bold": "Intérêts légitimes :",
+            "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne."
+          },
+          {
+            "bold": "Intérêts vitaux ou mission d'intérêt public :",
+            "text": "Lorsque les conditions légales applicables à ces bases sont remplies."
+          }
         ],
         "outro": "La base légale applicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
       },
