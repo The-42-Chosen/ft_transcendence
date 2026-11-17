@@ -11,11 +11,12 @@ type Parameters = {
 	team: Side;
 	players: string[];
 	isYou?: boolean;
+	myName?: string | null;
 	max?: number;
 	onJoin?: () => void;
 };
 
-export default function RoleSection({ title, team, players, isYou = false, max = Infinity, onJoin }: Parameters) {
+export default function RoleSection({ title, team, players, isYou = false, myName, max = Infinity, onJoin }: Parameters) {
 	const full = players.length >= max;
 	const { t } = useLanguage();
 
@@ -27,7 +28,7 @@ export default function RoleSection({ title, team, players, isYou = false, max =
 			</div>
 			<ul className="flex flex-wrap gap-4">
 				{players.map((name) => (<PlayerSlot key={name} name={name} />))}
-				{isYou && (<PlayerSlot name={t.waitingRoom.you} isYou />)}
+				{isYou && (<PlayerSlot name={myName || t.waitingRoom.you} isYou />)}
 				{onJoin && !isYou && !full && (<JoinSlot team={team} onJoin={onJoin} />)}
 			</ul>
 		</div>
