@@ -9,6 +9,7 @@ import Button from './Button';
 import { cn } from '@/lib/cn';
 import { AI_PLAYER, TEAM_COLORS, defaultSpectators, defaultTeams, shuffleLobby, teamStyles, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { usePlayerName } from '@/lib/usePlayerName';
 
 type Parameters = {
     role: Role;
@@ -31,6 +32,7 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
     const router = useRouter();
     const { t } = useLanguage();
     const wr = t.waitingRoom;
+    const myName = usePlayerName();
 	// TODO: Shuffled rosters stay local until they come from the backend
 
     const [humanTeams, setHumanTeams] = useState<Teams>(initialTeams);
@@ -123,8 +125,8 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
             <h2 className="mb-4 font-display text-5xl text-black tracking-wide">{wr.title}</h2>
             <RoomCode code={roomCode}/>
             <article className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <TeamPanel team="red" roster={teams.red} seat={seat} onJoin={onJoin}/>
-                <TeamPanel team="blue" roster={teams.blue} seat={seat} onJoin={onJoin}/>
+                <TeamPanel team="red" roster={teams.red} seat={seat} myName={myName} onJoin={onJoin}/>
+                <TeamPanel team="blue" roster={teams.blue} seat={seat} myName={myName} onJoin={onJoin}/>
             </article>
             <aside className={cn("mt-4 rounded-2xl border-2 p-4 text-left", teamStyles.spectator.panel)}>
                 <RoleSection
@@ -132,6 +134,7 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
                     team="spectator"
                     players={spectators}
                     isYou={seat === "spectator"}
+                    myName={myName}
                     onJoin={onJoin && (() => onJoin("spectator"))}
                 />
             </aside>

@@ -31,7 +31,7 @@ export default function PlayerSlot({name, isYou = false}: Parameters) {
 					<span className="absolute -right-1.5 -bottom-1 rounded-full bg-cyan-400 px-1.5 text-[10px] font-bold leading-4 text-slate-900 shadow">AI</span>
 				)}
 			</div> 
-			<span className={cn("w-full truncate text-center text-xs", isYou ? "font-bold text-amber-800" : isAi ? "font-semibold text-cyan-800" : "font-medium text-black/70")} title={name}>{isYou ? "You" : name}</span>
+			<span className={cn("w-full truncate text-center text-xs", isYou ? "font-bold text-amber-800" : isAi ? "font-semibold text-cyan-800" : "font-medium text-black/70")} title={name}>{name}</span>
 		</li>
 	);
 }
