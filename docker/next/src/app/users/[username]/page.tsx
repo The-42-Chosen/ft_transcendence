@@ -111,7 +111,6 @@ export default async function UserPage({
           >
             Edit profile
           </Link>
-
           <LogOutButton />
         </div>
       ) : (
@@ -121,6 +120,12 @@ export default async function UserPage({
         />
       )}
 
+          <Link
+            href="/"
+            className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-600"
+          >
+            Retour à l'accueil
+          </Link>
       <section className="w-full max-w-md">
         <h2 className="mb-4 text-xl font-semibold">
           Friends

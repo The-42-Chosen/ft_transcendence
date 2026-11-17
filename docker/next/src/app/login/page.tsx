@@ -1,13 +1,26 @@
-import { signIn } from "@/auth";
+import { signIn, auth } from "@/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { db } from "@/prisma/db";
+import Link from "next/link";
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const session = await auth();
+
+  if (session?.user?.email) {
+    const currentUser = await db.orm.public.User
+      .where({ email: session.user.email })
+      .first();
+
+    if (currentUser) {
+      redirect(`/users/${currentUser.username}`);
+    }
+  }
+
   const { error } = await searchParams;
 
   return (
@@ -99,6 +112,23 @@ export default async function LoginPage({
         >
           Login
         </button>
+
+        <p className="text-center text-sm text-gray-600">
+          Pas encore de compte ?{" "}
+          <Link
+            href="/register"
+            className="font-semibold underline"
+          >
+            Créer un compte
+          </Link>
+        </p>
+
+        <Link
+          href="/"
+          className="text-center rounded border px-4 py-2"
+        >
+          Retour à l'accueil
+        </Link>
       </form>
     </main>
   );
