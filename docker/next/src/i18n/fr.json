@@ -196,6 +196,7 @@
         "title": "3. Principes du traitement des données",
         "intro": "Nous nous efforçons de traiter les données personnelles conformément aux principes suivants du RGPD :",
         "points": [
+<<<<<<< HEAD
           {
             "bold": "Licéité, loyauté et transparence :",
             "text": "Les données sont traitées de manière licite, loyale et transparente."
@@ -224,12 +225,22 @@
             "bold": "Responsabilité :",
             "text": "Nous visons à démontrer notre conformité avec les exigences applicables en matière de protection des données."
           }
+=======
+          { "bold": "Licéité, loyauté et transparence :", "text": "Les données sont traitées de manière licite, loyale et transparente." },
+          { "bold": "Limitation des finalités :", "text": "Les données sont collectées pour des finalités déterminées, explicites et légitimes." },
+          { "bold": "Minimisation des données :", "text": "Seules les données nécessaires à la finalité prévue sont collectées." },
+          { "bold": "Exactitude :", "text": "Des mesures raisonnables sont prises pour garder les données personnelles exactes et à jour." },
+          { "bold": "Limitation de la conservation :", "text": "Les données ne sont pas conservées plus longtemps que nécessaire, sous réserve des exigences légales." },
+          { "bold": "Intégrité et confidentialité :", "text": "Des garanties appropriées sont utilisées pour protéger les données personnelles." },
+          { "bold": "Responsabilité :", "text": "Nous visons à démontrer notre conformité avec les exigences applicables en matière de protection des données." }
+>>>>>>> a5b4726c82b540e008a3480aeb641151a05e7b82
         ]
       },
       "4": {
         "title": "4. Bases légales du traitement",
         "intro": "Nous ne traitons les données personnelles que lorsqu'il existe une base légale appropriée en vertu de l'article 6 du RGPD. Selon la finalité, cela peut inclure :",
         "points": [
+<<<<<<< HEAD
           {
             "bold": "Consentement :",
             "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique."
@@ -250,6 +261,13 @@
             "bold": "Intérêts vitaux ou mission d'intérêt public :",
             "text": "Lorsque les conditions légales applicables à ces bases sont remplies."
           }
+=======
+          { "bold": "Consentement :", "text": "Lorsqu'une personne a librement donné son consentement à une activité de traitement spécifique." },
+          { "bold": "Contrat :", "text": "Lorsque le traitement est nécessaire à l'exécution d'un contrat ou à la prise de mesures précontractuelles demandées." },
+          { "bold": "Obligation légale :", "text": "Lorsque le traitement est requis pour se conformer à la loi applicable." },
+          { "bold": "Intérêts légitimes :", "text": "Lorsque nos intérêts légitimes ne prévalent pas sur les droits et libertés de la personne." },
+          { "bold": "Intérêts vitaux ou mission d'intérêt public :", "text": "Lorsque les conditions légales applicables à ces bases sont remplies." }
+>>>>>>> a5b4726c82b540e008a3480aeb641151a05e7b82
         ],
         "outro": "La base légale applicable est déterminée pour chaque finalité de traitement et communiquée lorsque cela est requis."
       },
