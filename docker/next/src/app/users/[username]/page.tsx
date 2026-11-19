@@ -97,6 +97,7 @@ export default async function UserPage({
       <PresenceHeartbeat userId={currentUserId} />
 
       <Profile
+        userId={user.id}
         username={user.username}
         displayName={user.displayName}
         email={user.email}
@@ -144,6 +145,7 @@ export default async function UserPage({
                   className="flex items-center gap-3 rounded border p-3"
                 >
                   <Avatar
+                    userId={friend!.id}
                     username={friend!.username}
                     avatarUrl={friend!.avatarUrl}
                     size={48}
