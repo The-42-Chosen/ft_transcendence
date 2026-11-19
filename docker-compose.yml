@@ -352,7 +352,10 @@ services:
 
     networks:
       - transcendence
-      
+    
+    ports:
+      - "8001"
+
     restart: unless-stopped
 
 

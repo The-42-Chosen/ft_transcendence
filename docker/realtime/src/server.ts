@@ -14,12 +14,44 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? "")
 const MAX_BODY_SIZE = 100_000;
 
 // Same split as audienceOf() in docker/next/src/lib/game.ts
-type Audience = "spymaster" | "agent";
+export type Audience = "spymaster" | "agent" | "ai";
 const AUDIENCES: Audience[] = ["spymaster", "agent"];
 
+type Clue = {
+    word: string;
+    count: number;
+    team: string;
+};
+
+type GameView = {
+    version: number;
+    turn: string;
+    clue: Clue | null;
+    cards: (string | null)[];
+    found: boolean[];
+    lastFound: number | null;
+    remaining: {
+        red: number;
+        blue: number;
+    };
+    gameOver: boolean;
+    winner: string | null;
+};
+
+export type IAGame = {
+    agent_fmotte_teams: string[];
+    current_turn: string;
+};
+
+type BroadcastViews = {
+    spymaster: GameView;
+    agent: GameView;
+    ai: IAGame;
+};
+
 type BroadcastBody = {
-  code: string;
-  views: Record<Audience, unknown>;
+    code: string;
+    views: BroadcastViews;
 };
 
 // Spectators see what operatives see
@@ -48,25 +80,105 @@ function isBroadcastBody(body: unknown): body is BroadcastBody {
 }
 
 const httpServer = createServer(async (req, res) => {
+  console.log("\n========== REQUEST ==========");
+  console.log("Method:", req.method);
+  console.log("URL:", req.url);
+  console.log("Headers:", req.headers);
+
   if (req.url === "/health") {
+    console.log("Health check received");
+
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ status: "ok" }));
     return;
   }
+
   if (req.method === "POST" && req.url === "/broadcast") {
-    const body = await readJson(req).catch(() => null);
+    const body = await readJson(req).catch((err) => {
+      console.log("JSON parsing error:", err);
+      return null;
+    });
+
+    console.log("Received body:", JSON.stringify(body, null, 2));
+
     if (!isBroadcastBody(body)) {
+      console.log("Invalid broadcast body:", body);
+
       res.writeHead(400);
       res.end();
       return;
     }
-    for (const audience of AUDIENCES) {
-      io.to(channel(body.code, audience)).emit("state", body.views[audience]);
+
+    console.log("Broadcast code:", body.code);
+    console.log("Broadcast views:", body.views);
+
+    const view = body.views.ai;
+
+    console.log("AI VIEW:", view);
+    console.log("TEAMS:", view?.agent_fmotte_teams);
+    console.log("TURN:", view?.current_turn);
+
+    const shouldPlay = view?.agent_fmotte_teams?.includes(view.current_turn);
+
+    console.log("SHOULD PLAY:", shouldPlay);
+
+    if (shouldPlay) {
+      console.log("AI PLAY-----------------------");
+
+      try {
+        const response = await fetch("http://ia:8001", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(view)
+        });
+
+        if (!response.ok) {
+            console.error("AI request failed:", response.status);
+        } else {
+            console.log("AI request successfully sent!");
+            const result = await response.json();
+            console.log("AI response:", result);
+
+            body.views.agent.clue = {
+              	word: result.clue,
+              	count: result.number,
+              	team: view.current_turn
+          	};
+
+			body.views.spymaster.clue = {
+				word: result.clue,
+				count: result.number,
+				team: view.current_turn
+			};
+        }
+
+      } catch (error) {
+        console.error("Failed to contact AI server:", error);
+      }
     }
-    res.writeHead(204);
-    res.end();
+
+    for (const audience of AUDIENCES) {
+      const channelName = channel(body.code, audience);
+      console.log(`Emitting to channel: ${channelName}`);
+      console.log("Payload:", body.views[audience]);
+
+      io.to(channelName).emit("state", body.views[audience]);
+    }
+
+    console.log("Broadcast completed successfully");
+
+    res.writeHead(200, {
+		"Content-Type": "application/json"
+	});
+
+	res.end(JSON.stringify(body));
     return;
   }
+
+  console.log("404 - Route not found:", req.method, req.url);
+
   res.writeHead(404);
   res.end();
 });
