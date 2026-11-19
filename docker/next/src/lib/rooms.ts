@@ -27,7 +27,8 @@ export function getRoom(code: string): Game | null {
 export async function startRoom(code: string, aiTeams: TeamColor[] = []): Promise<Game | null> {
 	const room = getRoom(code);
 	if (room?.start(aiTeams)) {
-		await publish(room);
+		const response = await publish(room);
+		console.log("startRoom response: ", response);
 	}
 	return room;
 }
@@ -38,26 +39,50 @@ export function publicRoom({ code, language, status }: Game) {
 
 export async function publish(room: Game) {
 	saveAiBoard(room);
-	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent") } };
-	await fetch(`${REALTIME_URL}/broadcast`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-		signal: AbortSignal.timeout(2000),
-	})
-		.then((res) => {
-			if (!res.ok) {
-				console.error("Realtime broadcast failed: HTTP", res.status);
-			}
-		})
-		.catch((error) => console.error("Realtime broadcast failed:", error));
+	console.log("PUBLISH");
+	console.log(room.aiBoard());
+	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent"), ai: room.aiBoard()} };
+	
+	console.log("BEFORE BODY: ", body);
+	console.log("BEFORE CLUE: ", body.views.agent.clue);
+
+	body.views.agent.clue = { word: 'multijoueur', count: 2, team: 'red' };
+	body.views.spymaster.clue = { word: 'multijoueur', count: 2, team: 'red' };
+
+	console.log("AFTER BODY: ", body);
+	console.log("AFTER CLUE: ", body.views.agent.clue);
+	console.log("AFTER BODY BEFORE SEND:", JSON.stringify(body, null, 2));
+
+	try {
+		const response = await fetch(`${REALTIME_URL}/broadcast`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+			signal: AbortSignal.timeout(2000),
+		});
+
+		console.log("RESPONSE STATUS:", response.status);
+
+		if (!response.ok) {
+			console.error("Broadcast failed:", response.status);
+		}
+	} catch (error) {
+		console.error("Broadcast error:", error);
+	}
 }
 
 export async function playMove(room: Game, seat: Seat, move: () => object) {
 	try {
 		const result = move();
-		await publish(room);
-		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
+		const response = await publish(room);
+		const gameview = room.viewFor(audienceOf(seat))
+		console.log("playMove Seat: ", gameview);
+		console.log("playMove result: ", result);
+		console.log("playMove response: ", response);
+		gameview.clue = { word: 'incursion', count: 2, team: 'blue' };
+		console.log("playMove Seat: ", gameview);
+
+		return NextResponse.json({ ...result, state: gameview });
 	} catch (error) {
 		if (error instanceof GameError) {
 			return NextResponse.json({ error: error.message }, { status: error.status });
