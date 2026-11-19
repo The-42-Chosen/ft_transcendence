@@ -89,6 +89,165 @@
   "footer": {
     "about": "Nosotros",
     "privacy": "Privacidad",
-    "gdpr": "RGPD"
+    "gdpr": "RGPD",
+    "legal": "Legal",
+    "terms": "Términos de uso"
+  },
+  "terms": {
+    "label": "Información legal",
+    "title": "Términos de uso",
+    "intro": "Las normas que se aplican cuando usas Transcendence, creas una cuenta o juegas como invitado.",
+    "tableOfContents": "Índice",
+    "lastUpdated": "Última actualización",
+    "privacyPolicy": "Política de privacidad",
+    "gdprPolicy": "Política de cumplimiento del RGPD",
+    "sections": [
+      {
+        "title": "1. Aceptación de los términos",
+        "blocks": [
+          {
+            "p": "Estos Términos de uso regulan el acceso y el uso del sitio web y del juego Transcendence, gestionados por {company}. Al crear una cuenta, unirte a una partida como invitado o utilizar el servicio de cualquier otra forma, aceptas estos Términos. Si no estás de acuerdo, no utilices el servicio."
+          }
+        ]
+      },
+      {
+        "title": "2. Descripción del servicio",
+        "blocks": [
+          {
+            "p": "Transcendence es un juego de palabras multijugador en línea y gratuito, desarrollado como proyecto educativo en 42 París. El servicio te permite:"
+          },
+          {
+            "ul": [
+              "Crear o unirte a salas de juego mediante un código.",
+              "Jugar como agente, jefe de espías o espectador en el equipo rojo o azul.",
+              "Crear un perfil con un nombre visible, una biografía y un avatar.",
+              "Añadir a otros jugadores como amigos y ver si están conectados."
+            ]
+          },
+          {
+            "p": "El servicio se ofrece sin fines comerciales. Sus funciones pueden cambiar, añadirse o eliminarse en cualquier momento."
+          }
+        ]
+      },
+      {
+        "title": "3. Requisitos de edad",
+        "blocks": [
+          {
+            "p": "Debes tener al menos 15 años para crear una cuenta, que es la edad de consentimiento digital en Francia. Si eres menor, solo puedes utilizar el servicio con la autorización de uno de tus padres o de tu tutor legal, que acepta estos Términos en tu nombre."
+          }
+        ]
+      },
+      {
+        "title": "4. Cuentas de usuario y acceso como invitado",
+        "blocks": [
+          {
+            "p": "**Cuentas registradas:** para crear una cuenta, proporcionas una dirección de correo electrónico, un nombre de usuario y una contraseña. Te comprometes a facilitar información veraz y a mantener tu contraseña en secreto. Eres responsable de toda la actividad realizada con tu cuenta y debes avisarnos sin demora de cualquier uso no autorizado."
+          },
+          {
+            "p": "**Acceso como invitado:** puedes jugar sin cuenta eligiendo un nombre de invitado. Ese nombre solo se guarda en tu navegador durante la sesión y no está vinculado a ningún perfil permanente. El progreso de los invitados no se guarda."
+          }
+        ]
+      },
+      {
+        "title": "5. Normas de uso",
+        "blocks": [
+          {
+            "p": "Al utilizar el servicio, te comprometes a no:"
+          },
+          {
+            "ul": [
+              "Elegir un nombre de usuario, nombre visible, biografía o avatar ofensivo, de odio, discriminatorio, sexualmente explícito o que suplante la identidad de otra persona.",
+              "Acosar, amenazar o insultar a otros jugadores.",
+              "Hacer trampas, por ejemplo compartiendo la información del jefe de espías con los agentes por medios externos o aprovechando errores del juego.",
+              "Intentar acceder a cuentas, datos o sistemas a los que no tienes autorización, ni perturbar el funcionamiento o la seguridad del servicio.",
+              "Utilizar bots, scripts o herramientas automatizadas para interactuar con el servicio, salvo autorización expresa.",
+              "Utilizar el servicio con fines ilícitos."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "6. Contenido de los usuarios",
+        "blocks": [
+          {
+            "p": "Sigues siendo el titular del contenido que publicas, como tu nombre visible, tu biografía y tu avatar. Al publicarlo, concedes a {company} una licencia no exclusiva, gratuita y mundial para alojarlo, almacenarlo y mostrarlo, únicamente para el funcionamiento del servicio y mientras permanezca publicado. Garantizas que tienes los derechos necesarios sobre ese contenido. Podemos retirar cualquier contenido que incumpla estos Términos."
+          }
+        ]
+      },
+      {
+        "title": "7. Propiedad intelectual",
+        "blocks": [
+          {
+            "p": "El servicio, incluidos su código fuente, su diseño, sus gráficos y sus listas de palabras, es propiedad de {company} o de sus colaboradores, salvo indicación en contrario. No puedes copiar, modificar, distribuir ni reutilizar ninguna parte del servicio sin autorización previa, salvo en los casos permitidos por la ley o por una licencia de código abierto aplicable."
+          }
+        ]
+      },
+      {
+        "title": "8. Datos personales",
+        "blocks": [
+          {
+            "p": "Tratamos tus datos personales de acuerdo con nuestra {privacyPolicy} y nuestra {gdprPolicy}, que explican qué datos recogemos, por qué, durante cuánto tiempo los conservamos y cómo puedes ejercer tus derechos, en particular los de acceso, rectificación y supresión."
+          }
+        ]
+      },
+      {
+        "title": "9. Suspensión y cancelación",
+        "blocks": [
+          {
+            "p": "Puedes dejar de utilizar el servicio en cualquier momento y solicitar la eliminación de tu cuenta escribiéndonos a {email}."
+          },
+          {
+            "p": "Si se incumplen estos Términos, podemos suspender o eliminar una cuenta, o expulsar a un jugador de una partida, informando previamente al usuario cuando sea posible y de forma proporcionada a la gravedad del incumplimiento. La eliminación de una cuenta conlleva la supresión de los datos personales asociados, salvo que la ley exija conservarlos."
+          }
+        ]
+      },
+      {
+        "title": "10. Disponibilidad y exención de garantías",
+        "blocks": [
+          {
+            "p": "Al tratarse de un proyecto educativo, el servicio se ofrece «tal cual» y «según disponibilidad». No garantizamos que funcione sin interrupciones ni errores, ni que esté disponible de forma permanente, y los datos de las partidas pueden perderse, por ejemplo al reiniciarse el servidor. El servicio puede modificarse, suspenderse o interrumpirse en cualquier momento."
+          }
+        ]
+      },
+      {
+        "title": "11. Limitación de responsabilidad",
+        "blocks": [
+          {
+            "p": "En la medida en que lo permita la ley, {company} no será responsable de los daños indirectos derivados del uso o de la imposibilidad de usar el servicio, ni del contenido y el comportamiento de otros jugadores. Nada en estos Términos limita la responsabilidad que no pueda limitarse según la ley aplicable, ni tus derechos como consumidor."
+          }
+        ]
+      },
+      {
+        "title": "12. Cambios en estos Términos",
+        "blocks": [
+          {
+            "p": "Podemos modificar estos Términos para reflejar cambios en el servicio o en la legislación aplicable. La última versión se publicará en esta página junto con su fecha de revisión. Seguir utilizando el servicio tras una modificación implica la aceptación de los Términos revisados."
+          }
+        ]
+      },
+      {
+        "title": "13. Legislación aplicable y litigios",
+        "blocks": [
+          {
+            "p": "Estos Términos se rigen por la legislación francesa. En caso de conflicto, te invitamos a contactarnos primero para buscar una solución amistosa. De no ser posible, el litigio se someterá a los tribunales franceses competentes, sin perjuicio de las normas imperativas que protegen a los consumidores."
+          }
+        ]
+      },
+      {
+        "title": "14. Contacto",
+        "blocks": [
+          {
+            "p": "Para cualquier pregunta sobre estos Términos, puedes contactar con:"
+          },
+          {
+            "ul": [
+              "Empresa: {company}",
+              "Dirección: {address}",
+              "Correo electrónico: {email}"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

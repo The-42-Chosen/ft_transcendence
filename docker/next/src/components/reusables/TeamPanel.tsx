@@ -10,23 +10,26 @@ type Parameters = {
 	team: TeamColor;
 	roster: TeamRoster;
 	seat: Seat | null;
-	myName?: string | null;
+	playerName?: string | null;
 	onJoin?: (seat: Seat) => void;
 };
 
-export default function TeamPanel({ team, roster, seat, myName, onJoin }: Parameters) {
+export default function TeamPanel({ team, roster, seat, playerName, onJoin }: Parameters) {
 	const { t } = useLanguage();
 	const wr = t.waitingRoom;
 
 	return (
 		<div className={cn("flex flex-col gap-5 rounded-2xl border-2 p-4", teamStyles[team].panel)}>
-			<BoardTeam team={team} />
+			<BoardTeam
+				display="lobby"
+				team={team}
+			/>
 			<RoleSection
 				title={wr.spymasters}
 				team={team}
 				players={roster.spymasters}
 				isYou={seat === `${team}-spymaster`}
-				myName={myName}
+				playerName={playerName}
 				max={MAX_SPYMASTERS}
 				onJoin={onJoin && (() => onJoin(`${team}-spymaster`))}
 			/>
@@ -36,7 +39,7 @@ export default function TeamPanel({ team, roster, seat, myName, onJoin }: Parame
 				team={team}
 				players={roster.operatives}
 				isYou={seat === `${team}-operative`}
-				myName={myName}
+				playerName={playerName}
 				onJoin={onJoin && (() => onJoin(`${team}-operative`))}
 			/>
 		</div>
