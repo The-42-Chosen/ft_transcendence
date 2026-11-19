@@ -76,8 +76,8 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
-      AUTH_URL: "https://localhost:${NGINX_SSL_PORT:-8443}"
       AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_TRUST_HOST: "true"
       DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     depends_on:
       prisma-migrate:
@@ -109,7 +109,7 @@ services:
       AUTH_SECRET: "${AUTH_SECRET}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
-      AUTH_URL: "http://localhost:${NEXT_DEV_PORT:-3000}"
+      AUTH_TRUST_HOST: "true"
       DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     depends_on:
       prisma-migrate:
