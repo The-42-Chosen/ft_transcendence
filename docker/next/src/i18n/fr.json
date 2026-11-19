@@ -89,6 +89,165 @@
   "footer": {
     "about": "À propos",
     "privacy": "Confidentialité",
-    "gdpr": "RGPD"
+    "gdpr": "RGPD",
+    "legal": "Légal",
+    "terms": "Conditions d'utilisation"
+  },
+  "terms": {
+    "label": "Informations légales",
+    "title": "Conditions générales d'utilisation",
+    "intro": "Les règles qui s'appliquent lorsque vous utilisez Transcendence, créez un compte ou jouez en tant qu'invité.",
+    "tableOfContents": "Sommaire",
+    "lastUpdated": "Dernière mise à jour",
+    "privacyPolicy": "Politique de confidentialité",
+    "gdprPolicy": "Politique de conformité RGPD",
+    "sections": [
+      {
+        "title": "1. Acceptation des conditions",
+        "blocks": [
+          {
+            "p": "Les présentes conditions générales d'utilisation (CGU) encadrent l'accès au site et au jeu Transcendence, édités par {company}, ainsi que leur utilisation. En créant un compte, en rejoignant une partie en tant qu'invité ou en utilisant le service de toute autre manière, vous acceptez les présentes CGU. Si vous ne les acceptez pas, merci de ne pas utiliser le service."
+          }
+        ]
+      },
+      {
+        "title": "2. Description du service",
+        "blocks": [
+          {
+            "p": "Transcendence est un jeu de mots multijoueur en ligne et gratuit, développé dans le cadre d'un projet pédagogique à 42 Paris. Le service vous permet de :"
+          },
+          {
+            "ul": [
+              "Créer ou rejoindre des salons de jeu à l'aide d'un code.",
+              "Jouer en tant qu'agent, maître-espion ou spectateur dans l'équipe rouge ou bleue.",
+              "Créer un profil avec un nom d'affichage, une bio et un avatar.",
+              "Ajouter d'autres joueurs en amis et voir s'ils sont en ligne."
+            ]
+          },
+          {
+            "p": "Le service est fourni à titre non commercial. Ses fonctionnalités peuvent évoluer, être ajoutées ou supprimées à tout moment."
+          }
+        ]
+      },
+      {
+        "title": "3. Conditions d'âge",
+        "blocks": [
+          {
+            "p": "Vous devez avoir au moins 15 ans pour créer un compte, ce qui correspond à l'âge de la majorité numérique en France. Si vous êtes plus jeune, vous ne pouvez utiliser le service qu'avec l'autorisation d'un parent ou d'un représentant légal, qui accepte les présentes CGU en votre nom."
+          }
+        ]
+      },
+      {
+        "title": "4. Comptes utilisateurs et accès invité",
+        "blocks": [
+          {
+            "p": "**Comptes enregistrés :** pour créer un compte, vous fournissez une adresse email, un nom d'utilisateur et un mot de passe. Vous vous engagez à fournir des informations exactes et à garder votre mot de passe confidentiel. Vous êtes responsable de toute activité réalisée depuis votre compte et devez nous signaler sans délai toute utilisation non autorisée."
+          },
+          {
+            "p": "**Accès invité :** vous pouvez jouer sans compte en choisissant un nom d'invité. Ce nom est uniquement conservé dans votre navigateur pendant la durée de votre session et n'est rattaché à aucun profil permanent. La progression des invités n'est pas sauvegardée."
+          }
+        ]
+      },
+      {
+        "title": "5. Règles d'utilisation",
+        "blocks": [
+          {
+            "p": "En utilisant le service, vous vous engagez à ne pas :"
+          },
+          {
+            "ul": [
+              "Choisir un nom d'utilisateur, un nom d'affichage, une bio ou un avatar injurieux, haineux, discriminatoire, à caractère sexuel ou usurpant l'identité d'une autre personne.",
+              "Harceler, menacer ou insulter d'autres joueurs.",
+              "Tricher, notamment en communiquant aux agents les informations du maître-espion par un moyen extérieur au jeu ou en exploitant des bugs.",
+              "Tenter d'accéder à des comptes, données ou systèmes auxquels vous n'êtes pas autorisé à accéder, ou perturber le fonctionnement ou la sécurité du service.",
+              "Utiliser des bots, scripts ou outils automatisés pour interagir avec le service, sauf autorisation expresse.",
+              "Utiliser le service à des fins illicites."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "6. Contenus des utilisateurs",
+        "blocks": [
+          {
+            "p": "Vous restez propriétaire des contenus que vous publiez, comme votre nom d'affichage, votre bio et votre avatar. En les publiant, vous accordez à {company} une licence non exclusive, gratuite et mondiale pour les héberger, les stocker et les afficher, uniquement pour faire fonctionner le service et tant qu'ils y restent publiés. Vous garantissez détenir les droits nécessaires sur ces contenus. Nous pouvons supprimer tout contenu contraire aux présentes CGU."
+          }
+        ]
+      },
+      {
+        "title": "7. Propriété intellectuelle",
+        "blocks": [
+          {
+            "p": "Le service, y compris son code source, son design, ses éléments graphiques et ses listes de mots, est la propriété de {company} ou de ses contributeurs, sauf mention contraire. Vous ne pouvez pas copier, modifier, distribuer ou réutiliser tout ou partie du service sans autorisation préalable, sauf dans les cas permis par la loi ou par une licence open source applicable."
+          }
+        ]
+      },
+      {
+        "title": "8. Données personnelles",
+        "blocks": [
+          {
+            "p": "Nous traitons vos données personnelles conformément à notre {privacyPolicy} et à notre {gdprPolicy}, qui expliquent quelles données nous collectons, pourquoi, combien de temps nous les conservons et comment exercer vos droits, notamment vos droits d'accès, de rectification et d'effacement."
+          }
+        ]
+      },
+      {
+        "title": "9. Suspension et résiliation",
+        "blocks": [
+          {
+            "p": "Vous pouvez cesser d'utiliser le service à tout moment et demander la suppression de votre compte en nous écrivant à {email}."
+          },
+          {
+            "p": "En cas de manquement aux présentes CGU, nous pouvons suspendre ou supprimer un compte, ou exclure un joueur d'une partie, après en avoir informé l'utilisateur lorsque c'est possible et de manière proportionnée à la gravité du manquement. La suppression d'un compte entraîne l'effacement des données personnelles associées, sauf obligation légale de conservation."
+          }
+        ]
+      },
+      {
+        "title": "10. Disponibilité et absence de garantie",
+        "blocks": [
+          {
+            "p": "S'agissant d'un projet pédagogique, le service est fourni « en l'état » et « selon sa disponibilité ». Nous ne garantissons pas qu'il sera ininterrompu, exempt d'erreurs ou disponible de façon permanente, et les données de jeu peuvent être perdues, par exemple lors d'un redémarrage du serveur. Le service peut être modifié, suspendu ou arrêté à tout moment."
+          }
+        ]
+      },
+      {
+        "title": "11. Limitation de responsabilité",
+        "blocks": [
+          {
+            "p": "Dans les limites permises par la loi, {company} ne saurait être tenu responsable des dommages indirects résultant de l'utilisation ou de l'impossibilité d'utiliser le service, ni des contenus et du comportement des autres joueurs. Rien dans les présentes CGU ne limite une responsabilité qui ne peut l'être en vertu de la loi applicable, ni vos droits en tant que consommateur."
+          }
+        ]
+      },
+      {
+        "title": "12. Modification des CGU",
+        "blocks": [
+          {
+            "p": "Nous pouvons modifier les présentes CGU pour tenir compte de l'évolution du service ou de la loi. La dernière version sera publiée sur cette page avec sa date de mise à jour. Continuer à utiliser le service après une modification vaut acceptation des CGU révisées."
+          }
+        ]
+      },
+      {
+        "title": "13. Droit applicable et litiges",
+        "blocks": [
+          {
+            "p": "Les présentes CGU sont régies par le droit français. En cas de litige, nous vous invitons à nous contacter d'abord afin de rechercher une solution amiable. À défaut, le litige sera porté devant les tribunaux français compétents, sous réserve des règles impératives protégeant les consommateurs."
+          }
+        ]
+      },
+      {
+        "title": "14. Contact",
+        "blocks": [
+          {
+            "p": "Pour toute question concernant les présentes CGU, vous pouvez contacter :"
+          },
+          {
+            "ul": [
+              "Société : {company}",
+              "Adresse : {address}",
+              "Email : {email}"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
