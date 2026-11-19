@@ -1,6 +1,7 @@
 import Avatar from "@/app/components/User/Avatar";
 
 type ProfileProps = {
+  userId: number;
   username: string;
   displayName?: string | null;
   email: string;
@@ -8,6 +9,7 @@ type ProfileProps = {
 };
 
 export default function Profile({
+  userId,
   username,
   displayName,
   email,
@@ -17,6 +19,7 @@ export default function Profile({
     <section className="w-full max-w-md rounded-xl border p-6 text-left">
       <div className="flex items-center gap-4">
         <Avatar
+          userId={userId}
           username={username}
           avatarUrl={avatarUrl}
           size={80}

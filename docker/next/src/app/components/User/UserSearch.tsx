@@ -70,6 +70,7 @@ export default function UserSearch() {
               className="flex items-center gap-3 rounded border p-3"
             >
               <Avatar
+                userId={user.id}
                 username={user.username}
                 avatarUrl={user.avatarUrl}
                 size={40}

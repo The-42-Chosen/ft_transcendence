@@ -76,12 +76,14 @@ services:
       - ./.env
     environment:
       NODE_ENV: production
-      AUTH_URL: "https://localhost:${NGINX_SSL_PORT:-8443}"
       AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_TRUST_HOST: "true"
       DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     depends_on:
       prisma-migrate:
         condition: service_completed_successfully
+    volumes:
+      - avatars_data:/app/public/uploads/avatars
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 15s
@@ -107,7 +109,7 @@ services:
       AUTH_SECRET: "${AUTH_SECRET}"
       NEXT_PUBLIC_SOCKET_URL: "http://${SERVER_IP:-localhost}:${REALTIME_DEV_PORT:-3001}"
       SERVER_IP: "${SERVER_IP:-}"
-      AUTH_URL: "http://localhost:${NEXT_DEV_PORT:-3000}"
+      AUTH_TRUST_HOST: "true"
       DATABASE_URL: "postgresql://${POSTGRES_USER:-transcendence}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-transcendence}"
     depends_on:
       prisma-migrate:
@@ -118,6 +120,7 @@ services:
       - ./docker/next:/app
       - next_dev_node_modules:/app/node_modules
       - next_dev_build:/app/.next
+      - avatars_data:/app/public/uploads/avatars
     networks:
       - transcendence
     restart: unless-stopped
@@ -384,6 +387,7 @@ networks:
     driver: bridge
 
 volumes:
+  avatars_data:
   next_dev_node_modules:
   prisma_migrate_node_modules:
   next_dev_build:
