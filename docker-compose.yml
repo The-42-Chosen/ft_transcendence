@@ -381,6 +381,10 @@ services:
       context: ./docker/ia
     networks:
       - transcendence
+    
+    ports:
+      - "8001"
+
     restart: unless-stopped
 
 
