@@ -7,6 +7,8 @@ import { randomUUID } from "crypto";
 import path from "path";
 
 import { auth } from "@/auth";
+import { readFile } from "fs/promises";
+
 
 export const runtime = "nodejs";
 
@@ -17,6 +19,8 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+
+// POST
 
 export async function POST(
   request: Request,
@@ -135,6 +139,75 @@ export async function POST(
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
+    );
+  }
+}
+
+// GET
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const userId = Number(id);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return NextResponse.json(
+        { error: "Invalid user id" },
+        { status: 400 }
+      );
+    }
+
+    const user = await db.orm.public.User
+      .where({ id: userId })
+      .first();
+
+    if (!user || !user.avatarUrl) {
+      return NextResponse.json(
+        { error: "Avatar not found" },
+        { status: 404 }
+      );
+    }
+
+    const filename = path.basename(user.avatarUrl);
+
+    const avatarPath = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "avatars",
+      filename
+    );
+
+    const file = await readFile(avatarPath);
+
+    const extension = path.extname(filename).toLowerCase();
+
+    const contentType =
+      extension === ".png"
+        ? "image/png"
+        : extension === ".webp"
+          ? "image/webp"
+          : "image/jpeg";
+
+    return new NextResponse(file, {
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (error) {
+    log.error({
+      service: "user",
+      msg: "error reading avatar",
+      error: String(error),
+    });
+
+    return NextResponse.json(
+      { error: "Avatar not found" },
+      { status: 404 }
     );
   }
 }
