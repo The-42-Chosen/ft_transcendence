@@ -89,6 +89,165 @@
   "footer": {
     "about": "About us",
     "privacy": "Privacy",
-    "gdpr": "GDPR"
+    "gdpr": "GDPR",
+    "legal": "Legal",
+    "terms": "Terms of service"
+  },
+  "terms": {
+    "label": "Legal Information",
+    "title": "Terms of Service",
+    "intro": "The rules that apply when you use Transcendence, create an account, or play as a guest.",
+    "tableOfContents": "Table of Contents",
+    "lastUpdated": "Last updated",
+    "privacyPolicy": "Privacy Policy",
+    "gdprPolicy": "GDPR Compliance Policy",
+    "sections": [
+      {
+        "title": "1. Acceptance of the Terms",
+        "blocks": [
+          {
+            "p": "These Terms of Service govern your access to and use of the Transcendence website and game, operated by {company}. By creating an account, joining a game as a guest, or otherwise using the service, you agree to these Terms. If you do not agree, please do not use the service."
+          }
+        ]
+      },
+      {
+        "title": "2. Description of the Service",
+        "blocks": [
+          {
+            "p": "Transcendence is a free, online multiplayer word game developed as an educational project at 42 Paris. The service allows you to:"
+          },
+          {
+            "ul": [
+              "Create or join game rooms using a room code.",
+              "Play as an agent, a spymaster, or a spectator in a red or blue team.",
+              "Create a user profile with a display name, a bio, and an avatar.",
+              "Add other players as friends and see their online presence."
+            ]
+          },
+          {
+            "p": "The service is provided on a non-commercial basis. Features may change, be added, or be removed at any time."
+          }
+        ]
+      },
+      {
+        "title": "3. Eligibility",
+        "blocks": [
+          {
+            "p": "You must be at least 15 years old to create an account, which corresponds to the age of digital consent in France. If you are younger, you may only use the service with the authorization of a parent or legal guardian, who accepts these Terms on your behalf."
+          }
+        ]
+      },
+      {
+        "title": "4. User Accounts and Guest Access",
+        "blocks": [
+          {
+            "p": "**Registered accounts:** To create an account, you provide an email address, a username, and a password. You agree to provide accurate information and to keep your password confidential. You are responsible for all activity carried out through your account, and you must notify us promptly of any unauthorized use."
+          },
+          {
+            "p": "**Guest access:** You may play without an account by choosing a guest name. Guest names are stored only in your browser for the duration of your session and are not linked to a permanent profile. Guest progress is not saved."
+          }
+        ]
+      },
+      {
+        "title": "5. Acceptable Use",
+        "blocks": [
+          {
+            "p": "When using the service, you agree not to:"
+          },
+          {
+            "ul": [
+              "Choose a username, display name, bio, or avatar that is offensive, hateful, discriminatory, sexually explicit, or that impersonates another person.",
+              "Harass, threaten, or abuse other players.",
+              "Cheat, including by sharing spymaster information with agents through external means or by exploiting bugs.",
+              "Attempt to access accounts, data, or systems that you are not authorized to access, or interfere with the operation or security of the service.",
+              "Use bots, scripts, or automated tools to interact with the service, unless expressly permitted.",
+              "Use the service for any unlawful purpose."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "6. User Content",
+        "blocks": [
+          {
+            "p": "You remain the owner of the content you submit, such as your display name, bio, and avatar. By submitting it, you grant {company} a non-exclusive, free, worldwide licence to host, store, and display that content solely for the purpose of operating the service, for as long as it remains on the service. You confirm that you hold the necessary rights to the content you submit. We may remove any content that breaches these Terms."
+          }
+        ]
+      },
+      {
+        "title": "7. Intellectual Property",
+        "blocks": [
+          {
+            "p": "The service, including its source code, design, graphics, and word lists, is the property of {company} or its contributors, unless stated otherwise. You may not copy, modify, distribute, or reuse any part of the service without prior permission, except as permitted by law or by an applicable open-source licence."
+          }
+        ]
+      },
+      {
+        "title": "8. Personal Data",
+        "blocks": [
+          {
+            "p": "We process your personal data in accordance with our {privacyPolicy} and our {gdprPolicy}, which describe what data we collect, why we collect it, how long we keep it, and how you can exercise your rights, including your right to access, correct, and delete your data."
+          }
+        ]
+      },
+      {
+        "title": "9. Suspension and Termination",
+        "blocks": [
+          {
+            "p": "You may stop using the service at any time and request the deletion of your account by contacting us at {email}."
+          },
+          {
+            "p": "We may suspend or delete an account, or remove a player from a game, if these Terms are breached, after informing the user where possible and proportionately to the seriousness of the breach. Account deletion results in the erasure of the associated personal data, except where retention is required by law."
+          }
+        ]
+      },
+      {
+        "title": "10. Availability and Disclaimer",
+        "blocks": [
+          {
+            "p": "As an educational project, the service is provided \"as is\" and \"as available\". We do not guarantee that it will be uninterrupted, error-free, or permanently available, and game data may be lost, for example when the server restarts. The service may be modified, suspended, or discontinued at any time."
+          }
+        ]
+      },
+      {
+        "title": "11. Limitation of Liability",
+        "blocks": [
+          {
+            "p": "To the extent permitted by law, {company} is not liable for any indirect damage resulting from the use of, or the inability to use, the service, or for the content and behaviour of other players. Nothing in these Terms limits liability that cannot be limited under applicable law, nor your rights as a consumer."
+          }
+        ]
+      },
+      {
+        "title": "12. Changes to These Terms",
+        "blocks": [
+          {
+            "p": "We may update these Terms to reflect changes to the service or to applicable law. The latest version will be published on this page with its revision date. Continued use of the service after an update constitutes acceptance of the revised Terms."
+          }
+        ]
+      },
+      {
+        "title": "13. Governing Law and Disputes",
+        "blocks": [
+          {
+            "p": "These Terms are governed by French law. In the event of a dispute, we encourage you to contact us first to seek an amicable solution. Failing that, the dispute will be brought before the competent French courts, subject to any mandatory rules protecting consumers."
+          }
+        ]
+      },
+      {
+        "title": "14. Contact",
+        "blocks": [
+          {
+            "p": "For any question about these Terms, please contact:"
+          },
+          {
+            "ul": [
+              "Company: {company}",
+              "Address: {address}",
+              "Email: {email}"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
