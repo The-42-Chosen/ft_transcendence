@@ -1,4 +1,5 @@
 type AvatarProps = {
+  userId: number;
   username: string;
   avatarUrl?: string | null;
   size?: number;
@@ -26,6 +27,7 @@ function getAvatarColor(username: string) {
 }
 
 export default function Avatar({
+  userId,
   username,
   avatarUrl,
   size = 64,
@@ -33,7 +35,7 @@ export default function Avatar({
   if (avatarUrl) {
     return (
       <img
-        src={avatarUrl}
+        src={`/api/users/${userId}/avatar`}
         alt={`${username} avatar`}
         width={size}
         height={size}
