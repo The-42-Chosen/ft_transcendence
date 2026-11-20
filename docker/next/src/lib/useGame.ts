@@ -24,10 +24,7 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
       setConnected(true);
       const res = await fetch(`/api/rooms/${roomCode}/state?seat=${seat}`, { cache: "no-store" }).catch(() => null);
       if (res?.ok) {
-        console.log("SEAT: ", seat);
-        console.log("RoomCode: ", roomCode);
         const data: GameView = await res.json();
-        console.log("JSON:", data);
         applyState(data);
       }
     });
