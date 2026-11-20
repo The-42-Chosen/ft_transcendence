@@ -41,32 +41,28 @@ export function publicRoom({ code, language, status }: Game) {
 
 export async function publish(room: Game) {
 	saveAiBoard(room);
-	console.log("PUBLISH");
-	console.log(room.aiBoard());
 	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent"), ai: room.aiBoard()} };
-	
-	console.log("BEFORE BODY: ", body);
-	console.log("BEFORE CLUE: ", body.views.agent.clue);
-
-	body.views.agent.clue = { word: 'multijoueur', count: 2, team: 'red' };
-	body.views.spymaster.clue = { word: 'multijoueur', count: 2, team: 'red' };
-
-	console.log("AFTER BODY: ", body);
-	console.log("AFTER CLUE: ", body.views.agent.clue);
-	console.log("AFTER BODY BEFORE SEND:", JSON.stringify(body, null, 2));
 
 	try {
 		const response = await fetch(`${REALTIME_URL}/broadcast`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(body),
+			// The realtime service waits for the AI before answering
 			signal: AbortSignal.timeout(2000),
 		});
 
-		console.log("RESPONSE STATUS:", response.status);
-
 		if (!response.ok) {
 			console.error("Broadcast failed:", response.status);
+			return;
+		}
+
+		// If the AI played, the realtime service sends back the views with its clue:
+		// save it in the Game, or the next viewFor() / publish() would lose it.
+		const answer = await response.json();
+		const aiClue = answer?.views?.spymaster?.clue;
+		if (aiClue && !room.clue) {
+			room.giveClue(`${room.turn}-spymaster` as Seat, String(aiClue.word), Number(aiClue.count));
 		}
 	} catch (error) {
 		console.error("Broadcast error:", error);
@@ -76,15 +72,9 @@ export async function publish(room: Game) {
 export async function playMove(room: Game, seat: Seat, move: () => object) {
 	try {
 		const result = move();
-		const response = await publish(room);
-		const gameview = room.viewFor(audienceOf(seat))
-		console.log("playMove Seat: ", gameview);
-		console.log("playMove result: ", result);
-		console.log("playMove response: ", response);
-		gameview.clue = { word: 'incursion', count: 2, team: 'blue' };
-		console.log("playMove Seat: ", gameview);
-
-		return NextResponse.json({ ...result, state: gameview });
+		await publish(room);
+		// Read the view after publish(): it now holds the AI clue if the AI played
+		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
 	} catch (error) {
 		if (error instanceof GameError) {
 			log.info({ service: "game", msg: "move refused", room_code: room.code, seat, reason: error.message, status: error.status });
