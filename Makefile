@@ -47,12 +47,9 @@ check_env:
         [ -z "$$missing" ] || { echo -e "\033[1;101mErreur : variables manquantes dans .env : $$missing\033[0m"; exit 1; }
 
 auth_secret: check_env
-	@current=$$(sed -n 's/^AUTH_SECRET=//p' .env | sed 's/[[:space:]]*#.*$$//; s/^"\(.*\)"$$/\1/'); \
-	if [ -z "$$current" ] || [ "$$current" = "replace-with-a-random-secret" ]; then \
-		secret=$$(head -c 32 /dev/urandom | base64 | tr -d '\n'); \
-		sed -i "s|^AUTH_SECRET=.*|AUTH_SECRET=\"$$secret\"|" .env; \
-		printf '\033[1;102mAUTH_SECRET genere dans .env\033[0m\n'; \
-	fi
+	@secret=$$(head -c 32 /dev/urandom | base64 | tr -d '\n'); \
+	sed -i "s|^AUTH_SECRET=.*|AUTH_SECRET=\"$$secret\"|" .env; \
+	printf '\033[1;102mAUTH_SECRET genere dans .env\033[0m\n'
 
 kibana_encryption_key: check_env
 	@current=$$(sed -n 's/^KIBANA_ENCRYPTION_KEY=//p' .env | sed 's/[[:space:]]*#.*$$//; s/^"\(.*\)"$$/\1/'); \
