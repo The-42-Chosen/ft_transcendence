@@ -142,6 +142,7 @@ clean: down
 fclean: storage
 	-$(DC) --profile dev down -v --rmi all --remove-orphans
 	-podman rm -f next-dev 2>/dev/null
+	-podman image prune -a -f
 	rm -rf docker/next/public/uploads/avatars/*
 
 info: storage
