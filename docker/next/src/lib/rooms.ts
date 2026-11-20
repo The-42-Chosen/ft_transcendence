@@ -72,6 +72,10 @@ export async function publish(room: Game) {
 export async function playMove(room: Game, seat: Seat, move: () => object) {
 	try {
 		const result = move();
+		log.info({ service: "game", msg: "move played", room_code: room.code, seat, ...result });
+		if (room.isOver()) {
+			log.info({ service: "game", msg: "game over", room_code: room.code, winner: room.winner(), remaining_red: room.remaining("red"), remaining_blue: room.remaining("blue"), duration_ms: Date.now() - room.createdAt });
+		}
 		await publish(room);
 		// Read the view after publish(): it now holds the AI clue if the AI played
 		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
