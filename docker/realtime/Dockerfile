@@ -6,7 +6,12 @@ ENV PORT=3001
 
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
-RUN corepack install && pnpm install --frozen-lockfile --prod
+RUN n=1; until corepack install && pnpm --version; do \
+        [ "$n" -ge 3 ] && exit 1; \
+        echo "pnpm : tentative $n/3 echouee, nouvelle tentative dans 5 s"; \
+        n=$((n+1)); sleep 5; \
+    done && \
+    pnpm install --frozen-lockfile --prod
 
 COPY src ./src
 
