@@ -80,14 +80,8 @@ function isBroadcastBody(body: unknown): body is BroadcastBody {
 }
 
 const httpServer = createServer(async (req, res) => {
-  console.log("\n========== REQUEST ==========");
-  console.log("Method:", req.method);
-  console.log("URL:", req.url);
-  console.log("Headers:", req.headers);
 
   if (req.url === "/health") {
-    console.log("Health check received");
-
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ status: "ok" }));
     return;
@@ -95,35 +89,24 @@ const httpServer = createServer(async (req, res) => {
 
   if (req.method === "POST" && req.url === "/broadcast") {
     const body = await readJson(req).catch((err) => {
-      console.log("JSON parsing error:", err);
+      console.error("JSON parsing error:", err);
       return null;
     });
 
-    console.log("Received body:", JSON.stringify(body, null, 2));
-
     if (!isBroadcastBody(body)) {
-      console.log("Invalid broadcast body:", body);
+      console.error("Invalid broadcast body:", body);
 
       res.writeHead(400);
       res.end();
       return;
     }
 
-    console.log("Broadcast code:", body.code);
-    console.log("Broadcast views:", body.views);
-
     const view = body.views.ai;
 
-    console.log("AI VIEW:", view);
-    console.log("TEAMS:", view?.agent_fmotte_teams);
-    console.log("TURN:", view?.current_turn);
-
-    const shouldPlay = view?.agent_fmotte_teams?.includes(view.current_turn);
-
-    console.log("SHOULD PLAY:", shouldPlay);
+    // Only ask the AI once per turn: after its clue, its operatives keep playing the same turn
+    const shouldPlay = view?.agent_fmotte_teams?.includes(view.current_turn) && !body.views.spymaster?.clue;
 
     if (shouldPlay) {
-      console.log("AI PLAY-----------------------");
 
       try {
         const response = await fetch("http://ia:8001", {
@@ -137,21 +120,18 @@ const httpServer = createServer(async (req, res) => {
         if (!response.ok) {
             console.error("AI request failed:", response.status);
         } else {
-            console.log("AI request successfully sent!");
             const result = await response.json();
-            console.log("AI response:", result);
 
-            body.views.agent.clue = {
-              	word: result.clue,
-              	count: result.number,
-              	team: view.current_turn
-          	};
-
-			body.views.spymaster.clue = {
-				word: result.clue,
-				count: result.number,
-				team: view.current_turn
-			};
+            // Same clue and version as Game.giveClue() in Next, which saves it from our answer
+            const clue: Clue = {
+              word: String(result.clue).trim().toUpperCase(),
+              count: Number(result.number),
+              team: view.current_turn
+            };
+            for (const audience of AUDIENCES) {
+              body.views[audience].clue = { ...clue };
+              body.views[audience].version++;
+            }
         }
 
       } catch (error) {
@@ -161,13 +141,9 @@ const httpServer = createServer(async (req, res) => {
 
     for (const audience of AUDIENCES) {
       const channelName = channel(body.code, audience);
-      console.log(`Emitting to channel: ${channelName}`);
-      console.log("Payload:", body.views[audience]);
-
       io.to(channelName).emit("state", body.views[audience]);
     }
 
-    console.log("Broadcast completed successfully");
 
     res.writeHead(200, {
 		"Content-Type": "application/json"
@@ -176,8 +152,6 @@ const httpServer = createServer(async (req, res) => {
 	res.end(JSON.stringify(body));
     return;
   }
-
-  console.log("404 - Route not found:", req.method, req.url);
 
   res.writeHead(404);
   res.end();
