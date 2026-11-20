@@ -49,7 +49,7 @@ export default function LegalDocument({
     t.commons?.tableOfContents ?? t.terms?.tableOfContents ?? tableOfContentsLabel ?? "Table of Contents";
 
   return (
-    <article className="mx-auto my-8 max-w-3xl rounded-2xl border border-(--color-border-default) bg-(--color-bg-surface) p-6 text-left leading-relaxed shadow-2xl sm:my-16 sm:p-12">
+    <article className="page-narrow my-8 rounded-2xl border border-(--color-border-default) bg-(--color-bg-surface) p-6 text-left leading-relaxed shadow-2xl sm:my-16 sm:p-12">
       <header className="p-6 border-b border-(--color-border-default) pb-8 !bg-transparent">
         <span className="font-agent text-xs uppercase tracking-[0.2em] text-(--color-accent-gold)">{label}</span>
         <h1 className="my-4 font-display text-4xl tracking-wide sm:text-5xl">{title}</h1>
