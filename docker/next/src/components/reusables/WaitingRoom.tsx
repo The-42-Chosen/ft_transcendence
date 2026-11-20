@@ -121,7 +121,7 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
     }
 
     return (
-        <section className="bg-amber-100 rounded-2xl p-6 m-4 shadow-xl">
+        <section className="page-wide my-4 bg-amber-100 rounded-2xl p-6 shadow-xl">
             <h2 className="mb-4 font-display text-5xl text-black tracking-wide">{wr.title}</h2>
             <RoomCode code={roomCode}/>
             <article className="grid grid-cols-1 gap-4 md:grid-cols-2">

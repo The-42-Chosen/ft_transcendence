@@ -36,6 +36,19 @@
   --rgb-status-online: 55 214 122;
 }
 
+/* LAYOUT */
+@utility page-wide {
+  width: calc(100% - 2rem);
+  max-width: var(--container-5xl);
+  margin-inline: auto;
+}
+
+@utility page-narrow {
+  width: calc(100% - 2rem);
+  max-width: var(--container-3xl);
+  margin-inline: auto;
+}
+
 /* FONTS */
 
 @theme inline {
