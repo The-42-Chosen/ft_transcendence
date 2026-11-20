@@ -59,7 +59,20 @@ export default function GameSetup() {
     }
   }
 
-  function pickGuestName(name: string) {
+  async function pickGuestName(name: string) {
+    setPending(true);
+    setError(null);
+    const res = await fetch("/api/guest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    }).catch(() => null);
+    setPending(false);
+    if (!res?.ok) {
+      setError(s.errorServer);
+      return;
+    }
+    // TODO: Remove once usePlayer() reads /api/me
     try {
       sessionStorage.setItem(GUEST_NAME_KEY, name);
     } catch {
@@ -136,6 +149,8 @@ export default function GameSetup() {
           variant="text"
           maxLength={GUEST_NAME_MAX}
           onSubmit={pickGuestName}
+          pending={pending}
+          error={error}
         />
       )}
       {step === "language" && (
