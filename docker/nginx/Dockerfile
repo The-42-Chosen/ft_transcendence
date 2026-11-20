@@ -1,6 +1,10 @@
 FROM docker.io/library/nginx:alpine
 
-RUN apk add --no-cache openssl && \
+RUN n=1; until apk add --no-cache openssl; do \
+        [ "$n" -ge 3 ] && exit 1; \
+        echo "apk : tentative $n/3 echouee, nouvelle tentative dans 5 s"; \
+        n=$((n+1)); sleep 5; \
+    done && \
     mkdir -p /etc/nginx/certs && \
     openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
         -keyout /etc/nginx/certs/key.pem \
