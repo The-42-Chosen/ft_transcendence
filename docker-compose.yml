@@ -209,7 +209,6 @@ services:
       - logstash_data:/usr/share/logstash/data
     depends_on:
       - elasticsearch
-      - elk-setup
     networks:
       - transcendence
     restart: unless-stopped
@@ -229,7 +228,6 @@ services:
       XPACK_REPORTING_ENCRYPTIONKEY: "${KIBANA_ENCRYPTION_KEY}"
     depends_on:
       - elasticsearch
-      - elk-setup
     networks:
       - transcendence
     restart: unless-stopped
@@ -354,7 +352,6 @@ services:
       ES_PASSWORD: "${ES_MONITORING_PASSWORD}"
     depends_on:
       - elasticsearch
-      - elk-setup
     networks:
       - transcendence
     restart: unless-stopped
