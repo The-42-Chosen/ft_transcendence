@@ -14,12 +14,44 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? "")
 const MAX_BODY_SIZE = 100_000;
 
 // Same split as audienceOf() in docker/next/src/lib/game.ts
-type Audience = "spymaster" | "agent";
+export type Audience = "spymaster" | "agent" | "ai";
 const AUDIENCES: Audience[] = ["spymaster", "agent"];
 
+type Clue = {
+    word: string;
+    count: number;
+    team: string;
+};
+
+type GameView = {
+    version: number;
+    turn: string;
+    clue: Clue | null;
+    cards: (string | null)[];
+    found: boolean[];
+    lastFound: number | null;
+    remaining: {
+        red: number;
+        blue: number;
+    };
+    gameOver: boolean;
+    winner: string | null;
+};
+
+export type IAGame = {
+    agent_fmotte_teams: string[];
+    current_turn: string;
+};
+
+type BroadcastViews = {
+    spymaster: GameView;
+    agent: GameView;
+    ai: IAGame;
+};
+
 type BroadcastBody = {
-  code: string;
-  views: Record<Audience, unknown>;
+    code: string;
+    views: BroadcastViews;
 };
 
 // Spectators see what operatives see
@@ -48,25 +80,79 @@ function isBroadcastBody(body: unknown): body is BroadcastBody {
 }
 
 const httpServer = createServer(async (req, res) => {
+
   if (req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ status: "ok" }));
     return;
   }
+
   if (req.method === "POST" && req.url === "/broadcast") {
-    const body = await readJson(req).catch(() => null);
+    const body = await readJson(req).catch((err) => {
+      console.error("JSON parsing error:", err);
+      return null;
+    });
+
     if (!isBroadcastBody(body)) {
+      console.error("Invalid broadcast body:", body);
+
       res.writeHead(400);
       res.end();
       return;
     }
-    for (const audience of AUDIENCES) {
-      io.to(channel(body.code, audience)).emit("state", body.views[audience]);
+
+    const view = body.views.ai;
+
+    // Only ask the AI once per turn: after its clue, its operatives keep playing the same turn
+    const shouldPlay = view?.agent_fmotte_teams?.includes(view.current_turn) && !body.views.spymaster?.clue;
+
+    if (shouldPlay) {
+
+      try {
+        const response = await fetch("http://ia:8001", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(view)
+        });
+
+        if (!response.ok) {
+            console.error("AI request failed:", response.status);
+        } else {
+            const result = await response.json();
+
+            // Same clue and version as Game.giveClue() in Next, which saves it from our answer
+            const clue: Clue = {
+              word: String(result.clue).trim().toUpperCase(),
+              count: Number(result.number),
+              team: view.current_turn
+            };
+            for (const audience of AUDIENCES) {
+              body.views[audience].clue = { ...clue };
+              body.views[audience].version++;
+            }
+        }
+
+      } catch (error) {
+        console.error("Failed to contact AI server:", error);
+      }
     }
-    res.writeHead(204);
-    res.end();
+
+    for (const audience of AUDIENCES) {
+      const channelName = channel(body.code, audience);
+      io.to(channelName).emit("state", body.views[audience]);
+    }
+
+
+    res.writeHead(200, {
+		"Content-Type": "application/json"
+	});
+
+	res.end(JSON.stringify(body));
     return;
   }
+
   res.writeHead(404);
   res.end();
 });

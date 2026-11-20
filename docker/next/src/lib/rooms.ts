@@ -41,23 +41,32 @@ export function publicRoom({ code, language, status }: Game) {
 
 export async function publish(room: Game) {
 	saveAiBoard(room);
-	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent") } };
-	await fetch(`${REALTIME_URL}/broadcast`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-		signal: AbortSignal.timeout(2000),
-	})
-		.then((res) => {
-			if (!res.ok) {
-				console.error("Realtime broadcast failed: HTTP", res.status);
-				log.error({ service: "game", msg: "realtime broadcast failed", error: `HTTP ${res.status}`, room_code: room.code });
-			}
-		})
-		.catch((error) => {
-			console.error("Realtime broadcast failed:", error);
-			log.error({ service: "game", msg: "realtime broadcast failed", error: String(error), room_code: room.code });
+	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent"), ai: room.aiBoard()} };
+
+	try {
+		const response = await fetch(`${REALTIME_URL}/broadcast`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
+			// The realtime service waits for the AI before answering
+			signal: AbortSignal.timeout(2000),
 		});
+
+		if (!response.ok) {
+			console.error("Broadcast failed:", response.status);
+			return;
+		}
+
+		// If the AI played, the realtime service sends back the views with its clue:
+		// save it in the Game, or the next viewFor() / publish() would lose it.
+		const answer = await response.json();
+		const aiClue = answer?.views?.spymaster?.clue;
+		if (aiClue && !room.clue) {
+			room.giveClue(`${room.turn}-spymaster` as Seat, String(aiClue.word), Number(aiClue.count));
+		}
+	} catch (error) {
+		console.error("Broadcast error:", error);
+	}
 }
 
 export async function playMove(room: Game, seat: Seat, move: () => object) {
@@ -68,6 +77,7 @@ export async function playMove(room: Game, seat: Seat, move: () => object) {
 			log.info({ service: "game", msg: "game over", room_code: room.code, winner: room.winner(), remaining_red: room.remaining("red"), remaining_blue: room.remaining("blue"), duration_ms: Date.now() - room.createdAt });
 		}
 		await publish(room);
+		// Read the view after publish(): it now holds the AI clue if the AI played
 		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
 	} catch (error) {
 		if (error instanceof GameError) {
