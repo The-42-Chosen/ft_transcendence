@@ -40,7 +40,6 @@ NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
 
 all:
 	@$(MAKE) up
-	@printf '\e[1;42mPublic IP: https://%b:%s\e[m\n' '$(SERVER_IP)' '$(NGINX_SSL_PORT)'
 
 check_env:
 	@test -f .env || { echo -e "\033[1;101mErreur : File .env missing\033[0m"; exit 1; } 
@@ -80,6 +79,7 @@ up: check_env auth_secret kibana_encryption_key storage
 		$(NEXT_RECREATE); \
 	fi
 	$(DC) up -d --remove-orphans
+	@printf '\e[1;42mPublic IP: https://%b:%s\e[m\n' '$(SERVER_IP)' '$(NGINX_SSL_PORT)'
 
 down: storage
 	$(DC) down --remove-orphans
