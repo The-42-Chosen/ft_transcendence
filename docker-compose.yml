@@ -27,6 +27,7 @@ services:
       context: ./docker/next
       target: dev
     container_name: prisma-migrate
+    init: true
     env_file:
       - ./.env
     environment:
@@ -102,6 +103,7 @@ services:
       context: ./docker/next
       target: dev
     container_name: next-dev
+    init: true
     env_file:
       - ./.env
     environment:
@@ -181,6 +183,7 @@ services:
   elk-setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.19.25
     container_name: elk-setup
+    init: true
     environment:
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD}"
       KIBANA_SYSTEM_PASSWORD: "${KIBANA_SYSTEM_PASSWORD}"
@@ -372,6 +375,7 @@ services:
 
   ia:
     container_name: ia
+    init: true
     build:
       context: ./docker/ia
     networks:
