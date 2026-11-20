@@ -11,7 +11,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen">
       <Header/>
-      <div className="px-4">
+      <div>
         <About/>
       </div>
       <Footer/>

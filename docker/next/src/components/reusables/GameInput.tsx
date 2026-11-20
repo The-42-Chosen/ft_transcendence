@@ -30,7 +30,7 @@ export default function GameInput ({title, label, info, onSubmit, error, pending
   }
 
   return (
-    <div className="bg-amber-100 p-6 m-4 rounded-2xl shadow-xl">
+    <div className="page-narrow my-4 bg-amber-100 p-6 rounded-2xl shadow-xl">
       <h3 className="mb-5 font-display text-4xl text-black tracking-wide">{title}</h3>
       <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col items-center gap-3">
         <label htmlFor={inputId} className="font-agent text-sm uppercase tracking-widest text-amber-800">{label}</label>

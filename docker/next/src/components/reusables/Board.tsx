@@ -14,11 +14,13 @@ type Parameters = {
 	colors: CardColor[];
 };
 
+const boardClass = "page-wide my-4 rounded-2xl bg-amber-100 p-6";
+
 export default function Board({ type, team, words, colors }: Parameters) {
 	return (
 		<>
 			{type === "agent" && (
-				<section className="bg-amber-100 rounded-2xl p-6 m-4">
+				<section className={boardClass}>
 					<BoardTeam display="board" team={team}/>
 					<div className="grid grid-cols-5 gap-4">
 						{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} />))}
@@ -29,7 +31,7 @@ export default function Board({ type, team, words, colors }: Parameters) {
 				</section>
 			)}
 			{type === "spectator" && (
-				<section className="bg-amber-100 rounded-2xl p-6 m-4">
+				<section className={boardClass}>
 					<BoardTeam display="board" team={team} />
 					<div className="grid grid-cols-5 gap-4">
 						{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} readOnly />))}
@@ -40,7 +42,7 @@ export default function Board({ type, team, words, colors }: Parameters) {
 
 			)}
 			{type === "spymaster" && (
-				<section className="bg-amber-100 rounded-2xl p-6 m-4">
+				<section className={boardClass}>
 					<BoardTeam display="board" team={team} />
 					<div className="grid grid-cols-5 gap-4">
 						{words.map((word, i) => (

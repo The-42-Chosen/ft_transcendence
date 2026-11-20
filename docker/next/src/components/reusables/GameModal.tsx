@@ -21,7 +21,7 @@ export default function GameModal ({title, text1, text2, text3, action, onConfir
   const { t } = useLanguage();
 
   return (
-    <div className="bg-amber-100 p-6 m-4 rounded-2xl shadow-xl">
+    <div className="page-narrow my-4 bg-amber-100 p-6 rounded-2xl shadow-xl">
       <h3 className="mb-5 font-display text-4xl text-black tracking-wide">{title}</h3>
       <ul className={cn("grid grid-cols-1 gap-3", text3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
         {[text1, text2, text3].filter((text): text is string => !!text).map((text) => (

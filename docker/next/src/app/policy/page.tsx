@@ -11,7 +11,7 @@ export default function PolicyPage() {
   return (
     <main className="min-h-screen">
       <Header/>
-      <div className="px-4">
+      <div>
         <PrivacyPolicy/>
       </div>
       <Footer/>
