@@ -17,19 +17,35 @@ type LanguageContextValue = {
 
 export const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>("fr");
+export function LanguageProvider({
+  children,
+  initialLang = "fr",
+}: {
+  children: ReactNode;
+  initialLang?: Language;
+}) {
+  const [lang, setLangState] = useState<Language>(initialLang);
 
   useEffect(() => {
-    const saved = localStorage.getItem("lang") as Language | null;
-    if (saved && translations[saved]) {
-      setLangState(saved);
-    }
+    try {
+      const saved = window.localStorage.getItem("lang") as Language | null;
+      if (saved && translations[saved] && saved !== lang) {
+        setLangState(saved);
+        document.cookie = `lang=${saved}; path=/; max-age=31536000; SameSite=Lax`;
+      }
+    } catch {}
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   function setLang(next: Language) {
     setLangState(next);
-    localStorage.setItem("lang", next);
+    try {
+      window.localStorage.setItem("lang", next);
+    } catch {}
+    document.cookie = `lang=${next}; path=/; max-age=31536000; SameSite=Lax`;
   }
 
   return (
