@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { cookies } from "next/headers";
 import { Bebas_Neue, Manrope, Special_Elite } from "next/font/google";
-import { LanguageProvider } from "@/i18n/LanguageContext";
+import { LanguageProvider, type Language } from "@/i18n/LanguageContext";
 import "./globals.css";
 
 const bebas = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-bebas" });
@@ -13,11 +14,18 @@ export const metadata: Metadata = {
   description: "ATAB Codename",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+const VALID_LANGUAGES: Language[] = ["fr", "en", "es"];
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const cookieStore = await cookies();
+  const cookieLang = cookieStore.get("lang")?.value as Language | undefined;
+  const initialLang: Language =
+    cookieLang && VALID_LANGUAGES.includes(cookieLang) ? cookieLang : "fr";
+
   return (
-    <html lang="fr" className={`${bebas.variable} ${specialElite.variable} ${manrope.variable}`}>
+    <html lang={initialLang} className={`${bebas.variable} ${specialElite.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
-        <LanguageProvider>
+        <LanguageProvider initialLang={initialLang}>
           {children}
         </LanguageProvider>
       </body>

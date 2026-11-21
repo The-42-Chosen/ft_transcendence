@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import UserCard from '@/components/reusables/UserCard';
 import { LanguageContext, type Language } from '@/i18n/LanguageContext';
@@ -8,8 +8,17 @@ import { LanguageContext, type Language } from '@/i18n/LanguageContext';
 export default function Nav() {
   const context = useContext(LanguageContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [enableTransition, setEnableTransition] = useState(false);
+
+  useEffect(() => {
+    const id = window.requestAnimationFrame(() => {
+      setEnableTransition(true);
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, []);
 
   const changeLanguage = (lang: Language) => {
+    setEnableTransition(true);
     if (context) {
       context.setLang(lang);
     }
@@ -31,20 +40,20 @@ export default function Nav() {
     login: "Login"
   };
 
-
   const navLinkClass =
     "cursor-pointer rounded-lg px-3 py-1.5 text-sm uppercase tracking-wider text-(--color-text-primary) transition-colors hover:bg-(--color-bg-elevated) hover:text-(--color-accent-gold) font-agent";
 
-
   const flagButtonClass = (targetLang: Language) =>
-    `!rounded-md px-1.5 py-0.5 text-lg transition hover:scale-110 ${lang === targetLang
-      ? "!bg-(--color-bg-subtle) ring-1 ring-(--color-accent-gold)"
-      : "!bg-transparent opacity-60 hover:!bg-white/10 hover:opacity-100"
+    `!rounded-md px-1.5 py-0.5 text-lg ${
+      enableTransition ? "transition duration-150" : "transition-none"
+    } hover:scale-110 ${
+      lang === targetLang
+        ? "!bg-(--color-bg-subtle) ring-1 ring-(--color-accent-gold)"
+        : "!bg-transparent opacity-60 hover:!bg-white/10 hover:opacity-100"
     }`;
 
   return (
     <nav className="relative flex min-w-0 items-center justify-end">
-
       <button
         type="button"
         onClick={toggleMenu}
@@ -54,7 +63,6 @@ export default function Nav() {
       >
         {isOpen ? "✕" : "☰"}
       </button>
-
 
       <ul className="hidden items-center justify-end gap-x-2 lg:gap-x-5 md:flex">
         <li>
@@ -102,7 +110,6 @@ export default function Nav() {
         </li>
       </ul>
 
-
       {isOpen && (
         <div className="absolute top-13 right-0 z-50 w-64 rounded-2xl border border-(--color-border-default) bg-(--color-bg-surface) p-4 text-(--color-text-primary) shadow-2xl md:hidden">
           <ul className="flex flex-col gap-2 text-left">
@@ -136,7 +143,6 @@ export default function Nav() {
 
             <hr className="my-1 border-(--color-border-default)" />
 
-
             <li className="flex items-center justify-center gap-4 py-1">
               <button type="button" onClick={() => changeLanguage('fr')} className={flagButtonClass('fr')}>
                 🇫🇷
@@ -150,7 +156,6 @@ export default function Nav() {
             </li>
 
             <hr className="my-1 border-(--color-border-default)" />
-
 
             <li>
               <Link
