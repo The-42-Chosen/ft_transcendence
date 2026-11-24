@@ -14,7 +14,7 @@ type Parameters = {
 	colors: CardColor[];
 };
 
-const boardClass = "page-wide my-4 rounded-2xl bg-amber-100 p-6";
+const boardClass = "rounded-2xl bg-amber-100 p-6";
 
 export default function Board({ type, team, words, colors }: Parameters) {
 	return (

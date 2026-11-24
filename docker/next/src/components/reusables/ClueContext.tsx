@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import type { Socket } from "socket.io-client";
 import type { CardColor } from "@/lib/words";
 import type { GameView } from "@/lib/game";
 import type { Seat } from "@/lib/lobby";
@@ -32,6 +33,7 @@ type ClueContextValue = {
   revealed: CardColor[] | null;
   winner: TeamTurn | null;
   connected: boolean;
+  socket: Socket | null;
   giveClue: (word: string, count: number) => Promise<MoveResult>;
   guess: (word: string) => Promise<MoveResult>;
   endTurn: () => Promise<MoveResult>;
@@ -47,7 +49,7 @@ type ClueProviderProps = {
 const ClueContext = createContext<ClueContextValue | null>(null);
 
 export function ClueProvider({ children, roomCode, seat, initialState }: ClueProviderProps) {
-  const { state, applyState, connected } = useGame(roomCode, seat, initialState);
+  const { state, applyState, connected, socket } = useGame(roomCode, seat, initialState);
 
   // Sends a move to the server, the new state then comes back to everybody through the socket
   async function play(move: string, body: object = {}): Promise<MoveResult> {
@@ -74,6 +76,7 @@ export function ClueProvider({ children, roomCode, seat, initialState }: CluePro
     revealed: state.gameOver ? (state.cards as CardColor[]) : null,
     winner: state.winner,
     connected,
+    socket,
     giveClue: (word, count) => play("clue", { word, count }),
     guess: (word) => play("guess", { word }),
     endTurn: () => play("end-turn"),
