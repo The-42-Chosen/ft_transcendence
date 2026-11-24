@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 import type { GameView } from "@/lib/game";
 import type { Seat } from "@/lib/lobby";
 
 export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
   const [state, setState] = useState<GameView>(initialState);
   const [connected, setConnected] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const applyState = useCallback((next: GameView) => {
     setState((current) => (next.version >= current.version ? next : current));
@@ -31,11 +32,13 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
     socket.on("disconnect", () => setConnected(false));
     socket.on("connect_error", (error) => console.error("Socket.IO error:", error.message));
     socket.on("state", applyState);
+    setSocket(socket);
 
     return () => {
       socket.disconnect();
+      setSocket(null);
     };
   }, [roomCode, seat, applyState]);
 
-  return { state, applyState, connected };
+  return { state, applyState, connected, socket };
 }

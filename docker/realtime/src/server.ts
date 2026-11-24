@@ -63,6 +63,24 @@ function channel(code: string, audience: Audience): string {
   return `${code.trim().toUpperCase()}:${audience}`;
 }
 
+const CHAT_MAX_LENGTH = 200;
+const CHAT_NAME_MAX = 32;
+const CHAT_HISTORY = 50;
+
+type ChatMessage = {
+  id: string;
+  name: string;
+  seat: string;
+  text: string;
+  at: number;
+};
+
+const chatHistory = new Map<string, ChatMessage[]>();
+
+function chatChannel(code: string): string {
+  return `${code.trim().toUpperCase()}:chat`;
+}
+
 async function readJson(req: IncomingMessage): Promise<unknown> {
   let data = "";
   for await (const chunk of req) {
@@ -169,6 +187,48 @@ io.on("connection", (socket) => {
     return;
   }
   socket.join(channel(code, audienceOf(seat)));
+
+  const room = chatChannel(code);
+  socket.join(room);
+
+  socket.on("chat:history", (reply: unknown) => {
+    if (typeof reply === "function") {
+      reply(chatHistory.get(room) ?? []);
+    }
+  });
+
+  socket.on("chat", (payload: unknown) => {
+    const { name, text } = (payload ?? {}) as { name?: unknown; text?: unknown };
+    if (typeof text !== "string") {
+      return;
+    }
+    const cleanText = text.trim().slice(0, CHAT_MAX_LENGTH);
+    if (!cleanText) {
+      return;
+    }
+    // TODO: Take the name from the next-auth session too, the client can lie about it
+    const cleanName = typeof name === "string" && name.trim() ? name.trim().slice(0, CHAT_NAME_MAX) : "Anonymous";
+
+    const message: ChatMessage = {
+      id: `${Date.now()}-${socket.id}`,
+      name: cleanName,
+      seat: typeof seat === "string" ? seat : "spectator",
+      text: cleanText,
+      at: Date.now(),
+    };
+
+    const history = chatHistory.get(room) ?? [];
+    history.push(message);
+    chatHistory.set(room, history.slice(-CHAT_HISTORY));
+
+    io.to(room).emit("chat", message);
+  });
+
+  socket.on("disconnect", () => {
+    if (!io.sockets.adapter.rooms.get(room)?.size) {
+      chatHistory.delete(room);
+    }
+  });
 });
 
 httpServer.listen(PORT, "0.0.0.0", () => {
