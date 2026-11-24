@@ -76,6 +76,24 @@ When it finishes, `make` prints the address of the website, which is served over
 
 To stop the project, run `make down`. To also remove the containers, volumes and images, run `make fclean` (this deletes all stored data, including the database).
 
+### Storage location
+
+We are not root on the 42 school computers, and by default Podman stores everything in `~/.local/share/containers/storage`. Since the 42 home directory has a size quota, the Makefile uses `/goinfre` instead whenever it is available, and falls back to the default path otherwise.
+
+To do so, the Makefile prepares the storage before running any Podman command:
+
+* `STORE` selects the storage path: `/goinfre/<login>/containers` if `/goinfre/<login>` exists, the default path otherwise.
+* `CONTAINERS_STORAGE_CONF` is exported. It is the environment variable Podman reads to know which storage configuration file to use.
+* The `storage` rule creates `.podman/storage.conf`, whose `graphroot` is set to the `STORE` path. This is where Podman keeps everything persistent (images, containers, volumes...).
+
+Run `make info` to see which location is in use.
+
+`CONTAINERS_STORAGE_CONF` is only set inside `make`. To run `podman` commands by hand on a 42 machine, export it first:
+
+```sh
+export CONTAINERS_STORAGE_CONF="$PWD/.podman/storage.conf"
+```
+
 ## Team Information
 
 For each team member mentioned at the top of the README.md, you must pro-
