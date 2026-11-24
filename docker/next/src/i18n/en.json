@@ -85,7 +85,14 @@
     "assassinFound": "Assassin word found",
     "allWordsRevealed": "All words revealed",
     "wordDiscovered": "The word {word} has been discovered",
-    "close": "Close"
+    "close": "Close",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "empty": "No messages yet",
+      "you": "You"
+    }
   },
   "footer": {
     "about": "About us",

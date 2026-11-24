@@ -85,7 +85,14 @@
     "assassinFound": "Palabra asesina encontrada",
     "allWordsRevealed": "Todas las palabras reveladas",
     "wordDiscovered": "La palabra {word} ha sido descubierta",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Escribe un mensaje…",
+      "send": "Enviar",
+      "empty": "Todavía no hay mensajes",
+      "you": "Tú"
+    }
   },
   "footer": {
     "about": "Nosotros",
