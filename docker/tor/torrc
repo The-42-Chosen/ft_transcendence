@@ -1,0 +1,5 @@
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 443 nginx:443
+
+# HiddenServiceDir permet de generer et sauvegarder la cle privee et l'adresse .onion
+# HiddenServicePort 443 redirige le port 443 de l'adresse .onion vers le conteneur nginx:443
