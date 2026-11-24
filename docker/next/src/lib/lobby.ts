@@ -49,21 +49,6 @@ export const LANGUAGE_FLAGS: Record<string, Language> = {
 	"🇪🇦": "es",
 };
 
-// TODO: Need to be replaces once backend connected
-export const defaultTeams: Teams = {
-	red: {
-		spymasters: [],
-		operatives: ["Benjamin Suger"],
-	},
-	blue: {
-		spymasters: [],
-		operatives: [],
-	},
-};
-
-// TODO: Need to be replaces once backend connected
-export const defaultSpectators: string[] = ["Moulinette", "Norminette"];
-
 // No 0/O or 1/I/L so the code is easy to read out loud
 const ROOM_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const ROOM_CODE_LENGTH = 6;

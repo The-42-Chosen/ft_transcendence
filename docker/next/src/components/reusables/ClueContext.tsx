@@ -54,7 +54,7 @@ export function ClueProvider({ children, roomCode, seat, initialState }: CluePro
     const res = await fetch(`/api/rooms/${roomCode}/${move}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...body, seat }),
+      body: JSON.stringify(body),
     }).catch(() => null);
     const data = res ? await res.json().catch(() => null) : null;
     if (data?.state) {
