@@ -96,42 +96,35 @@ export CONTAINERS_STORAGE_CONF="$PWD/.podman/storage.conf"
 
 ## Team Information
 
-This project required assignement of different roles as Product Owner, Project Manager and Tech Lead. All members have also the role "Developers" by default. Members can have also customs roles in addition to the mandatory ones. 
+The subject requires three roles to be assigned: Product Owner, Project Manager and Technical Lead. Every member is also a Developer by default, and members can take on custom roles in addition to the mandatory ones.
 
-* Eric Pascual ; Product Owner, Tech lead, Developer
-With his experience in web project before 42, Eric helped to choose the technical stack of the application, manages the backlog and helped prioritize the work needed to be done.
-#des choses a dire sur son role de PO
+* **Eric Pascual**: Product Owner, Developer
 
+  Drawing on his experience with web projects before 42, Eric managed the backlog and helped prioritize the work to be done. He prioritized the features, made the final call when the team had to choose between them, and validated the completed work against the requirements of the subject.
 
-* Guillaume Pollastri ; , Developer
-Guillaume manages a big part of the back end developpment of the project with the most sensitive part with Users. 
-Helped in various part of the project.
+* **Guillaume Pollastri**: Technical Lead, Developer
 
+  Guillaume handled a large part of the back-end development, including its most sensitive part: user management. He also helped choose the technical stack of the application and the tools used by the team.
 
-* Florent Motte ; AI Specialist, Developer
-Florent, respected member of the 42 AI association was our AI specialist. His intra login served as the name of our AI.
-He also set up communication channel between his services and the back-end.
+* **Florent Motte**: AI Specialist, Developer
 
+  Florent, a respected member of the 42 AI association, was our AI specialist. His intra login gave its name to our AI. He also set up the communication channel between his service and the back end.
 
-* Salomé Brochard ; Developer
-Salomé implemented the availability of the service in Tor, translation in different languages and front end of several parts of the project.
+* **Salomé Brochard**: Tor Specialist, Developer
 
+  Salomé made the service available over Tor, added support for several languages, and built the front end of several parts of the project.
 
-* Benjamin Suger ; Project Manager, DevOps, Developer
-Benjamin set up the environment with podman, github actions as a CI pipeline and the Makefile. He also manage the observality of the project with the ELK suite and Prometheus/Grafana.
+* **Benjamin Suger**: Project Manager, DevOps, Developer
 
-
-For each team member mentioned at the top of the README.md, you must pro-
-vide:
-◦ Assigned role(s): PO, PM, Tech Lead, Developers, etc.
-◦ Brief description of their responsibilities.
+  Benjamin set up the environment with Podman, GitHub Actions as the CI pipeline, and the Makefile. He also managed the observability of the project with the ELK stack and Prometheus/Grafana.
 
 ## Project Management
 
-How the team organized the work (task distribution, meetings, etc.).
-◦ Tools used for project management (GitHub Issues, Trello, etc.).
-◦ Communication channels used (Discord, Slack, etc.).
+**Work organization**: Over several meetings, we identified which parts of the project interested each member of the team, which helped us set the project goals. From there, the organization came naturally: each member worked on a separate part, and the parts were then linked together.
 
+**Project management tools**: GitHub, where we keep our backlog.
+
+**Communication channels**: Discord, and in person at school.
 
 ## Technical Stack
 
@@ -254,6 +247,22 @@ choice".
 
 
 ## Individual Contributions:
+
+### Eric Pascual
+
+
+### Guillaume Pollastri
+
+
+### Salome Brochard
+
+
+### Florent Motte
+
+
+### Benjamin Suger
+
+
 
 Detailed breakdown of what each team member contributed.
 ◦ Specific features, modules, or components implemented by each person.
