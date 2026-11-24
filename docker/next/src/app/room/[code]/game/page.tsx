@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import Footer from '@/components/commons/Footer';
 import Header from '@/components/commons/Header';
 import Board from '@/components/reusables/Board';
+import Chat from '@/components/reusables/Chat';
 import { ClueProvider } from '@/components/reusables/ClueContext';
 import GameOverModal from '@/components/reusables/GameOverModal';
 import GameOverSetup from '@/components/reusables/GameOverSetup';
@@ -32,7 +33,12 @@ export default async function GamePage({ params }: Parameters) {
     <main className="min-h-screen text-center">
       <Header/>
       <ClueProvider roomCode={room.code} seat={playerSeat} initialState={room.viewFor(audienceOf(playerSeat))}>
-        <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
+        <div className="mx-auto my-4 flex w-[calc(100%-2rem)] max-w-5xl flex-col gap-4 xl:max-w-7xl xl:flex-row">
+          <div className="min-w-0 flex-1">
+            <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
+          </div>
+          <Chat className="xl:w-80 xl:shrink-0"/>
+        </div>
         <GameOverSetup/>
         <GameOverModal words={room.words}/>
       </ClueProvider>
