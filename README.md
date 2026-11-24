@@ -233,20 +233,162 @@ ELK and Prometheus are complementary. Metrics tell us that something is wrong (a
 ◦ Key fields and data types.
 
 ## Features List:
-◦ Complete list of implemented features.
-◦ Which team member(s) worked on each feature.
-◦ Brief description of each feature’s functionality.
+
+### Game
+
+| Feature | Description | Team member(s) |
+| :--- | :--- | :--- |
+| Game rooms | Create a room in English, French or Spanish and share its code so that other players can join. | erpascua |
+| Waiting room | Players pick their team and their role (Spymaster or agent) before the game starts. | erpascua |
+| Codenames gameplay | The Spymaster gives a one-word clue and a number, the agents guess words on the board, and the teams take turns until one of them wins. | erpascua |
+| Real-time play | Every move is sent instantly to all the players of the room. | fmotte, erpascua |
+| AI Spymaster | An AI can replace the Spymaster of one or both teams and gives its clues in the language of the room. | fmotte |
+| Guest play | Join a quick game with just a name, without creating an account. | erpascua |
+
+### Users
+
+| Feature | Description | Team member(s) |
+| :--- | :--- | :--- |
+| Registration and login | Create an account and log in with an email address and a password. | gpollast, bsuger |
+| Profile | Edit a display name, a bio and a profile picture (JPEG, PNG or WebP, up to 2 MB). | gpollast |
+| Public profile page | View the profile of another player. | gpollast |
+| Player search | Search for other players. | gpollast |
+| Friends | Add and remove friends, and see the list of friends. | gpollast |
+| Online status | See which players are currently online. | gpollast |
+
+### Interface
+
+| Feature | Description | Team member(s) |
+| :--- | :--- | :--- |
+| Multiple languages | The website is available in English, French and Spanish, with a language selector. | sbrochar, erpascua |
+| User interface | Reusable components shared by the whole website (header, navigation, game board, forms...). | erpascua, sbrochar |
+| Legal pages | Terms of service, privacy policy, GDPR information and an About page. | erpascua, sbrochar |
+
+### Access and security
+
+| Feature | Description | Team member(s) |
+| :--- | :--- | :--- |
+| HTTPS | The whole website is served over HTTPS, and HTTP requests are redirected to it. | bsuger |
+| Tor access | The website can be reached with Tor Browser through a `.onion` address. | sbrochar |
+
+### Operations
+
+| Feature | Description | Team member(s) |
+| :--- | :--- | :--- |
+| One-command launch | `make` builds and starts the whole platform. | bsuger |
+| Centralized logs | The nginx and application logs are collected in one place and can be searched in Kibana. | bsuger |
+| Monitoring and alerts | The metrics of the host, the containers and the services are displayed in Grafana dashboards, and alerts are sent by email. | bsuger |
+| Continuous integration | Every pull request is checked automatically with GitHub Actions. | bsuger |
+| Outage simulation | `make crisis` stops a service on purpose to show that the monitoring detects it. | bsuger |
 
 ## Modules:
-◦ List of all chosen modules (Major and Minor).
-◦ Point calculation (Major = 2pts, Minor = 1pt).
-◦ Justification for each module choice, especially for custom "Modules of
-choice".
-◦ How each module was implemented.
-◦ Which team member(s) worked on each module
+
+Total points ; 25 / 19 (19 required to get 125% of the project, 14 for mandatory part)
+Each Major add 2 points and Minor 1 point.
+
+* **Major: Use a framework for both the frontend and backend.**
+
+  We chose Next.js to write the pages and the API in a single TypeScript code base that shares its types and validation rules. The pages are built with React and the App Router, and the back end is a REST API made of Route Handlers under `/api`.
+
+  *Team member(s): erpascua*
+
+* **Major: Infrastructure for log management using ELK (Elasticsearch, Logstash, Kibana).**
+
+  With more than fifteen containers, the logs had to be centralized to be usable. Logstash collects the nginx and application logs, Elasticsearch stores them with dedicated accounts, a 30-day retention policy and nightly snapshots, and Kibana is used to search them.
+
+  *Team member(s): bsuger*
+
+* **Major: Monitoring system with Prometheus and Grafana.**
+
+  We wanted to know that a service is failing before a player tells us. Prometheus scrapes six exporters and evaluates eight alert rules, and Grafana displays three provisioned dashboards and sends the alerts by email.
+
+  *Team member(s): bsuger*
+
+* **Major: Introduce an AI Opponent for games.**
+
+  Codenames needs four players, so an AI Spymaster lets smaller groups play. It is a Python service that scores candidate clues with pre-trained fastText word vectors and NumPy, in English, French and Spanish.
+
+  *Team member(s): fmotte*
+
+* **Major: Standard user management and authentication.**
+
+  Accounts are required for profiles, friends and online status. Users register and log in with an email address and a password (Auth.js, passwords hashed with bcrypt), edit their profile, upload an avatar, add friends and see who is online.
+
+  *Team member(s): gpollast*
+
+* **Major: Implement a complete web-based game where users can play against each other.**
+
+  The game is the heart of the project: an online adaptation of Codenames, with its rules and win conditions. The rules run on the server (`src/lib/game.ts`) behind a REST API, and the hidden colors of the cards are only sent to the Spymasters, so an agent cannot cheat.
+
+  *Team member(s): erpascua, fmotte*
+
+* **Major: Remote players — Enable two players on separate computers to play the same game in real-time.**
+
+  Codenames is meant to be played with friends who are not in the same room, each on their own computer. Every client keeps a Socket.IO connection to the real-time service, which pushes the new state of the game to the room after each move.
+
+  *Team member(s): erpascua*
+
+* **Major: Allow users to interact with other users.**
+
+  A social game needs players to find each other outside of a match. Users can search for other players, view their profile, and add or remove friends.
+  #a completer : le chat n'est pas encore dans le code
+
+  *Team member(s): gpollast, fmotte*
+
+* **Major: Multiplayer game (more than two players).**
+
+  Codenames is a team game: two teams, each with a Spymaster and one or more agents, so at least four players share the same match. All the clients of a room receive the same state from the real-time service, each with the view allowed by their role.
+
+  *Team member(s): erpascua*
+
+* **Minor: Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components).**
+
+  A shared set of components keeps the interface consistent and avoids rewriting the same elements on every page. It contains 23 reusable React components (`src/components/reusables`), a color palette defined as CSS variables, and three fonts (Manrope, Bebas Neue and Special Elite).
+
+  *Team member(s): erpascua*
+
+* **Minor: Implement spectator mode for games.**
+
+  Spectators let friends watch a match without taking a seat. From the home screen, a user can join a room as a spectator and follow the board in real time.
+
+  *Team member(s): erpascua*
+
+* **Minor: Support for multiple languages (at least 3 languages).**
+
+  Codenames is a word game, so the language matters as much for the game as for the interface. The website is translated into English, French and Spanish with JSON files and a language selector, and the word lists and the AI exist in the three languages too.
+
+  *Team member(s): sbrochar*
+
+* **Minor: Use an ORM for the database.**
+
+  An ORM gives us typed queries and versioned migrations instead of hand-written SQL. We use Prisma: the schema is described in `contract.prisma`, and the migrations are applied automatically when the platform starts.
+
+  *Team member(s): gpollast*
+
+* **Minor: Support for additional browsers.**
+
+  Players should not have to install a specific browser to join a game.
+  #a completer : navigateurs testes et limites constatees
+
+  *Team member(s): erpascua, sbrochar*
+
+* **Minor: Game statistics and match history (requires a game module).**
+
+  Statistics and match history give players a reason to come back and to compare themselves with their friends.
+  #a completer : implementation, le module n'est pas encore dans le code
+
+  *Team member(s): gpollast*
+
+* **Minor: Module of choice - Tor**
+
+  Our theme is espionage, and we wanted the game to stay reachable for players whose internet access is restricted or monitored. It deserves to be a module because it adds a real feature (anonymous access) and required work on networking, isolation and TLS that no listed module covers. A dedicated Tor container publishes the website as an onion service and reaches nginx through Unix sockets, without any access to the other services.
+
+  *Team member(s): sbrochar*
 
 
 ## Individual Contributions:
+
+*Every member of the team wrote their own part of this section.*
 
 ### Eric Pascual
 
@@ -254,7 +396,7 @@ choice".
 ### Guillaume Pollastri
 
 
-### Salome Brochard
+### Salomé Brochard
 
 
 ### Florent Motte
@@ -262,10 +404,15 @@ choice".
 
 ### Benjamin Suger
 
+I created the CI pipeline, the Makefile and everything related to DevOps, and I implemented the two DevOps major modules (ELK and Prometheus/Grafana).
+
+**Challenges**: The tests and the `make` process must not become a bottleneck for the rest of the team. I reworked them several times to make them fast enough not to slow the other members down.
 
 
-Detailed breakdown of what each team member contributed.
-◦ Specific features, modules, or components implemented by each person.
-◦ Any challenges faced and how they were overcome.
+## The use of AI
 
+We used AI for the following tasks:
 
+* It helped us write this document in correct English.
+* It helped us with cybersecurity, through various tests run throughout the development of the website.
+* The script behind `make crisis` was generated by AI.
