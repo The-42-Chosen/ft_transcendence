@@ -8,7 +8,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 type Items = {
   title: string;
   text1: string;
-  text2: string;
+  text2?: string;
   text3?: string;
   action?: string;
   onConfirm?: (choice: string) => void;
