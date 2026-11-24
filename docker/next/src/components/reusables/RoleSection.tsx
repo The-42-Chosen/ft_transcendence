@@ -27,7 +27,7 @@ export default function RoleSection({ title, team, players, isYou = false, playe
 				<span className="text-xs font-semibold text-black/40">{players.length + (isYou ? 1 : 0)}</span>
 			</div>
 			<ul className="flex flex-wrap gap-4">
-				{players.map((name) => (<PlayerSlot key={name} name={name} />))}
+				{players.map((name, i) => (<PlayerSlot key={`${name}-${i}`} name={name} />))}
 				{isYou && (<PlayerSlot name={playerName || t.waitingRoom.you} isYou />)}
 				{onJoin && !isYou && !full && (<JoinSlot team={team} onJoin={onJoin} />)}
 			</ul>

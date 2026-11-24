@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GameModal from '@/components/reusables/GameModal';
 import GameInput from '@/components/reusables/GameInput';
-import { GUEST_NAME_KEY, GUEST_NAME_MAX, LANGUAGE_FLAGS, type Role } from '@/lib/lobby';
+import { GUEST_NAME_KEY, GUEST_NAME_MAX, LANGUAGE_FLAGS } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 type Step = "mode" | "connexion" | "guest_name" | "language" | "room_code";
@@ -17,7 +17,6 @@ export default function GameSetup() {
   const s = t.setup;
 
   const [step, setStep] = useState<Step>("mode");
-  const [role, setRole] = useState<Role>("player");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [afterLogin, setAfterLogin] = useState<Step>("language");
@@ -36,12 +35,7 @@ export default function GameSetup() {
   }
 
   async function pickMode(choice: string) {
-    const nextRole: Role =
-      choice === s.createGame ? "game_master" :
-        choice === s.joinGame ? "player" :
-          "spectator";
     const next: Step = choice === s.createGame ? "language" : "room_code";
-    setRole(nextRole);
     const userLogged = await (sessionCheck.current ?? Promise.resolve(false));
     if (userLogged) {
       goTo(next);
@@ -93,7 +87,7 @@ export default function GameSetup() {
         throw new Error();
       }
       const { code } = await res.json();
-      router.push(`/room/${code}?role=game_master`);
+      router.push(`/room/${code}`);
     } catch {
       setError(s.errorCreate);
       setPending(false);
@@ -113,7 +107,7 @@ export default function GameSetup() {
       if (!res.ok) {
         throw new Error();
       }
-      router.push(`/room/${code}?role=${role}`);
+      router.push(`/room/${code}`);
     } catch {
       setError(s.errorServer);
       setPending(false);
