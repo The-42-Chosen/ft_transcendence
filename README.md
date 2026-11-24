@@ -96,6 +96,31 @@ export CONTAINERS_STORAGE_CONF="$PWD/.podman/storage.conf"
 
 ## Team Information
 
+This project required assignement of different roles as Product Owner, Project Manager and Tech Lead. All members have also the role "Developers" by default. Members can have also customs roles in addition to the mandatory ones. 
+
+* Eric Pascual ; Product Owner, Tech lead, Developer
+With his experience in web project before 42, Eric helped to choose the technical stack of the application, manages the backlog and helped prioritize the work needed to be done.
+#des choses a dire sur son role de PO
+
+
+* Guillaume Pollastri ; , Developer
+Guillaume manages a big part of the back end developpment of the project with the most sensitive part with Users. 
+Helped in various part of the project.
+
+
+* Florent Motte ; AI Specialist, Developer
+Florent, respected member of the 42 AI association was our AI specialist. His intra login served as the name of our AI.
+He also set up communication channel between his services and the back-end.
+
+
+* Salomé Brochard ; Developer
+Salomé implemented the availability of the service in Tor, translation in different languages and front end of several parts of the project.
+
+
+* Benjamin Suger ; Project Manager, DevOps, Developer
+Benjamin set up the environment with podman, github actions as a CI pipeline and the Makefile. He also manage the observality of the project with the ELK suite and Prometheus/Grafana.
+
+
 For each team member mentioned at the top of the README.md, you must pro-
 vide:
 ◦ Assigned role(s): PO, PM, Tech Lead, Developers, etc.
@@ -110,12 +135,104 @@ How the team organized the work (task distribution, meetings, etc.).
 
 ## Technical Stack
 
-Frontend technologies and frameworks used.
-◦ Backend technologies and frameworks used.
-◦ Database system and why it was chosen.
-◦ Any other significant technologies or libraries.
-◦ Justification for major technical choices.
+### Frontend
 
+| Technology | Version | Role |
+| :--- | :--- | :--- |
+| Next.js (App Router) | 16.3.6 | Pages and routing |
+| React | 19.2.8 | UI components |
+| TypeScript | 5 | Static typing for the whole code base |
+| Tailwind CSS | 4 | Styling |
+| socket.io-client | 4.8 | Live game updates |
+
+The interface is available in English, French and Spanish through JSON translation files (`src/i18n`).
+
+We chose Next.js because it lets us write the front end and the back end in a single TypeScript code base: the pages and the API share the same types, the same validation rules and the same container.
+
+### Backend
+
+| Technology | Version | Role |
+| :--- | :--- | :--- |
+| Next.js Route Handlers | 16.3.6 | REST API (`/api/users`, `/api/friends`, `/api/rooms`...) |
+| Auth.js (`next-auth`) | 5.0 beta | Authentication with email and password |
+| bcryptjs | 3 | Password hashing |
+| Zod | 4 | Validation of user input |
+| Prisma (`@prisma/orm-postgres`) | 8.0 RC | Typed access to PostgreSQL, schema and migrations |
+| Socket.IO on Node.js | 4.8 / 22 | Real-time service: keeps every player of a room in sync |
+| Python + NumPy | 3.12 | AI Spymaster service |
+
+The back end is split into three services, each in its own container:
+
+* **next** serves the pages and the REST API.
+* **realtime** is a small Socket.IO server dedicated to live game updates. Socket.IO gives us rooms, automatic reconnection and a fallback to HTTP long polling when WebSockets are not available.
+* **ia** is the AI Spymaster. It relies on pre-trained fastText word vectors (the 100,000 most frequent words in English, French and Spanish) and uses NumPy to measure how close a candidate clue is to the words of its team, and how far it is from the opposing, neutral and assassin words. It needs no GPU and no external API, so it runs entirely inside the project.
+
+### Database
+
+We chose PostgreSQL (version 16), in line with two requirements from the subject.
+
+**"The database must have a clear schema and well-defined relations."**
+Our data (users, friendships) is inherently relational, which a SQL database expresses naturally through typed tables and foreign key constraints. A NoSQL document store would have required enforcing these relations in application code instead.
+
+**"No data corruption or race conditions occur with simultaneous user actions."**
+Multiple clients connected through WebSockets can trigger writes at the same time. Databases handle this differently. SQLite, for example, uses a database-wide lock: only one write can happen at a time, and concurrent writes must wait or be retried in application code. PostgreSQL solves this natively with MVCC (Multi-Version Concurrency Control): instead of locking, each write creates a new version of the affected rows, and each transaction reads from a consistent snapshot. Writes to different rows never block each other, and conflicts on the same row are resolved at row level. Concurrency safety is therefore guaranteed by the database engine itself.
+
+### Infrastructure
+
+| Technology | Role |
+| :--- | :--- |
+| Podman and podman-compose | Run every service in its own container |
+| nginx | Single entry point of the platform |
+| GitHub Actions | Continuous integration |
+| Mailpit | Local mail server that receives the alert emails |
+| Tor | Publishes the website as an onion service |
+
+* **Podman** runs rootless, which is a requirement for us since we are not root on the 42 school computers.
+* **nginx** is the entry point of the website. It terminates HTTPS (TLS 1.2 and 1.3, HTTP/2), redirects HTTP to HTTPS, and acts as a reverse proxy for the application, the real-time service, Grafana, Kibana and Mailpit.
+* **GitHub Actions** validates the configuration files (compose file, Prometheus rules, Grafana dashboards, shell scripts) on every pull request, then starts the application, the monitoring stack and the ELK stack to check that they respond.
+
+### Tor onion service
+
+The platform is also published as a Tor onion service: it can be reached with Tor Browser through a `.onion` address.
+
+* A dedicated **tor** container runs the onion service. It runs as a non-root user, with a read-only file system and without any Linux capability.
+* This container sits on its own network and cannot reach the other services. Its only link to the platform is a pair of Unix sockets shared with nginx, which serves the same application as on the regular HTTPS port.
+* The administration tools (Grafana, Kibana and Mailpit) are not exposed through the onion service.
+* The `.onion` address is generated on first launch and written by `make` to the `add.onion` file. Its key is kept in a volume, so the address stays the same until `make fclean`.
+
+We chose an onion service rather than simply letting Tor users reach the regular address because the connection then stays inside the Tor network from end to end. No exit node is involved, the IP address of the player is never revealed to the server, and the website is reachable from anywhere without a public IP address, a domain name or port forwarding.
+
+### Log management: ELK
+
+We use the Elastic Stack (Elasticsearch, Logstash and Kibana, version 8.19.25) to centralize the logs of the platform.
+
+* **Logstash** collects the nginx access logs (written as JSON), the nginx error logs, and the application logs that the back end sends as structured JSON (authentication, game, API and user events). It parses them and sends them to Elasticsearch.
+* **Elasticsearch** stores and indexes the logs. Security is enabled, and every component has its own account with only the rights it needs: Logstash can only write logs, the monitoring account is read-only, and a separate account is used to log in to Kibana.
+* **Kibana** is the web interface used to search the logs. A data view and an nginx dashboard are imported automatically on first launch.
+
+The log life cycle is automated. An index lifecycle policy starts a new index every day (or when it reaches 1 GB) and deletes logs after 30 days, and a snapshot of the logs is taken every night and kept for 90 days.
+
+### Monitoring: Prometheus and Grafana
+
+Prometheus (version 3.16.0) collects the metrics of the platform and Grafana (version 12.4.15) displays them.
+
+* **Prometheus** scrapes its targets every 15 seconds and keeps 15 days of history. The metrics come from dedicated exporters:
+
+  | Exporter | What it measures |
+  | :--- | :--- |
+  | node-exporter | Host machine (CPU, memory, disk) |
+  | cAdvisor | Resource usage of each container |
+  | postgres-exporter | PostgreSQL |
+  | nginx-prometheus-exporter | nginx |
+  | elasticsearch-exporter | Elasticsearch |
+  | blackbox-exporter | Availability probes on the application, Logstash, Kibana, Mailpit and the AI service |
+
+* **Alert rules** are evaluated by Prometheus: service down, failed probe, high CPU usage, high memory usage, disk almost full, PostgreSQL down, too many PostgreSQL connections, and Elasticsearch cluster in red state. These rules are unit-tested in the CI.
+* **Grafana** is provisioned from files in the repository: the Prometheus data source, three dashboards (system, containers and PostgreSQL) and the alerting configuration are ready on first launch. When an alert fires, Grafana sends an email, which is caught by Mailpit.
+
+`make crisis` stops a service on purpose to show the chain at work: Prometheus sees the service down, then the service is started again. With `ALERT=1`, the service stays down until the alert fires.
+
+ELK and Prometheus are complementary. Metrics tell us that something is wrong (a service is down, memory is running out); logs tell us why.
 
 ## Database Schema:
 ◦ Visual representation or description of the database structure.
