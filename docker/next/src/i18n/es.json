@@ -23,6 +23,7 @@
     "waitingMaster": "Esperando a que el maestro del juego comience la partida…",
     "pickWhileReady": "Elige tu asiento mientras el maestro del juego se prepara",
     "errorStart": "No se pudo iniciar la partida, inténtalo de nuevo",
+    "errorAction": "Acción rechazada, inténtalo de nuevo",
     "red": "Rojo",
     "blue": "Azul",
     "spectator": "Espectador",

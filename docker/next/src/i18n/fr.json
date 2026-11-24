@@ -23,6 +23,7 @@
     "waitingMaster": "En attente du maître du jeu pour lancer la partie…",
     "pickWhileReady": "Choisissez votre place pendant que le maître du jeu se prépare",
     "errorStart": "Impossible de lancer la partie, réessayez",
+    "errorAction": "Action refusée, réessayez",
     "red": "Rouge",
     "blue": "Bleu",
     "spectator": "Spectateurs",

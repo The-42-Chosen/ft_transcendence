@@ -23,6 +23,7 @@
     "waitingMaster": "Waiting for the game master to start the game…",
     "pickWhileReady": "Pick your seat while the game master gets ready",
     "errorStart": "Could not start the game, try again",
+    "errorAction": "Action refused, try again",
     "red": "Red",
     "blue": "Blue",
     "spectator": "Spectator",
