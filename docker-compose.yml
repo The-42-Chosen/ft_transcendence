@@ -50,6 +50,8 @@ services:
     environment:
       NGINX_SSL_PORT: "${NGINX_SSL_PORT:-8443}"
       NGINX_ENTRYPOINT_LOCAL_RESOLVERS: "1"
+      SERVER_IP: "${SERVER_IP:-127.0.0.1}"
+      SERVER_HOST: "${SERVER_HOST:-localhost}"
     ports:
       - "${NGINX_PORT:-8080}:80"
       - "${NGINX_SSL_PORT:-8443}:443"

@@ -18,8 +18,10 @@ DC      := $(COMPOSE) -p $(PROJECT) -f $(COMPOSE_FILE)
  
 NEXT_DEV_PORT ?= $(or $(shell sed -n 's/^NEXT_DEV_PORT=//p' .env 2>/dev/null),3000)
 NGINX_SSL_PORT ?= $(or $(shell sed -n 's/^NGINX_SSL_PORT=//p' .env 2>/dev/null),8443)
-SERVER_IP ?= $(shell ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($$i=="src") {print $$(i+1); exit}}')
+SERVER_IP ?= $(or $(shell ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($$i=="src") {print $$(i+1); exit}}'),127.0.0.1)
 export SERVER_IP
+SERVER_HOST ?= $(or $(shell hostname -f 2>/dev/null),localhost)
+export SERVER_HOST
 
 UID   := $(shell id -u)
 LOGIN := $(shell id -un)
