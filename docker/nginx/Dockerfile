@@ -17,4 +17,4 @@ RUN n=1; until apk add --no-cache openssl; do \
     chmod 600 /etc/nginx/certs/key.pem && \
     apk del openssl
 
-EXPOSE 80 443
+EXPOSE 80 443 8444
