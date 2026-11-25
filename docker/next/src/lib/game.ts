@@ -1,4 +1,5 @@
-import type { Language, Seat, TeamColor } from "@/lib/lobby";
+import { MAX_SPYMASTERS, TEAM_COLORS, shuffleLobby, type Language, type Seat, type TeamColor } from "@/lib/lobby";
+import type { Player, SessionPlayer } from "@/lib/player";
 import { pickCardColors, pickRandomWords, type CardColor } from "@/lib/words";
 
 export type RoomStatus = "waiting" | "playing";
@@ -27,6 +28,21 @@ export type GameView = {
 	winner: TeamColor | null;
 };
 
+export type LobbyMember = {
+	player: SessionPlayer;
+	seat: Seat;
+};
+
+// Browser received
+export type LobbyView = {
+	version: number;
+	status: RoomStatus;
+	hostId: string | null;
+	players: (Player & { seat: Seat })[];
+	aiTeams: TeamColor[];
+	canStart: boolean;
+};
+
 export class GameError extends Error {
 	constructor(message: string, readonly status: number) {
 		super(message);
@@ -44,23 +60,138 @@ export class Game {
 	turn: TeamColor = "red";
 	clue: Clue | null = null;
 	version = 0;
+	startedAt: number | null = null;
+	lobbyVersion = 0;
+	hostId: string | null = null;
+	// Key: Player.id (opaque)
+	players = new Map<string, LobbyMember>();
 
 	constructor(readonly code: string, readonly language: Language) {}
 
-	start(aiTeams: TeamColor[]): boolean {
+	// LOBBY
+
+	isHost(playerId: string): boolean {
+		return this.hostId === playerId;
+	}
+
+	seatOf(playerId: string | null | undefined): Seat {
+		return (playerId && this.players.get(playerId)?.seat) || "spectator";
+	}
+
+	// Spectator when join room
+	join(player: SessionPlayer): LobbyMember {
+		const current = this.players.get(player.id);
+		if (current) {
+			current.player = player;
+			return current;
+		}
+		const member: LobbyMember = { player, seat: "spectator" };
+		this.players.set(player.id, member);
+		this.hostId ??= player.id;
+		this.lobbyVersion++;
+		return member;
+	}
+
+	// If player left role goes to the next player
+	leave(playerId: string) {
+		if (!this.players.delete(playerId)) {
+			return;
+		}
+		if (this.hostId === playerId) {
+			this.hostId = this.players.keys().next().value ?? null;
+		}
+		this.lobbyVersion++;
+	}
+
+	setSeat(playerId: string, seat: Seat) {
+		this.assertWaiting();
+		const member = this.players.get(playerId);
+		if (!member) {
+			throw new GameError("Not in this room", 403);
+		}
+		if (seat !== "spectator") {
+			const [team, position] = seat.split("-") as [TeamColor, string];
+			if (position === "spymaster") {
+				if (this.aiTeams.includes(team)) {
+					throw new GameError("The AI is the spymaster of this team", 409);
+				}
+				if (this.membersAt(seat).filter((m) => m !== member).length >= MAX_SPYMASTERS) {
+					throw new GameError("This team already has a spymaster", 409);
+				}
+			}
+		}
+		member.seat = seat;
+		this.lobbyVersion++;
+	}
+
+	setAi(aiTeams: TeamColor[]) {
+		this.assertWaiting();
+		const teams = TEAM_COLORS.filter((team) => aiTeams.includes(team));
+		if (teams.some((team) => this.membersAt(`${team}-spymaster`).length > 0)) {
+			throw new GameError("This team already has a spymaster", 409);
+		}
+		this.aiTeams = teams;
+		this.lobbyVersion++;
+	}
+
+	// Shuffle team members
+	shuffle() {
+		this.assertWaiting();
+		const seated = [...this.players.values()].filter((m) => m.seat !== "spectator");
+		const { teams, aiTeams } = shuffleLobby(seated, this.aiTeams.length);
+		for (const team of TEAM_COLORS) {
+			teams[team].spymasters.forEach((m) => (m.seat = `${team}-spymaster`));
+			teams[team].operatives.forEach((m) => (m.seat = `${team}-operative`));
+		}
+		this.aiTeams = aiTeams;
+		this.lobbyVersion++;
+	}
+
+	// Spymaster on each team check
+	canStart(): boolean {
+		return TEAM_COLORS.every((team) =>
+			(this.aiTeams.includes(team) || this.membersAt(`${team}-spymaster`).length > 0)
+			&& this.membersAt(`${team}-operative`).length > 0);
+	}
+
+	lobbyView(): LobbyView {
+		return {
+			version: this.lobbyVersion,
+			status: this.status,
+			hostId: this.hostId,
+			players: [...this.players.values()].map(({ player: { id, name, avatarUrl, guest }, seat }) => ({ id, name, avatarUrl, guest, seat })),
+			aiTeams: [...this.aiTeams],
+			canStart: this.canStart(),
+		};
+	}
+
+	private membersAt(seat: Seat): LobbyMember[] {
+		return [...this.players.values()].filter((m) => m.seat === seat);
+	}
+
+	private assertWaiting() {
 		if (this.status !== "waiting") {
-			return false;
+			throw new GameError("Game already started", 409);
+		}
+	}
+
+	// GAME
+
+	start() {
+		this.assertWaiting();
+		if (!this.canStart()) {
+			throw new GameError("Each team needs a spymaster and an operative", 409);
 		}
 		this.words = pickRandomWords(this.language);
 		this.colors = pickCardColors();
 		this.found = this.words.map(() => false);
 		this.lastFound = null;
-		this.aiTeams = aiTeams;
+		this.startedAt = Date.now();
 		// The team with 9 cards starts
 		this.turn = this.colors.filter((c) => c === "red").length > 8 ? "red" : "blue";
 		this.status = "playing";
 		this.version++;
-		return true;
+		this.lobbyVersion++;
 	}
 
 	giveClue(seat: Seat, word: string, count: number): Clue {
