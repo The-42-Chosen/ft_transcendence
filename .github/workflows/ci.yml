@@ -129,9 +129,9 @@ jobs:
             "cibles prometheus up (hors ELK)=docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
                | jq -e '[.data.activeTargets[] | select(.labels.job != \"elasticsearch\" and .labels.job != \"probes\")] \
                         | length > 0 and all(.health == \"up\")'" \
-            "grafana derriere nginx (https + sous-chemin)=curl -fsk -o /dev/null https://localhost:8443/grafana/api/health" \
+            "grafana derriere nginx (https + sous-chemin)=curl -fsk -o /dev/null https://localhost:8444/grafana/api/health" \
             "dashboards grafana provisionnes ($expected)=curl -fsk -u \"$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD\" \
-               'https://localhost:8443/grafana/api/search?type=dash-db' | jq -e 'length >= $expected'"
+               'https://localhost:8444/grafana/api/search?type=dash-db' | jq -e 'length >= $expected'"
 
       - name: Etat des cibles Prometheus en cas d'echec
         if: failure()
@@ -174,7 +174,7 @@ jobs:
                docker exec elasticsearch curl -fsS -u \"elastic:$ELASTIC_PASSWORD\" 'localhost:9200/transcendence-logs*/_count' \
                | jq -e '.count > 0'" \
             "kibana derriere nginx (https + sous-chemin + login kibana_user)=curl -fsk -o /dev/null \
-               -u \"kibana_user:$KIBANA_USER_PASSWORD\" https://localhost:8443/kibana/api/status" \
+               -u \"kibana_user:$KIBANA_USER_PASSWORD\" https://localhost:8444/kibana/api/status" \
             "cibles prometheus elasticsearch + sondes logstash/kibana up=docker exec prometheus wget -qO- localhost:9090/api/v1/targets \
                | jq -e '[.data.activeTargets[] | select(.labels.job == \"elasticsearch\" or (.labels.job == \"probes\" and (.labels.probe == \"logstash\" or .labels.probe == \"kibana\")))] \
                         | length == 3 and all(.health == \"up\")'" \
