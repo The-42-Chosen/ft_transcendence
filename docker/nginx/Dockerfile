@@ -10,7 +10,10 @@ RUN n=1; until apk add --no-cache openssl; do \
         -keyout /etc/nginx/certs/key.pem \
         -out    /etc/nginx/certs/cert.pem \
         -subj   "/C=FR/ST=IDF/L=Paris/O=42/OU=ft_transcendence/CN=localhost" \
-        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" && \
+        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+        -addext "basicConstraints=critical,CA:FALSE" \
+        -addext "keyUsage=critical,digitalSignature,keyEncipherment" \
+        -addext "extendedKeyUsage=serverAuth" && \
     chmod 600 /etc/nginx/certs/key.pem && \
     apk del openssl
 
