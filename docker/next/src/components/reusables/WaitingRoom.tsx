@@ -7,17 +7,17 @@ import RoleSection from '@/components/reusables/RoleSection';
 import RoomCode from '@/components/reusables/RoomCode';
 import Button from './Button';
 import { cn } from '@/lib/cn';
-import { AI_PLAYER, TEAM_COLORS, defaultSpectators, defaultTeams, shuffleLobby, teamStyles, type Role, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
+import type { LobbyView } from '@/lib/game';
+import { AI_PLAYER, TEAM_COLORS, teamStyles, type Seat, type TeamColor, type Teams } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { usePlayerName } from '@/lib/usePlayerName';
 
 type Parameters = {
-    role: Role;
     roomCode: string;
-    teams?: Teams;
-    spectators?: string[];
+    meId: string;
+    initialLobby: LobbyView;
 }
 
+// TODO: Replace polling with the "lobby" event of the realtime service
 const POLL_INTERVAL = 2000;
 
 const aiButtonClass = "rounded-full border-2 border-amber-400 bg-white/70 font-agent text-sm text-amber-900 hover:bg-amber-200 active:bg-amber-300";
@@ -26,98 +26,87 @@ const aiTeamButtonClass: Record<TeamColor, string> = {
     blue: "bg-(--color-brand-blue) hover:bg-(--color-brand-blue-dark) active:bg-(--color-brand-blue-dark)",
 };
 
-const YOU = Symbol("you");
-
-export default function WaitingRoom({role, teams: initialTeams = defaultTeams, spectators = defaultSpectators, roomCode}: Parameters) {
+export default function WaitingRoom({ roomCode, meId, initialLobby }: Parameters) {
     const router = useRouter();
     const { t } = useLanguage();
     const wr = t.waitingRoom;
-    const playerName = usePlayerName();
-	// TODO: Shuffled rosters stay local until they come from the backend
 
-    const [humanTeams, setHumanTeams] = useState<Teams>(initialTeams);
-    const [seat, setSeat] = useState<Seat | null>(role === "spectator" ? "spectator" : null);
+    const [lobby, setLobby] = useState<LobbyView>(initialLobby);
     const [starting, setStarting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [aiTeams, setAiTeams] = useState<TeamColor[]>([]);
     const [choosingAiTeam, setChoosingAiTeam] = useState(false);
-	// TODO: Only the game master sees the AI until the rosters come from the backend
 
-    const teams = aiTeams.reduce((acc, team) => ({
-        ...acc,
-        [team]: { ...acc[team], spymasters: [...acc[team].spymasters, AI_PLAYER] },
-    }), humanTeams);
+    const me = lobby.players.find((p) => p.id === meId);
+    const seat: Seat = me?.seat ?? "spectator";
+    const isHost = lobby.hostId === meId;
+    const others = lobby.players.filter((p) => p.id !== meId);
+    const namesAt = (s: Seat) => others.filter((p) => p.seat === s).map((p) => p.name);
+    const teams = Object.fromEntries(TEAM_COLORS.map((team) => [team, {
+        spymasters: [...(lobby.aiTeams.includes(team) ? [AI_PLAYER] : []), ...namesAt(`${team}-spymaster`)],
+        operatives: namesAt(`${team}-operative`),
+    }])) as Teams;
     const hasSpymaster = (team: TeamColor) => teams[team].spymasters.length > 0 || seat === `${team}-spymaster`;
-    const hasOperative = (team: TeamColor) => teams[team].operatives.length > 0 || seat === `${team}-operative`;
-    const canStart = TEAM_COLORS.every((team) => hasSpymaster(team) && hasOperative(team));
-    const aiFreeTeams = TEAM_COLORS.filter((team) => !aiTeams.includes(team));
-    const onJoin = role === "spectator" ? undefined : setSeat;
-    const gameUrl = `/room/${roomCode}/game?seat=${seat ?? "spectator"}`;
-	// TODO: Replace polling with a websocket once the backend is ready
+    const aiFreeTeams = TEAM_COLORS.filter((team) => !lobby.aiTeams.includes(team));
+
+    function applyLobby(next: LobbyView) {
+        setLobby((current) => (next.version >= current.version ? next : current));
+    }
 
     useEffect(() => {
-        if (role === "game_master") {
-            return;
-        }
         const id = setInterval(async () => {
-            const res = await fetch(`/api/rooms/${roomCode}`).catch(() => null);
-            const room = res?.ok ? await res.json() : null;
-            if (room?.status === "playing") {
-                router.push(gameUrl);
+            const res = await fetch(`/api/rooms/${roomCode}/lobby`, { cache: "no-store" }).catch(() => null);
+            if (res?.ok) {
+                applyLobby(await res.json());
             }
         }, POLL_INTERVAL);
         return () => clearInterval(id);
-    }, [role, roomCode, gameUrl, router]);
+    }, [roomCode]);
+
+    useEffect(() => {
+        if (lobby.status === "playing") {
+            router.push(`/room/${roomCode}/game`);
+        }
+    }, [lobby.status, roomCode, router]);
+
+    async function send(action: string, body?: object): Promise<boolean> {
+        setError(null);
+        const res = await fetch(`/api/rooms/${roomCode}/${action}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body ?? {}),
+        }).catch(() => null);
+        const data = res ? await res.json().catch(() => null) : null;
+        if (!res?.ok || !data) {
+            setError(action === "start" ? wr.errorStart : wr.errorAction);
+            return false;
+        }
+        applyLobby(data);
+        return true;
+    }
+
+    function pickSeat(next: Seat) {
+        void send("seat", { seat: next });
+    }
 
     function addAi(team: TeamColor) {
-        setAiTeams((current) => TEAM_COLORS.filter((t) => t === team || current.includes(t)));
+        void send("ai", { aiTeams: [...lobby.aiTeams, team] });
         setChoosingAiTeam(false);
     }
 
     function removeAi(team: TeamColor) {
-        setAiTeams((current) => current.filter((t) => t !== team));
+        void send("ai", { aiTeams: lobby.aiTeams.filter((t) => t !== team) });
     }
 
     function shuffleSeats() {
-        const players: (string | typeof YOU)[] = TEAM_COLORS.flatMap((team) => [...humanTeams[team].spymasters, ...humanTeams[team].operatives]);
-        const seated = seat !== "spectator";
-        if (seated) {
-            players.push(YOU);
-        }
-        const shuffled = shuffleLobby(players, aiTeams.length);
-        let nextSeat: Seat | null = seated ? null : "spectator";
-        const names = (list: (string | typeof YOU)[]) => list.filter((p): p is string => p !== YOU);
-        const nextTeams = {} as Teams;
-        for (const team of TEAM_COLORS) {
-            const { spymasters, operatives } = shuffled.teams[team];
-            if (spymasters.includes(YOU)) {
-                nextSeat = `${team}-spymaster`;
-            }
-            if (operatives.includes(YOU)) {
-                nextSeat = `${team}-operative`;
-            }
-            nextTeams[team] = { spymasters: names(spymasters), operatives: names(operatives) };
-        }
-        setHumanTeams(nextTeams);
-        setAiTeams(shuffled.aiTeams);
-        setSeat(nextSeat);
+        void send("shuffle");
         setChoosingAiTeam(false);
     }
 
     async function startGame() {
         setStarting(true);
-        setError(null);
-        const res = await fetch(`/api/rooms/${roomCode}/start`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ aiTeams }),
-        }).catch(() => null);
-        if (!res?.ok) {
-            setError(wr.errorStart);
+        if (!(await send("start"))) {
             setStarting(false);
-            return;
         }
-        router.push(gameUrl);
     }
 
     return (
@@ -125,28 +114,28 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
             <h2 className="mb-4 font-display text-5xl text-black tracking-wide">{wr.title}</h2>
             <RoomCode code={roomCode}/>
             <article className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <TeamPanel team="red" roster={teams.red} seat={seat} playerName={playerName} onJoin={onJoin}/>
-                <TeamPanel team="blue" roster={teams.blue} seat={seat} playerName={playerName} onJoin={onJoin}/>
+                <TeamPanel team="red" roster={teams.red} seat={seat} playerName={me?.name} onJoin={pickSeat}/>
+                <TeamPanel team="blue" roster={teams.blue} seat={seat} playerName={me?.name} onJoin={pickSeat}/>
             </article>
             <aside className={cn("mt-4 rounded-2xl border-2 p-4 text-left", teamStyles.spectator.panel)}>
                 <RoleSection
                     title={wr.spectators}
                     team="spectator"
-                    players={spectators}
+                    players={namesAt("spectator")}
                     isYou={seat === "spectator"}
-                    playerName={playerName}
-                    onJoin={onJoin && (() => onJoin("spectator"))}
+                    playerName={me?.name}
+                    onJoin={() => pickSeat("spectator")}
                 />
             </aside>
             <footer className="mt-6 flex flex-col items-center gap-2">
-                {role === "game_master" ? (
+                {isHost ? (
                     <>
                         <Button variant="secondary" className={aiButtonClass} onClick={shuffleSeats}>
                             {wr.shuffle}
                         </Button>
-                        {aiTeams.length > 0 && (
+                        {lobby.aiTeams.length > 0 && (
                             <div className="flex flex-wrap items-center justify-center gap-2">
-                                {aiTeams.map((team) => (
+                                {lobby.aiTeams.map((team) => (
                                     <Button key={team} variant="secondary" className={aiButtonClass} onClick={() => removeAi(team)}>
                                         {wr.removeAi.replace("{name}", AI_PLAYER).replace("{team}", wr[team])}
                                     </Button>
@@ -168,21 +157,24 @@ export default function WaitingRoom({role, teams: initialTeams = defaultTeams, s
                                 {wr.addAi.replace("{name}", AI_PLAYER)}
                             </Button>
                         )}
-                        <Button variant="action" disabled={!canStart || !seat || starting} onClick={startGame}>
+                        <Button variant="action" disabled={!lobby.canStart || starting} onClick={startGame}>
                             {wr.play}
                         </Button>
                         {error ? (
                             <p role="alert" className="font-agent text-xs text-(--color-brand-red)">{error}</p>
-                        ) : !seat ? (
-                            <p className="font-agent text-xs text-black/50">{wr.pickSeat}</p>
-                        ) : !canStart && (
+                        ) : !lobby.canStart && (
                             <p className="font-agent text-xs text-black/50">{wr.needRoles}</p>
                         )}
                     </>
                 ) : (
-                    <p className="font-agent text-sm text-black/50">
-                        {seat ? wr.waitingMaster : wr.pickWhileReady}
-                    </p>
+                    <>
+                        <p className="font-agent text-sm text-black/50">
+                            {seat !== "spectator" ? wr.waitingMaster : wr.pickWhileReady}
+                        </p>
+                        {error && (
+                            <p role="alert" className="font-agent text-xs text-(--color-brand-red)">{error}</p>
+                        )}
+                    </>
                 )}
             </footer>
         </section>
