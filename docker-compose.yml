@@ -5,6 +5,7 @@ services:
     build:
       context: ./docker/postgres
     container_name: postgres
+    command: ["postgres", "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
     environment:
       POSTGRES_DB: "${POSTGRES_DB:-transcendence}"
       POSTGRES_USER: "${POSTGRES_USER:-transcendence}"

@@ -90,7 +90,7 @@ jobs:
             "nginx proxifie next en https=curl -fsk -o /dev/null https://localhost:8443/api/health"
 
       - name: Verifier que postgres repond aux requetes
-        run: docker exec postgres psql -U transcendence -d transcendence -c 'SELECT 1'
+        run: docker exec postgres sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1"'
 
       - name: Verifier la conf nginx rendue (templates + env)
         run: docker exec nginx nginx -t
