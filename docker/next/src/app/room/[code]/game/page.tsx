@@ -6,17 +6,15 @@ import { ClueProvider } from '@/components/reusables/ClueContext';
 import GameOverModal from '@/components/reusables/GameOverModal';
 import GameOverSetup from '@/components/reusables/GameOverSetup';
 import { audienceOf } from '@/lib/game';
-import { parseSeat, seatBoard } from '@/lib/lobby';
-import { getRoom } from '@/lib/rooms';
+import { seatBoard } from '@/lib/lobby';
+import { currentSeat, getRoom } from '@/lib/rooms';
 
 type Parameters = {
   params: Promise<{ code: string }>;
-  searchParams: Promise<{ seat?: string }>;
 };
 
-export default async function GamePage({ params, searchParams }: Parameters) {
+export default async function GamePage({ params }: Parameters) {
   const { code } = await params;
-  const { seat } = await searchParams;
   const room = getRoom(code);
 
   if (!room) {
@@ -26,8 +24,8 @@ export default async function GamePage({ params, searchParams }: Parameters) {
     redirect(`/room/${room.code}`);
   }
 
-  // TODO: Take the seat from the logged user once auth is done
-  const playerSeat = parseSeat(seat);
+  // Seat saved in the lobby, unknown players watch as spectators
+  const playerSeat = await currentSeat(room);
   const board = seatBoard(playerSeat);
 
   return (

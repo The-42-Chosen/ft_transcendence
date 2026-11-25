@@ -1,31 +1,35 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Footer from '@/components/commons/Footer';
 import Header from '@/components/commons/Header';
 import WaitingRoom from '@/components/reusables/WaitingRoom';
-import { ROLES, type Role } from '@/lib/lobby';
+import { getPlayer } from '@/lib/player';
 import { getRoom } from '@/lib/rooms';
 
 type Parameters = {
   params: Promise<{ code: string }>;
-  searchParams: Promise<{ role?: string }>;
 };
 
-export default async function RoomPage({ params, searchParams }: Parameters) {
+export default async function RoomPage({ params }: Parameters) {
   const { code } = await params;
-  const { role } = await searchParams;
   const room = getRoom(code);
 
   if (!room) {
     notFound();
   }
-
-  // TODO: Take the role from the logged user once auth is done
-  const userRole: Role = ROLES.includes(role as Role) ? (role as Role) : "player";
+  const player = await getPlayer();
+  if (!player) {
+    redirect('/');
+  }
+  // Redirect user as spectator
+  room.join(player);
+  if (room.status === "playing") {
+    redirect(`/room/${room.code}/game`);
+  }
 
   return (
     <main className="min-h-screen text-center">
       <Header/>
-      <WaitingRoom role={userRole} roomCode={room.code}/>
+      <WaitingRoom roomCode={room.code} meId={player.id} initialLobby={room.lobbyView()}/>
       <Footer/>
     </main>
   );
