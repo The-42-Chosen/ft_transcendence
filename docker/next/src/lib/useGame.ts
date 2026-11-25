@@ -14,6 +14,7 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
   }, []);
 
   useEffect(() => {
+    // TODO: Replace the seat query with a signed token, realtime still trusts it to pick the channel
     // Prod : same domain, nginx sends /socket.io/ to the realtime service
     // Dev  : NEXT_PUBLIC_SOCKET_URL points straight at realtime (:3001)
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
@@ -22,7 +23,7 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
 
     socket.on("connect", async () => {
       setConnected(true);
-      const res = await fetch(`/api/rooms/${roomCode}/state?seat=${seat}`, { cache: "no-store" }).catch(() => null);
+      const res = await fetch(`/api/rooms/${roomCode}/state`, { cache: "no-store" }).catch(() => null);
       if (res?.ok) {
         const data: GameView = await res.json();
         applyState(data);
