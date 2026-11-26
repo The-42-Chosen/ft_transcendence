@@ -79,6 +79,23 @@ up: check_env auth_secret kibana_encryption_key storage
 	fi
 	$(DC) up -d --remove-orphans
 	@printf '\e[1;42mPublic IP: https://%b:%s\e[m\n' '$(SERVER_IP)' '$(NGINX_SSL_PORT)'
+	@$(MAKE) tor-url
+
+tor-url: storage
+	@i=0; \
+	while [ $$i -lt 20 ]; do \
+		if podman exec tor test -s /var/lib/tor/hidden_service/hostname 2>/dev/null; then \
+			break; \
+		fi; \
+		sleep 1; \
+		i=$$((i + 1)); \
+	done; \
+	onion=$$(podman exec tor cat /var/lib/tor/hidden_service/hostname 2>/dev/null); \
+	if [ -n "$$onion" ]; then \
+		printf '\e[1;42mTor Onion: https://%s\e[m\n' "$$onion"; \
+	else \
+		printf '\033[1;101mErreur : adresse .onion introuvable\033[0m\n'; \
+	fi
 
 down: storage
 	$(DC) down --remove-orphans
@@ -188,4 +205,4 @@ prisma: prisma-emit prisma-migrate
 
 .PHONY: storage check_env auth_secret up down re build pull logs ps clean fclean info \
         next-shell next-logs dev dev-logs dev-down next-reload \
-        crisis crisis-restore kibana_encryption_key
+        crisis crisis-restore kibana_encryption_key tor-url
