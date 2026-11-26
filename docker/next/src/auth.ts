@@ -33,7 +33,12 @@ export const {
         const parsed = loginSchema.safeParse(credentials);
 
         if (!parsed.success) {
-          log.warn({ service: "auth", msg: "login failed", reason: "invalid_input" });
+          log.warn({
+            service: "auth",
+            msg: "login failed",
+            reason: "invalid_input",
+          });
+
           return null;
         }
 
@@ -44,7 +49,13 @@ export const {
           .first();
 
         if (!user || !user.passwordHash) {
-	  log.warn({service: 'auth', msg: 'login failed', error: 'unknown_user', user_id: user?.id});
+          log.warn({
+            service: "auth",
+            msg: "login failed",
+            error: "unknown_user",
+            user_id: user?.id,
+          });
+
           return null;
         }
 
@@ -54,10 +65,22 @@ export const {
         );
 
         if (!passwordIsValid) {
-	  log.warn({service: 'auth', msg: 'login failed', error: 'bad_password', user_id: user.id});
+          log.warn({
+            service: "auth",
+            msg: "login failed",
+            error: "bad_password",
+            user_id: user.id,
+          });
+
           return null;
         }
-	log.info({service: 'auth', msg: 'login successful', user_id: user.id });
+
+        log.info({
+          service: "auth",
+          msg: "login successful",
+          user_id: user.id,
+        });
+
         return {
           id: String(user.id),
           email: user.email,
@@ -66,4 +89,58 @@ export const {
       },
     }),
   ],
+
+  callbacks: {
+    /*
+     * Au moment du login, on garde l'id de l'utilisateur
+     * dans le token Auth.js.
+     */
+    async jwt({ token, user }) {
+      if (user?.id) {
+        token.sub = user.id;
+      }
+
+      return token;
+    },
+
+    /*
+     * À chaque récupération de session, on relit
+     * l'utilisateur directement dans la base.
+     *
+     * Cela permet d'avoir les informations à jour
+     * même si le username, l'email ou l'avatar changent.
+     */
+    async session({ session, token }) {
+      if (!token.sub) {
+        return session;
+      }
+
+      const currentUser = await db.orm.public.User
+        .where({
+          id: Number(token.sub),
+        })
+        .first();
+
+      if (!currentUser) {
+        return session;
+      }
+
+      session.user.name = currentUser.username;
+      session.user.email = currentUser.email;
+
+      /*
+       * On utilise le champ standard "image" de Auth.js.
+       *
+       * Le navigateur récupérera ensuite réellement
+       * l'image via notre route :
+       *
+       * /api/users/<id>/avatar
+       */
+      session.user.image = currentUser.avatarUrl
+        ? `/api/users/${currentUser.id}/avatar`
+        : null;
+
+      return session;
+    },
+  },
 });
