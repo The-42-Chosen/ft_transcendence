@@ -4,10 +4,11 @@ import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 import { z } from "zod";
 import { log } from "@/lib/log";
+import { passwordSchema } from "@/lib/password";
 
 const loginSchema = z.object({
   email: z.email(),
-  password: z.string().min(8),
+  password: passwordSchema,
 });
 
 export const {

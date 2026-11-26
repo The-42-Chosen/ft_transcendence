@@ -3,10 +3,11 @@ import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { log } from "@/lib/log";
+import { passwordSchema } from "@/lib/password";
 
 const loginSchema = z.object({
     email: z.email(),
-    password: z.string().min(8),
+    password: passwordSchema,
 }).strict();
 
 export async function POST(request: Request) {
