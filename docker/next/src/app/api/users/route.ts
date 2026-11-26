@@ -4,11 +4,12 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { log } from "@/lib/log";
 import { auth } from "@/auth";
+import { passwordSchema } from "@/lib/password";
 
 const createUserSchema = z.object({
   email: z.email(),
   username: z.string().min(3),
-  password: z.string().min(8),
+  password: passwordSchema,
 }).strict();
 
 export async function GET() {
