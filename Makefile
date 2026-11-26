@@ -38,7 +38,7 @@ export CONTAINERS_STORAGE_CONF := $(STORAGE_CONF)
 #################################################################
 
 NEXT_RECREATE = podman rm -f -i --depend next && podman rm -f -i next && \
-                $(DC) up -d --no-deps next nginx nginx-exporter
+                $(DC) up -d --no-deps next nginx nginx-exporter tor
 
 all:
 	@$(MAKE) up
