@@ -3,6 +3,7 @@ import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { log } from "@/lib/log";
+import { auth } from "@/auth";
 
 const createUserSchema = z.object({
   email: z.email(),
@@ -11,11 +12,20 @@ const createUserSchema = z.object({
 }).strict();
 
 export async function GET() {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const users = await db.orm.public.User.all();
 
+  // No email here: this list is readable by every logged-in user
   const publicUsers = users.map((user) => ({
     id: user.id,
-    email: user.email,
     username: user.username,
     displayName: user.displayName,
     bio: user.bio,

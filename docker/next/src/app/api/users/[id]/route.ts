@@ -39,6 +39,15 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const userId = Number(id);
 
@@ -60,7 +69,13 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(toPublicUser(user));
+  // The email is only sent to its owner (undefined is dropped from the JSON)
+  const isOwner = user.email === session.user.email;
+
+  return NextResponse.json({
+    ...toPublicUser(user),
+    email: isOwner ? user.email : undefined,
+  });
 }
 
 export async function PATCH(

@@ -4,7 +4,7 @@ type ProfileProps = {
   userId: number;
   username: string;
   displayName?: string | null;
-  email: string;
+  email?: string | null;
   avatarUrl?: string | null;
 };
 
@@ -34,9 +34,11 @@ export default function Profile({
             @{username}
           </p>
 
-          <p className="text-sm">
-            {email}
-          </p>
+          {email && (
+            <p className="text-sm">
+              {email}
+            </p>
+          )}
         </div>
       </div>
     </section>

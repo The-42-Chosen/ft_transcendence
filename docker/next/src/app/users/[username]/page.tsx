@@ -100,7 +100,7 @@ export default async function UserPage({
         userId={user.id}
         username={user.username}
         displayName={user.displayName}
-        email={user.email}
+        email={currentUserId === user.id ? user.email : null}
         avatarUrl={user.avatarUrl}
       />
 
@@ -125,7 +125,7 @@ export default async function UserPage({
             href="/"
             className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-600"
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
       <section className="w-full max-w-md">
         <h2 className="mb-4 text-xl font-semibold">
