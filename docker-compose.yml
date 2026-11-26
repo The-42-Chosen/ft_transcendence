@@ -67,18 +67,24 @@ services:
       - kibana
     networks:
       - transcendence
+      - onion
     restart: unless-stopped
 
   tor:
     build:
       context: ./docker/tor
     container_name: tor
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - tor_data:/var/lib/tor/hidden_service
     depends_on:
       - nginx
+    # Reseau reserve : tor ne voit que nginx, pas la base ni les autres services
     networks:
-      - transcendence
+      - onion
     restart: unless-stopped
 
   # ------------------------------------------------------------------
@@ -416,6 +422,12 @@ services:
 networks:
   transcendence:
     driver: bridge
+  # tor + nginx uniquement. `isolate: strict` (podman) bloque aussi l'acces
+  # par adresse IP aux conteneurs des autres reseaux.
+  onion:
+    driver: bridge
+    driver_opts:
+      isolate: "strict"
 
 volumes:
   avatars_data:
