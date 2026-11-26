@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
+import { auth } from "@/auth";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const userId = Number(id);
 

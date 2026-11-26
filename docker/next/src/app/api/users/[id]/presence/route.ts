@@ -13,6 +13,15 @@ export async function GET(
     params: Promise<{ id: string }>;
   }
 ) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
   const userId = Number(id);
 
