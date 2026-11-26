@@ -133,7 +133,7 @@ export async function POST(
       .where({ id: userId })
       .update({ avatarUrl });
     log.info({service: 'user', msg: 'new avatar uploaded', user_id: userId, extension});	
-    return NextResponse.json(updatedUser);
+    return NextResponse.json({ id: userId, avatarUrl });
   } catch (error) {
     log.error({service:'user', msg: 'error avatar', error: String(error)});
     return NextResponse.json(
