@@ -25,10 +25,6 @@ export default function Nav() {
 
   const [user, setUser] = useState<SessionUser | null>(null);
 
-  /*
-   * Permet de forcer le navigateur à recharger l'avatar
-   * au lieu d'utiliser une ancienne image en cache.
-   */
   const [avatarVersion, setAvatarVersion] = useState(0);
 
   useEffect(() => {
@@ -39,18 +35,6 @@ export default function Nav() {
     return () => window.cancelAnimationFrame(id);
   }, []);
 
-  /*
-   * Recharge la session à chaque changement de page.
-   *
-   * Exemple :
-   *
-   * /users/gpollast/edit
-   *          ↓
-   * /users/gpollast
-   *
-   * Cela permet notamment de récupérer les nouvelles
-   * informations de l'utilisateur après une modification.
-   */
   useEffect(() => {
     async function loadSession() {
       try {
@@ -67,10 +51,6 @@ export default function Nav() {
 
         setUser(session?.user ?? null);
 
-        /*
-         * Nouvelle version de l'avatar.
-         * Cela change son URL et évite le cache navigateur.
-         */
         setAvatarVersion(Date.now());
       } catch (error) {
         console.error("Unable to load session:", error);
@@ -122,15 +102,7 @@ export default function Nav() {
         : "!bg-transparent opacity-60 hover:!bg-white/10 hover:opacity-100"
     }`;
 
-  /*
-   * user.image vient de auth.ts.
-   *
-   * Exemple :
-   * /api/users/1/avatar
-   *
-   * On ajoute ?v=... pour empêcher le navigateur
-   * de conserver l'ancien avatar en cache.
-   */
+  //  * IMPORTANT a noter ?v=... c'est pour empêcher le navigateur de conserver l'ancien avatar en cache
   const currentAvatarUrl = user?.image
     ? `${user.image}?v=${avatarVersion}`
     : null;

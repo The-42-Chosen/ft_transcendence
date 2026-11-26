@@ -91,10 +91,6 @@ export const {
   ],
 
   callbacks: {
-    /*
-     * Au moment du login, on garde l'id de l'utilisateur
-     * dans le token Auth.js.
-     */
     async jwt({ token, user }) {
       if (user?.id) {
         token.sub = user.id;
@@ -103,13 +99,6 @@ export const {
       return token;
     },
 
-    /*
-     * À chaque récupération de session, on relit
-     * l'utilisateur directement dans la base.
-     *
-     * Cela permet d'avoir les informations à jour
-     * même si le username, l'email ou l'avatar changent.
-     */
     async session({ session, token }) {
       if (!token.sub) {
         return session;
@@ -128,14 +117,6 @@ export const {
       session.user.name = currentUser.username;
       session.user.email = currentUser.email;
 
-      /*
-       * On utilise le champ standard "image" de Auth.js.
-       *
-       * Le navigateur récupérera ensuite réellement
-       * l'image via notre route :
-       *
-       * /api/users/<id>/avatar
-       */
       session.user.image = currentUser.avatarUrl
         ? `/api/users/${currentUser.id}/avatar`
         : null;
