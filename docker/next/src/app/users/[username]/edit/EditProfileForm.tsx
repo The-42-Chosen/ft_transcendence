@@ -199,6 +199,7 @@ export default function EditProfileForm({
             id="displayName"
             type="text"
             value={displayName}
+            maxLength={20}
             onChange={(event) =>
               setDisplayName(event.target.value)
             }
