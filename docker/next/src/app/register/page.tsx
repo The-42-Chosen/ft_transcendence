@@ -89,6 +89,7 @@ export default function RegisterPage() {
             id="username"
             type="text"
             value={username}
+            maxLength={15}
             onChange={(event) =>
               setUsername(event.target.value)
             }
