@@ -3,7 +3,7 @@ import { getPlayer } from "@/lib/player";
 import { signRealtimeToken } from "@/lib/realtimeToken";
 import { getRoom } from "@/lib/rooms";
 
-// Asked by the browser before every socket (re)connection, see useGame()
+
 export async function GET(_request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const room = getRoom(code);

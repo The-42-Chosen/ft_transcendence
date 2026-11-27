@@ -2,8 +2,6 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage } from "node:http";
 import { Server } from "socket.io";
 
-// This service holds no game: Next checks every move, changes the Game, then POSTs the new
-// state to /broadcast. This service only forwards it to the browsers of the room.
 
 const PORT = Number(process.env.PORT ?? 3001);
 
@@ -14,14 +12,12 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? "")
 
 const MAX_BODY_SIZE = 100_000;
 
-// Shared with Next, which signs the socket tokens (docker/next/src/lib/realtimeToken.ts)
 const AUTH_SECRET = process.env.AUTH_SECRET;
 if (!AUTH_SECRET) {
   console.error("AUTH_SECRET is not set");
   process.exit(1);
 }
 
-// Same split as audienceOf() in docker/next/src/lib/game.ts
 export type Audience = "spymaster" | "agent" | "ai";
 const AUDIENCES: Audience[] = ["spymaster", "agent"];
 
@@ -62,7 +58,7 @@ type BroadcastBody = {
     views: BroadcastViews;
 };
 
-// Spectators see what operatives see
+
 function audienceOf(seat: unknown): Audience {
   return typeof seat === "string" && seat.endsWith("-spymaster") ? "spymaster" : "agent";
 }
@@ -90,6 +86,7 @@ function verifyToken(token: unknown): Claims | null {
   if (!data || !signature) {
     return null;
   }
+
   const expected = Buffer.from(createHmac("sha256", AUTH_SECRET!).update(`realtime:${data}`).digest("base64url"));
   const received = Buffer.from(signature);
   if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
@@ -189,7 +186,7 @@ const httpServer = createServer(async (req, res) => {
 
     const view = body.views.ai;
 
-    // Only ask the AI once per turn: after its clue, its operatives keep playing the same turn
+    // Check if IA must play
     const shouldPlay = view?.agent_fmotte_teams?.includes(view.current_turn) && !body.views.spymaster?.clue;
 
     if (shouldPlay) {
@@ -208,7 +205,6 @@ const httpServer = createServer(async (req, res) => {
         } else {
             const result = await response.json();
 
-            // Same clue and version as Game.giveClue() in Next, which saves it from our answer
             const clue: Clue = {
               word: String(result.clue).trim().toUpperCase(),
               count: Number(result.number),
@@ -277,7 +273,6 @@ io.on("connection", (socket) => {
 
   socket.on("chat", (payload: unknown) => {
     const { channel: chat, text } = (payload ?? {}) as { channel?: unknown; text?: unknown };
-    // Unknown visitors can read the chat, not write in it
     if (!playerId || !isChatChannel(chat) || !canWriteChat(chat, seat)) {
       return;
     }
@@ -308,7 +303,6 @@ io.on("connection", (socket) => {
     io.to(target).emit("chat", message);
   });
 
-  // Forget the conversations once everybody left the room (everybody is in the "room" chat)
   socket.on("disconnect", () => {
     if (!io.sockets.adapter.rooms.get(chatChannel(code, "room"))?.size) {
       for (const chat of CHAT_CHANNELS) {
@@ -322,7 +316,6 @@ httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`Realtime server listening on :${PORT}`);
 });
 
-// Arret propre quand podman stoppe le conteneur.
 for (const signal of ["SIGTERM", "SIGINT"]) {
   process.on(signal, () => {
     io.close(() => process.exit(0));
