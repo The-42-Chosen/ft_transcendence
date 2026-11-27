@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 type AvatarProps = {
   username: string;
   avatarUrl?: string | null;
@@ -34,14 +38,18 @@ export default function UserCard({
   avatarUrl,
   size = 80,
 }: AvatarProps) {
-  if (avatarUrl) {
+  const [broken, setBroken] = useState(false);
+
+  if (avatarUrl && !broken) {
     return (
       <img
         src={avatarUrl}
         alt={`Avatar de ${username}`}
         width={size}
         height={size}
-        className="rounded-full object-cover"
+        className="shrink-0 rounded-full object-cover"
+        style={{ width: size, height: size }}
+        onError={() => setBroken(true)}
       />
     );
   }

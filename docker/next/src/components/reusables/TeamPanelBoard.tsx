@@ -6,10 +6,16 @@ import { cn } from "@/lib/cn";
 import UserCard from "@/components/reusables/UserCard";
 import { teamStyles, type TeamColor } from "@/lib/lobby";
 
+export type TeamMember = {
+	id: string;
+	name: string;
+	avatarUrl: string | null;
+};
+
 type Parameters = {
 	team: TeamColor;
-	teamOperatives: string[];
-	teamSpymaster: string;
+	spymasters: TeamMember[];
+	operatives: TeamMember[];
 };
 
 const remainingClasses: Record<TeamColor, string> = {
@@ -17,16 +23,16 @@ const remainingClasses: Record<TeamColor, string> = {
 	blue: "bg-(--color-brand-blue)",
 };
 
-function PlayerChip({ name, team }: { name: string; team: TeamColor }) {
+function PlayerChip({ member: { name, avatarUrl }, team }: { member: TeamMember; team: TeamColor }) {
 	return (
 		<li className="flex w-fit max-w-full items-center gap-2 rounded-full border border-amber-200 bg-white py-1 pr-3 pl-1 shadow-sm">
-			<UserCard username={name} size={32} />
+			<UserCard username={name} avatarUrl={avatarUrl} size={32} />
 			<span className={cn("truncate font-agent text-sm", teamStyles[team].label)} title={name}>{name}</span>
 		</li>
 	);
 }
 
-export default function TeamPanelBoard({ team, teamOperatives, teamSpymaster }: Parameters) {
+export default function TeamPanelBoard({ team, spymasters, operatives }: Parameters) {
 	const { t } = useLanguage();
 	const { remaining } = useClue();
 	const wr = t.waitingRoom;
@@ -51,12 +57,14 @@ export default function TeamPanelBoard({ team, teamOperatives, teamSpymaster }: 
 			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
 				<p className={label}>{wr.spymasters}</p>
 				<ul className="mb-3 flex flex-col gap-1.5">
-					{teamSpymaster ? <PlayerChip name={teamSpymaster} team={team} /> : <li className="text-amber-900/50">—</li>}
+					{spymasters.length > 0
+						? spymasters.map((member) => <PlayerChip key={member.id} member={member} team={team} />)
+						: <li className="text-amber-900/50">—</li>}
 				</ul>
 				<p className={label}>{wr.operatives}</p>
 				<ul className="flex flex-col gap-1.5">
-					{teamOperatives.map((operative, index) => (
-						<PlayerChip key={`${operative}-${index}`} name={operative} team={team} />
+					{operatives.map((member) => (
+						<PlayerChip key={member.id} member={member} team={team} />
 					))}
 				</ul>
 			</div>
