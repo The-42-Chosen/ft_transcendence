@@ -3,7 +3,7 @@ import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { db } from "@/prisma/db";
 import { currentAccount } from "@/lib/session";
-import Link from "next/link";
+import LoginForm from "./LoginForm";
 
 export default async function LoginPage({
   searchParams,
@@ -18,113 +18,37 @@ export default async function LoginPage({
 
   const { error } = await searchParams;
 
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <form
-        action={async (formData) => {
-          "use server";
+  async function loginAction(formData: FormData) {
+    "use server";
 
-          const email = formData.get("email");
+    const email = formData.get("email");
 
-          if (typeof email !== "string") {
-            redirect("/login?error=Default");
-          }
+    if (typeof email !== "string") {
+      redirect("/login?error=Default");
+    }
 
-          const user = await db.orm.public.User
-            .where({ email })
-            .first();
+    const user = await db.orm.public.User
+      .where({ email })
+      .first();
 
-          if (user) {
-            formData.set(
-              "redirectTo",
-              `/users/${user.username}`
-            );
-          }
+    if (user) {
+      formData.set("redirectTo", `/users/${user.username}`);
+    }
 
-          try {
-            await signIn("credentials", formData);
-          } catch (error) {
-            if (error instanceof AuthError) {
-              if (error.type === "CredentialsSignin") {
-                redirect("/login?error=CredentialsSignin");
-              }
+    try {
+      await signIn("credentials", formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        if (error.type === "CredentialsSignin") {
+          redirect("/login?error=CredentialsSignin");
+        }
 
-              redirect("/login?error=Default");
-            }
+        redirect("/login?error=Default");
+      }
 
-            throw error;
-          }
-        }}
-        className="flex w-full max-w-sm flex-col gap-4"
-      >
-        <h1 className="text-2xl font-semibold">
-          Login
-        </h1>
+      throw error;
+    }
+  }
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email">
-            Email
-          </label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="rounded border px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password">
-            Password
-          </label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            className="rounded border px-3 py-2"
-          />
-        </div>
-
-        {error === "CredentialsSignin" && (
-          <p className="text-sm text-red-500">
-            Invalid email or password
-          </p>
-        )}
-
-        {error === "Default" && (
-          <p className="text-sm text-red-500">
-            Something went wrong
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className="rounded border px-4 py-2"
-        >
-          Login
-        </button>
-
-        <p className="text-center text-sm text-gray-600">
-          Pas encore de compte ?{" "}
-          <Link
-            href="/register"
-            className="font-semibold underline"
-          >
-            Créer un compte
-          </Link>
-        </p>
-
-        <Link
-          href="/"
-          className="text-center rounded border px-4 py-2"
-        >
-          Retour à l'accueil
-        </Link>
-      </form>
-    </main>
-  );
+  return <LoginForm action={loginAction} error={error} />;
 }
