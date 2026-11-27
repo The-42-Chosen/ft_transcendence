@@ -64,6 +64,9 @@
     "errorServer": "No se pudo conectar con el servidor, inténtalo de nuevo"
   },
   "game": {
+    "showTeams": "Ver los equipos",
+    "playersCount": "{count} jugadores",
+    "teams": "Equipos",
     "currentClue": "Pista actual",
     "wordsCount": "{count} palabras",
     "waitingSpymaster": "Esperando al espía maestro…",
