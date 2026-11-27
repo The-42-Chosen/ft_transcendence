@@ -29,12 +29,21 @@ export default async function GamePage({ params }: Parameters) {
   // Seat saved in the lobby, unknown players watch as spectators
   const playerSeat = await currentSeat(room);
   const board = seatBoard(playerSeat);
+  const { players, aiTeams } = room.lobbyView();
 
   return (
     <main className="min-h-screen text-center">
       <Header/>
       <ClueProvider roomCode={room.code} seat={playerSeat} initialState={room.viewFor(audienceOf(playerSeat))}>
-        <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
+        <div className="mx-auto my-4 flex w-[calc(100%-2rem)] max-w-5xl flex-col gap-4 xl:max-w-7xl xl:flex-row">
+          <TeamPanelSide
+            className="xl:w-80 xl:shrink-0"
+            players={players}
+            aiTeams={aiTeams}
+          />
+          <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
+          {/* <Chat className="xl:w-80 xl:shrink-0"/> */}
+        </div>
         <GameOverSetup/>
         <GameOverModal words={room.words}/>
       </ClueProvider>
