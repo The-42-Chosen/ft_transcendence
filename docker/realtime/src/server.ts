@@ -197,7 +197,7 @@ const httpServer = createServer(async (req, res) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(view)
+            body: JSON.stringify({ ...view, code: body.code })
         });
 
         if (!response.ok) {
@@ -219,6 +219,14 @@ const httpServer = createServer(async (req, res) => {
       } catch (error) {
         console.error("Failed to contact AI server:", error);
       }
+    }
+
+    if (body.views.spymaster?.gameOver && view?.agent_fmotte_teams?.length) {
+      fetch("http://ia:8001/clear", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: body.code })
+      }).catch((error) => console.error("Failed to clear AI history:", error));
     }
 
     for (const audience of AUDIENCES) {

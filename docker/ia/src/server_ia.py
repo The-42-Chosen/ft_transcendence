@@ -8,6 +8,9 @@ from codenames_ia import (
     MOTS_OUTILS_EN, MOTS_OUTILS_ES, MOTS_OUTILS_FR
 )
 
+historique: dict[str, set[str]] = {}
+
+
 class Server(BaseHTTPRequestHandler):
 
     def __init__(self, list_SpyMaster):
@@ -22,14 +25,24 @@ class Server(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             data = json.loads(post_data.decode())
 
-            print(json.dumps(data, indent=4))
+            code = str(data.get('code', '')).strip().upper()
+
+            if self.path == '/clear':
+                historique.pop(code, None)
+                self.send_response(204)
+                self.end_headers()
+                return
+
+            deja_joues = historique.setdefault(code, set())
 
             if data['langue'] == 'en':
-                indice = create_clue(data, self.list_SpyMaster[0])
+                indice = create_clue(data, self.list_SpyMaster[0], deja_joues)
             elif data['langue'] == 'es':
-                indice = create_clue(data, self.list_SpyMaster[1])
+                indice = create_clue(data, self.list_SpyMaster[1], deja_joues)
             else:
-                indice = create_clue(data, self.list_SpyMaster[2])
+                indice = create_clue(data, self.list_SpyMaster[2], deja_joues)
+
+            deja_joues.add(indice.mot.upper())
 
             self.send_response(200)
             self.send_header("Content-type", "application/json")
@@ -89,7 +102,7 @@ def create_SpyMaster(langue: str) -> MaitreEspion:
     return maitre
 
 
-def create_clue(message_dict: str, maitre: MaitreEspion) -> Indice:
+def create_clue(message_dict: dict, maitre: MaitreEspion, deja_joues: set[str]) -> Indice:
 
     if message_dict['current_turn'] == 'blue':
         equipe = message_dict['list_blue']
@@ -105,9 +118,14 @@ def create_clue(message_dict: str, maitre: MaitreEspion) -> Indice:
         assassin=message_dict['assassin_word'],
     )
     
-    indices = maitre.proposer(plateau25, nb_resultats=200)[0]
-
-    return indices
+    indices = maitre.proposer(plateau25, nb_resultats=200)
+    if not indices:
+        raise ValueError("No clue found for this board")
+    
+    for indice in indices:
+        if indice.mot.upper() not in deja_joues:
+            return indice
+    return indices[0]
 
 
 def main():
@@ -120,12 +138,6 @@ def main():
         create_SpyMaster('es'),
         create_SpyMaster('fr')
     ]
-
-    # list_SpyMaster = [
-    #     'en'
-    #     'es'
-    #     'fr'
-    # ]
 
     try:
         httpd = HTTPServer((host,port), Server(list_SpyMaster))
