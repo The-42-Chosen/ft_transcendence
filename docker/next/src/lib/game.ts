@@ -52,6 +52,7 @@ export class GameError extends Error {
 export class Game {
 	status: RoomStatus = "waiting";
 	readonly createdAt = Date.now();
+	lastActivity = Date.now();
 	words: string[] = [];
 	colors: CardColor[] = [];
 	found: boolean[] = [];

@@ -57,10 +57,13 @@ export default function WaitingRoom({ roomCode, meId, initialLobby }: Parameters
             const res = await fetch(`/api/rooms/${roomCode}/lobby`, { cache: "no-store" }).catch(() => null);
             if (res?.ok) {
                 applyLobby(await res.json());
+            } else if (res?.status === 404) {
+                clearInterval(id);
+                router.replace("/");
             }
         }, POLL_INTERVAL);
         return () => clearInterval(id);
-    }, [roomCode]);
+    }, [roomCode, router]);
 
     useEffect(() => {
         if (lobby.status === "playing") {

@@ -1,5 +1,3 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { Game, GameError, audienceOf } from "@/lib/game";
 import { generateRoomCode, type Language, type Seat } from "@/lib/lobby";
@@ -12,7 +10,35 @@ const rooms = (store.rooms ??= new Map<string, Game>());
 
 const REALTIME_URL = process.env.REALTIME_INTERNAL_URL ?? "http://realtime:3001";
 
+const MAX_ROOMS = 300;
+const MINUTE = 60 * 1000;
+const WAITING_TTL = 15 * MINUTE;
+const PLAYING_TTL = 60 * MINUTE;
+const OVER_TTL = 30 * MINUTE;
+
+function roomTtl(room: Game): number {
+	if (room.status === "waiting") {
+		return WAITING_TTL;
+	}
+	return room.isOver() ? OVER_TTL : PLAYING_TTL;
+}
+
+function purgeRooms() {
+	const now = Date.now();
+	for (const [code, room] of rooms) {
+		if (now - room.lastActivity > roomTtl(room)) {
+			rooms.delete(code);
+			log.info({ service: "game", msg: "room expired", room_code: code, status: room.status });
+		}
+	}
+}
+
 export function createRoom(language: Language, host: SessionPlayer): Game {
+	purgeRooms();
+	if (rooms.size >= MAX_ROOMS) {
+		log.warn({ service: "game", msg: "room creation refused", reason: "too_many_rooms", rooms: rooms.size, player_id: host.id });
+		throw new GameError("Too many rooms, try again later", 503);
+	}
 	let code = generateRoomCode();
 	while (rooms.has(code)) {
 		code = generateRoomCode();
@@ -25,7 +51,11 @@ export function createRoom(language: Language, host: SessionPlayer): Game {
 }
 
 export function getRoom(code: string): Game | null {
-	return rooms.get(code.trim().toUpperCase()) ?? null;
+	const room = rooms.get(code.trim().toUpperCase()) ?? null;
+	if (room) {
+		room.lastActivity = Date.now();
+	}
+	return room;
 }
 
 export async function startRoom(room: Game) {
@@ -70,7 +100,6 @@ export function publicRoom({ code, language, status }: Game) {
 }
 
 export async function publish(room: Game) {
-	saveAiBoard(room);
 	const body = { code: room.code, views: { spymaster: room.viewFor("spymaster"), agent: room.viewFor("agent"), ai: room.aiBoard()} };
 
 	try {
@@ -116,12 +145,4 @@ export async function playMove(room: Game, seat: Seat, move: () => object) {
 		log.error({ service: "game", msg: "move failed", error: String(error), room_code: room.code, seat });
 		throw error;
 	}
-}
-
-// TODO: Temporary file until the board is sent straight to the AI
-const CURRENT_ROOMS_DIR = path.join(process.cwd(), "current_rooms");
-
-function saveAiBoard(room: Game) {
-	mkdirSync(CURRENT_ROOMS_DIR, { recursive: true });
-	writeFileSync(path.join(CURRENT_ROOMS_DIR, `${room.code}.json`), JSON.stringify(room.aiBoard(), null, 2));
 }
