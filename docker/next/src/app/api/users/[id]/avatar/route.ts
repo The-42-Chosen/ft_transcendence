@@ -6,7 +6,7 @@ import { mkdir, writeFile } from "fs/promises";
 import { randomUUID } from "crypto";
 import path from "path";
 
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 import { readFile } from "fs/promises";
 
 
@@ -38,20 +38,8 @@ export async function POST(
       );
     }
 
-    const session = await auth();
+    const currentUser = await currentAccount();
 
-    if (!session?.user?.email) { 
-      log.warn({service:'user', msg:'error avatar', reason: 'Unauthorized'})
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-    
-    const currentUser = await db.orm.public.User
-      .where({ email: session.user.email })
-      .first();
-    
     if (!currentUser) {
       log.warn({service:'user', msg:'error avatar', reason: 'Unauthorized'})
       return NextResponse.json(

@@ -1,6 +1,6 @@
 import { db } from "@/prisma/db";
 import EditProfileForm from "./EditProfileForm";
-import { auth } from "@/auth"
+import { currentAccount } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 export default async function EditProfilePage({
@@ -10,15 +10,7 @@ export default async function EditProfilePage({
 }) {
   const { username } = await params;
 
-  const session = await auth();
-
-  if (!session?.user?.email) {
-    redirect("/login");
-  }
-
-  const currentUser = await db.orm.public.User
-    .where({ email: session.user.email })
-    .first();
+  const currentUser = await currentAccount();
 
   if (!currentUser) {
     redirect("/login");

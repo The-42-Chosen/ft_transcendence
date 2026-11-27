@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 import { log } from "@/lib/log";
 
 // GET
@@ -13,9 +13,9 @@ export async function GET(
     params: Promise<{ id: string }>;
   }
 ) {
-  const session = await auth();
+  const me = await currentAccount();
 
-  if (!session?.user?.email) {
+  if (!me) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
@@ -58,18 +58,7 @@ export async function POST(
     params: Promise<{ id: string }>;
   }
 ) {
-  const session = await auth();
-
-  if (!session?.user?.email) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
-  const currentUser = await db.orm.public.User
-    .where({ email: session.user.email })
-    .first();
+  const currentUser = await currentAccount();
 
   if (!currentUser) {
     return NextResponse.json(

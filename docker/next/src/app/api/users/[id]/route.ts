@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 import { log } from "@/lib/log";
 
 const updateUserSchema = z.object({
@@ -39,9 +39,9 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
+  const me = await currentAccount();
 
-  if (!session?.user?.email) {
+  if (!me) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
@@ -69,8 +69,7 @@ export async function GET(
     );
   }
 
-  // The email is only sent to its owner (undefined is dropped from the JSON)
-  const isOwner = user.email === session.user.email;
+  const isOwner = user.id === me.id;
 
   return NextResponse.json({
     ...toPublicUser(user),
@@ -93,18 +92,7 @@ export async function PATCH(
       );
     }
 
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const currentUser = await db.orm.public.User
-      .where({ email: session.user.email })
-      .first();
+    const currentUser = await currentAccount();
 
     if (!currentUser) {
       log.warn({ service: "user", msg: "user update refused", reason: "session_user_not_found", target_user_id: userId });
@@ -156,9 +144,18 @@ export async function PATCH(
       );
     }
 
+    // A change revokes every existing token by modifying its sessionVersion.
+    const identifierChanged =
+      (parsed.data.email !== undefined && parsed.data.email !== currentUser.email) ||
+      (parsed.data.username !== undefined && parsed.data.username !== currentUser.username);
+
+    const updatePayload = identifierChanged
+      ? { ...parsed.data, sessionVersion: (currentUser.sessionVersion ?? 0) + 1 }
+      : parsed.data;
+
     const updatedUser = await db.orm.public.User
       .where({ id: userId })
-      .update(parsed.data);
+      .update(updatePayload);
 
     if (!updatedUser) {
       return NextResponse.json(

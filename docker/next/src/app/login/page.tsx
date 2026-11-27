@@ -1,7 +1,8 @@
-import { signIn, auth } from "@/auth";
+import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { db } from "@/prisma/db";
+import { currentAccount } from "@/lib/session";
 import Link from "next/link";
 
 export default async function LoginPage({
@@ -9,16 +10,10 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const session = await auth();
+  const currentUser = await currentAccount();
 
-  if (session?.user?.email) {
-    const currentUser = await db.orm.public.User
-      .where({ email: session.user.email })
-      .first();
-
-    if (currentUser) {
-      redirect(`/users/${currentUser.username}`);
-    }
+  if (currentUser) {
+    redirect(`/users/${currentUser.username}`);
   }
 
   const { error } = await searchParams;

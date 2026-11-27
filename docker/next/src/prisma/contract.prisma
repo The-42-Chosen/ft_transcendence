@@ -11,6 +11,7 @@ model User {
   updatedAt     temporal.updatedAtString()
   lastSeen      TimestamptzString?
   passwordHash  String?
+  sessionVersion Int     @default(0)
 
   friends       Friendship[] @relation("UserFriends")
   friendOf      Friendship[] @relation("FriendOf")

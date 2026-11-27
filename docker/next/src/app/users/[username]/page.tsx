@@ -7,7 +7,7 @@ import LogOutButton from "@/app/components/User/LogOutButton";
 import UserSearch from "@/app/components/User/UserSearch";
 import { db } from "@/prisma/db";
 import Link from "next/link";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -26,18 +26,10 @@ export default async function UserPage({
     return <p>User not found</p>;
   }
 
-  const session = await auth();
-  
-  if (!session?.user?.email) {
-    return <p>You must be logged in</p>;
-  }
-
-  const currentUser = await db.orm.public.User
-    .where({ email: session.user.email })
-    .first();
+  const currentUser = await currentAccount();
 
   if (!currentUser) {
-    return <p>User not found</p>;
+    return <p>You must be logged in</p>;
   }
 
   const currentUserId = currentUser.id;

@@ -3,7 +3,7 @@ import { db } from "@/prisma/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { log } from "@/lib/log";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 import { passwordSchema } from "@/lib/password";
 
 const createUserSchema = z.object({
@@ -13,9 +13,9 @@ const createUserSchema = z.object({
 }).strict();
 
 export async function GET() {
-  const session = await auth();
+  const me = await currentAccount();
 
-  if (!session?.user?.email) {
+  if (!me) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
