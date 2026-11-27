@@ -1,0 +1,5 @@
+#surcouche pour make dev et que ca embete pas sur le port 3001
+services:
+  realtime:
+    ports:
+      - "${SERVER_IP:-127.0.0.1}:${REALTIME_DEV_PORT:-3001}:3001"
