@@ -506,5 +506,23 @@
   "commons": {
     "lastUpdated": "Última actualización:",
     "tableOfContents": "Tabla de contenido"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "loginSubmit": "Iniciar sesión",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "createAccountLink": "Crear una cuenta",
+    "registerTitle": "Crear tu cuenta",
+    "registerSubmit": "Crear cuenta",
+    "registerLoading": "Creando…",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "loginLink": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "username": "Apodo",
+    "password": "Contraseña",
+    "backHome": "← Volver al inicio",
+    "errorCredentials": "Correo o contraseña inválidos",
+    "errorCreate": "No se pudo crear la cuenta",
+    "errorDefault": "Algo salió mal"
   }
 }

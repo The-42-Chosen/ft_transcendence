@@ -506,5 +506,23 @@
   "commons": {
     "lastUpdated": "Dernière mise à jour :",
     "tableOfContents": "Table des matières"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "loginSubmit": "Se connecter",
+    "noAccount": "Pas encore de compte ?",
+    "createAccountLink": "Créer un compte",
+    "registerTitle": "Créer un compte",
+    "registerSubmit": "Créer un compte",
+    "registerLoading": "Création…",
+    "hasAccount": "Déjà un compte ?",
+    "loginLink": "Se connecter",
+    "email": "Email",
+    "username": "Pseudo",
+    "password": "Mot de passe",
+    "backHome": "← Retour à l'accueil",
+    "errorCredentials": "Email ou mot de passe invalide",
+    "errorCreate": "Impossible de créer le compte",
+    "errorDefault": "Une erreur est survenue"
   }
 }

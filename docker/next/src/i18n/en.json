@@ -506,5 +506,23 @@
   "commons": {
     "lastUpdated": "Last updated:",
     "tableOfContents": "Table of Contents"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "loginSubmit": "Log in",
+    "noAccount": "Don't have an account yet?",
+    "createAccountLink": "Create an account",
+    "registerTitle": "Create your account",
+    "registerSubmit": "Create account",
+    "registerLoading": "Creating…",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log in",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "backHome": "← Back to home",
+    "errorCredentials": "Invalid email or password",
+    "errorCreate": "Unable to create account",
+    "errorDefault": "Something went wrong"
   }
 }
