@@ -64,6 +64,9 @@
     "errorServer": "Impossible de joindre le serveur, réessayez"
   },
   "game": {
+    "showTeams": "Voir les équipes",
+    "playersCount": "{count} joueurs",
+    "teams": "Équipes",
     "currentClue": "Indice actuel",
     "wordsCount": "{count} mots",
     "waitingSpymaster": "En attente du maître espion…",

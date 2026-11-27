@@ -64,6 +64,9 @@
     "errorServer": "Could not reach the server, try again"
   },
   "game": {
+    "showTeams": "Show the teams",
+    "playersCount": "{count} players",
+    "teams": "Teams",
     "currentClue": "Current clue",
     "wordsCount": "{count} words",
     "waitingSpymaster": "Waiting for the spymaster…",
