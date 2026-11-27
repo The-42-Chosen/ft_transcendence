@@ -125,7 +125,7 @@ dev: check_env auth_secret storage
 	podman rm -f -i next-dev
 	@# volumes recreated
 	podman volume rm -f $(PROJECT)_next_dev_node_modules
-	$(DC) --profile dev up -d postgres realtime next-dev
+	$(DC) -f docker-compose.dev.yml --profile dev up -d postgres realtime next-dev
 
 	@echo "Waiting for PostgreSQL..."
 	@until $(DC) exec -T postgres pg_isready -U transcendence -d transcendence >/dev/null 2>&1; do \
