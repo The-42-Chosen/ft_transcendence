@@ -38,7 +38,7 @@ export default function ClueForm() {
       <label htmlFor={clueId} className="pl-4 text-xs font-semibold uppercase tracking-widest text-amber-900/70">
         {g.giveClue}
       </label>
-      <fieldset disabled={!canGive || sending} className="flex items-center gap-2 rounded-full bg-white p-2 shadow-md ring-1 ring-amber-900/10 focus-within:ring-2 focus-within:ring-amber-500 disabled:opacity-50">
+      <fieldset disabled={!canGive || sending} className="flex min-h-15 min-w-0 items-center gap-2 rounded-full bg-white p-2 shadow-md ring-1 ring-amber-900/10 focus-within:ring-2 focus-within:ring-amber-500 disabled:opacity-50">
         <input
           id={clueId}
           value={word}
@@ -48,14 +48,14 @@ export default function ClueForm() {
           autoComplete="off"
           placeholder={g.oneWord}
           onChange={(event) => setWord(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent px-4 py-2 text-lg font-semibold uppercase tracking-wide text-amber-950 placeholder:normal-case placeholder:font-normal placeholder:text-amber-900/40 focus:outline-none"
+          className="w-0 min-w-0 flex-1 bg-transparent px-3 py-2 text-lg sm:px-4 font-semibold uppercase tracking-wide text-amber-950 placeholder:normal-case placeholder:font-normal placeholder:text-amber-900/40 focus:outline-none"
         />
         <select
           name="count"
           value={count}
           onChange={(event) => setCount(Number(event.target.value))}
           aria-label={g.numberOfWords}
-          className="h-11 w-16 cursor-pointer rounded-full bg-amber-100 text-center text-lg font-bold text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="h-11 w-14 shrink-0 cursor-pointer rounded-full sm:w-16 bg-amber-100 text-center text-lg font-bold text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
         >
           {Array.from({ length: 10 }, (_, n) => (
             <option key={n} value={n}>{n}</option>
@@ -63,7 +63,7 @@ export default function ClueForm() {
         </select>
         <button
           type="submit"
-          className="h-11 rounded-full bg-amber-500 px-6 font-semibold text-white transition-colors hover:bg-amber-600 active:bg-amber-700"
+          className="h-11 shrink-0 rounded-full bg-amber-500 px-4 font-semibold sm:px-6 text-white transition-colors hover:bg-amber-600 active:bg-amber-700"
         >
           {g.send}
         </button>
