@@ -168,7 +168,6 @@ io.on("connection", (socket) => {
     socket.disconnect(true);
     return;
   }
-  // TODO: Take the seat from the next-auth session once seats are saved, the client can lie about it
   socket.join(channel(code, audienceOf(seat)));
 });
 
