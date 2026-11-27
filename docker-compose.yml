@@ -166,6 +166,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3001"
+      AUTH_SECRET: "${AUTH_SECRET}"
       CORS_ORIGINS: "http://localhost:${NEXT_DEV_PORT:-3000},http://${SERVER_IP:-localhost}:${NEXT_DEV_PORT:-3000}"
     ports:
       - "${SERVER_IP:-127.0.0.1}:${REALTIME_DEV_PORT:-3001}:3001"
