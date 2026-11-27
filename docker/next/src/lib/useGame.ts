@@ -9,16 +9,32 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
   const [state, setState] = useState<GameView>(initialState);
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
 
   const applyState = useCallback((next: GameView) => {
     setState((current) => (next.version >= current.version ? next : current));
   }, []);
 
   useEffect(() => {
-    // Prod : same domain, nginx sends /socket.io/ to the realtime service
-    // Dev  : NEXT_PUBLIC_SOCKET_URL points straight at realtime (:3001)
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
-    const options = { path: "/socket.io", query: { code: roomCode, seat } };
+   
+    let retry = true;
+    const options = {
+      path: "/socket.io",
+      auth: (send: (data: object) => void) => {
+        fetch(`/api/rooms/${roomCode}/token`, { cache: "no-store" })
+          .then((res) => {
+            // No room any more: retrying would never succeed
+            retry = res.status !== 404;
+            return res.ok ? res.json() : null;
+          })
+          .catch(() => null)
+          .then((data: { token?: string; playerId?: string | null } | null) => {
+            setPlayerId(data?.playerId ?? null);
+            send({ token: data?.token ?? "" });
+          });
+      },
+    };
     const socket = socketUrl ? io(socketUrl, options) : io(options);
 
     socket.on("connect", async () => {
@@ -30,15 +46,23 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
       }
     });
     socket.on("disconnect", () => setConnected(false));
-    socket.on("connect_error", (error) => console.error("Socket.IO error:", error.message));
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    socket.on("connect_error", (error) => {
+      console.error("Socket.IO error:", error.message);
+      // Refused by the server (bad or missing token): socket.io gives up, try again with a new token
+      if (!socket.active && retry) {
+        retryTimer = setTimeout(() => socket.connect(), 3000);
+      }
+    });
     socket.on("state", applyState);
     setSocket(socket);
 
     return () => {
+      clearTimeout(retryTimer);
       socket.disconnect();
       setSocket(null);
     };
   }, [roomCode, seat, applyState]);
 
-  return { state, applyState, connected, socket };
+  return { state, applyState, connected, socket, playerId };
 }
