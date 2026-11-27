@@ -27,7 +27,7 @@ export default function Board({ type, team, words, colors }: Parameters) {
 					</div>
 					<ClueBar />
 					<EndTurnButton team={team} />
-					<RemainingWords />
+					<RemainingWords className="xl:hidden" />
 				</section>
 			)}
 			{type === "spectator" && (
@@ -37,7 +37,7 @@ export default function Board({ type, team, words, colors }: Parameters) {
 						{words.map((word, i) => (<Word key={word} index={i} text={word.toUpperCase()} readOnly />))}
 					</div>
 					<ClueBar />
-					<RemainingWords />
+					<RemainingWords className="xl:hidden" />
 				</section>
 
 			)}
@@ -51,7 +51,7 @@ export default function Board({ type, team, words, colors }: Parameters) {
 					</div>
 					<ClueBar />
 					<ClueForm />
-					<RemainingWords />
+					<RemainingWords className="xl:hidden" />
 				</section>
 			)}
 		</>
