@@ -63,8 +63,8 @@ export class Game {
 	startedAt: number | null = null;
 	lobbyVersion = 0;
 	hostId: string | null = null;
-	// Key: Player.id (opaque)
 	players = new Map<string, LobbyMember>();
+	lineup: LobbyMember[] = [];
 
 	constructor(readonly code: string, readonly language: Language) {}
 
@@ -187,6 +187,7 @@ export class Game {
 		this.found = this.words.map(() => false);
 		this.lastFound = null;
 		this.startedAt = Date.now();
+		this.lineup = [...this.players.values()].filter((m) => m.seat !== "spectator").map((m) => ({ ...m }));
 		// The team with 9 cards starts
 		this.turn = this.colors.filter((c) => c === "red").length > 8 ? "red" : "blue";
 		this.status = "playing";
@@ -249,13 +250,20 @@ export class Game {
 		return this.turn;
 	}
 
+	wordsFound(color: CardColor): number {
+		return this.colors.filter((c, i) => c === color && this.found[i]).length;
+	}
+
 	remaining(color: CardColor): number {
 		return this.colors.filter((c, i) => c === color && !this.found[i]).length;
 	}
 
+	assassinFound(): boolean {
+		return this.colors.some((c, i) => c === "assassin" && this.found[i]);
+	}
+
 	isOver(): boolean {
-		const assassinFound = this.colors.some((c, i) => c === "assassin" && this.found[i]);
-		return this.status === "playing" && (assassinFound || this.remaining("red") === 0 || this.remaining("blue") === 0);
+		return this.status === "playing" && (this.assassinFound() || this.remaining("red") === 0 || this.remaining("blue") === 0);
 	}
 
 	winner(): TeamColor | null {
