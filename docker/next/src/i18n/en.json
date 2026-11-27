@@ -91,7 +91,11 @@
       "placeholder": "Write a message…",
       "send": "Send",
       "empty": "No messages yet",
-      "you": "You"
+      "you": "You",
+      "tabRoom": "General",
+      "tabSpymasters": "Spymasters",
+      "readOnly": "Spymasters can't talk to their operatives",
+      "unread": "{count} new messages"
     }
   },
   "footer": {

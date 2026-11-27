@@ -91,7 +91,11 @@
       "placeholder": "Écrire un message…",
       "send": "Envoyer",
       "empty": "Aucun message pour l'instant",
-      "you": "Vous"
+      "you": "Vous",
+      "tabRoom": "Général",
+      "tabSpymasters": "Maîtres espions",
+      "readOnly": "Les maîtres espions ne peuvent pas parler à leurs agents",
+      "unread": "{count} nouveaux messages"
     }
   },
   "footer": {
