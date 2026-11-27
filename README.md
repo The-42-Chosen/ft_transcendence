@@ -418,7 +418,7 @@ Each Major add 2 points and Minor 1 point.
 
   The game is the heart of the project: an online adaptation of Codenames, with its rules and win conditions. The rules run on the server (`src/lib/game.ts`) behind a REST API, and the hidden colors of the cards are only sent to the Spymasters, so an agent cannot cheat.
 
-  *Team member(s): erpascua, fmotte*
+  *Team member(s): erpascua*
 
 * **Major: Remote players — Enable two players on separate computers to play the same game in real-time.**
 
@@ -489,6 +489,10 @@ Each Major add 2 points and Minor 1 point.
 *Every member of the team wrote their own part of this section.*
 
 ### Eric Pascual
+
+Implementation of Next, Next-dev and Tailwind. In charge of front and game components (frontend and backend) from room creation to end of game with multiplayer mode.
+
+**Challenges**: The hardest part, as developer, to deal with was the implementation of websockets with Next. I had some experience with react, but Next, and its backend was new to me. 
 
 
 ### Guillaume Pollastri
