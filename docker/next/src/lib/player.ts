@@ -1,8 +1,7 @@
 import 'server-only';
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
-import { auth } from "@/auth";
-import { db } from "@/prisma/db";
+import { currentAccount } from "@/lib/session";
 import { GUEST_NAME_MAX } from "@/lib/lobby";
 import { log } from "@/lib/log";
 
@@ -38,8 +37,8 @@ function sign(data: string): string {
 	return createHmac("sha256", secret()).update(data).digest("base64url");
 }
 
-function accountId(email: string): string {
-	return `u:${sign(`player:${email}`).slice(0, 22)}`;
+function accountId(id: number): string {
+	return `u:${sign(`player:${id}`).slice(0, 22)}`;
 }
 
 function encodeGuest(guest: { id: string; name: string }): string {
@@ -90,20 +89,15 @@ export async function setGuest(name: string): Promise<Player> {
 }
 
 export async function getPlayer(): Promise<SessionPlayer | null> {
-	const session = await auth();
-	const email = session?.user?.email;
-	if (email) {
-		const user = await db.orm.public.User.where({ email }).first();
-		if (user) {
-			return {
-				id: accountId(email),
-				name: user.displayName || user.username,
-				avatarUrl: user.avatarUrl ?? null,
-				guest: false,
-				email,
-			};
-		}
-		log.warn({ service: "game", msg: "session user not found" });
+	const user = await currentAccount();
+	if (user) {
+		return {
+			id: accountId(user.id),
+			name: user.displayName || user.username,
+			avatarUrl: user.avatarUrl ?? null,
+			guest: false,
+			email: user.email,
+		};
 	}
 	const guest = decodeGuest((await cookies()).get(GUEST_COOKIE)?.value);
 	if (guest) {

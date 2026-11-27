@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 
 export async function GET(request: Request) {
-  const session = await auth();
+  const me = await currentAccount();
 
-  if (!session?.user?.email) {
+  if (!me) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }

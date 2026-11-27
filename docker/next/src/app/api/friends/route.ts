@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/prisma/db";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { currentAccount } from "@/lib/session";
 import { log } from "@/lib/log";
 
 const friendshipSchema = z.object({
@@ -12,18 +12,7 @@ const friendshipSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const currentUser = await db.orm.public.User
-      .where({ email: session.user.email })
-      .first();
+    const currentUser = await currentAccount();
 
     if (!currentUser) {
       log.warn({ service: "user", msg: "friend add refused", reason: "session_user_not_found" });
@@ -113,18 +102,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const currentUser = await db.orm.public.User
-      .where({ email: session.user.email })
-      .first();
+    const currentUser = await currentAccount();
 
     if (!currentUser) {
       log.warn({ service: "user", msg: "friend remove refused", reason: "session_user_not_found" });

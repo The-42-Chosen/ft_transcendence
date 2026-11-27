@@ -63,8 +63,49 @@ export const {
           id: String(user.id),
           email: user.email,
           name: user.username,
+          sessionVersion: user.sessionVersion ?? 0,
         };
       },
     }),
   ],
+  callbacks: {
+    // so every request can be checked for revocation (see lib/session.ts).
+    async jwt({ token, user }) {
+      if (user) {
+        token.sessionVersion = (user as { sessionVersion?: number }).sessionVersion ?? 0;
+      }
+      return token;
+    },
+    // Expose the id and sessionVersion on the session so routes resolve the account by id
+    async session({ session, token }) {
+      if (session.user) {
+        if (token.sub) {
+          session.user.id = token.sub;
+        }
+        session.user.sessionVersion =
+          typeof token.sessionVersion === "number" ? token.sessionVersion : 0;
+      }
+      return session;
+    },
+  },
+  events: {
+    async signOut(message) {
+      const token = "token" in message ? message.token : null;
+      const rawId = token?.sub;
+      if (!rawId) {
+        return;
+      }
+      const id = Number(rawId);
+      if (!Number.isInteger(id) || id <= 0) {
+        return;
+      }
+      const user = await db.orm.public.User.where({ id }).first();
+      if (user) {
+        await db.orm.public.User
+          .where({ id })
+          .update({ sessionVersion: (user.sessionVersion ?? 0) + 1 });
+        log.info({ service: "auth", msg: "session revoked on signout", user_id: id });
+      }
+    },
+  },
 });
