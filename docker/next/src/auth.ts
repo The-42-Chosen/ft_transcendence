@@ -121,6 +121,12 @@ export const {
         ? `/api/users/${currentUser.id}/avatar`
         : null;
 
+      (
+        session.user as typeof session.user & {
+          id: string;
+        }
+      ).id = String(currentUser.id);
+
       return session;
     },
   },
