@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 import { Game, GameError, audienceOf } from "@/lib/game";
 import { generateRoomCode, type Language, type Seat } from "@/lib/lobby";
 import { log } from "@/lib/log";
+import { sendStats } from "@/lib/stats";
 import { PlayerError, getPlayer, requirePlayer, type SessionPlayer } from "@/lib/player";
 
-// TODO: In-memory store until rooms are saved in Postgres.
 const store = globalThis as unknown as { rooms?: Map<string, Game> };
 const rooms = (store.rooms ??= new Map<string, Game>());
 
@@ -101,9 +101,12 @@ export async function publish(room: Game) {
 
 export async function playMove(room: Game, seat: Seat, move: () => object) {
 	try {
+		const wasOver = room.isOver();
 		const result = move();
 		await publish(room);
-		// Read the view after publish(): it now holds the AI clue if the AI played
+		if (!wasOver && room.isOver()) {
+			void sendStats(room);
+		}
 		return NextResponse.json({ ...result, state: room.viewFor(audienceOf(seat)) });
 	} catch (error) {
 		if (error instanceof GameError) {
