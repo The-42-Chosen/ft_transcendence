@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage } from "node:http";
 import { Server } from "socket.io";
 
@@ -12,6 +13,13 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? "")
   .filter(Boolean);
 
 const MAX_BODY_SIZE = 100_000;
+
+// Shared with Next, which signs the socket tokens (docker/next/src/lib/realtimeToken.ts)
+const AUTH_SECRET = process.env.AUTH_SECRET;
+if (!AUTH_SECRET) {
+  console.error("AUTH_SECRET is not set");
+  process.exit(1);
+}
 
 // Same split as audienceOf() in docker/next/src/lib/game.ts
 export type Audience = "spymaster" | "agent" | "ai";
@@ -63,12 +71,60 @@ function channel(code: string, audience: Audience): string {
   return `${code.trim().toUpperCase()}:${audience}`;
 }
 
+
+type Claims = {
+  code: string;
+  playerId: string | null;
+  name: string | null;
+  seat: string;
+  exp: number;
+};
+
+const SEATS = ["red-spymaster", "red-operative", "blue-spymaster", "blue-operative", "spectator"];
+
+function verifyToken(token: unknown): Claims | null {
+  if (typeof token !== "string") {
+    return null;
+  }
+  const [data, signature] = token.split(".");
+  if (!data || !signature) {
+    return null;
+  }
+  const expected = Buffer.from(createHmac("sha256", AUTH_SECRET!).update(`realtime:${data}`).digest("base64url"));
+  const received = Buffer.from(signature);
+  if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
+    return null;
+  }
+  try {
+    const claims = JSON.parse(Buffer.from(data, "base64url").toString()) as Partial<Claims>;
+    if (typeof claims.code !== "string" || typeof claims.exp !== "number" || claims.exp < Date.now()) {
+      return null;
+    }
+    return {
+      code: claims.code,
+      playerId: typeof claims.playerId === "string" ? claims.playerId : null,
+      name: typeof claims.name === "string" ? claims.name : null,
+      seat: SEATS.includes(claims.seat as string) ? (claims.seat as string) : "spectator",
+      exp: claims.exp,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ---- Chat ----
+
 const CHAT_MAX_LENGTH = 200;
 const CHAT_NAME_MAX = 32;
 const CHAT_HISTORY = 50;
 
+type ChatChannel = "room" | "spymasters";
+const CHAT_CHANNELS: ChatChannel[] = ["room", "spymasters"];
+
 type ChatMessage = {
   id: string;
+  channel: ChatChannel;
+  playerId: string;
   name: string;
   seat: string;
   text: string;
@@ -77,8 +133,20 @@ type ChatMessage = {
 
 const chatHistory = new Map<string, ChatMessage[]>();
 
-function chatChannel(code: string): string {
-  return `${code.trim().toUpperCase()}:chat`;
+function chatChannel(code: string, chat: ChatChannel): string {
+  return `${code.trim().toUpperCase()}:chat:${chat}`;
+}
+
+function isChatChannel(value: unknown): value is ChatChannel {
+  return CHAT_CHANNELS.includes(value as ChatChannel);
+}
+
+function canReadChat(chat: ChatChannel, seat: string): boolean {
+  return chat === "room" || audienceOf(seat) === "spymaster";
+}
+
+function canWriteChat(chat: ChatChannel, seat: string): boolean {
+  return (chat === "spymasters") === (audienceOf(seat) === "spymaster");
 }
 
 async function readJson(req: IncomingMessage): Promise<unknown> {
@@ -180,25 +248,39 @@ const io = new Server(httpServer, {
   cors: CORS_ORIGINS.length ? { origin: CORS_ORIGINS } : undefined,
 });
 
-io.on("connection", (socket) => {
-  const { code, seat } = socket.handshake.query;
-  if (typeof code !== "string") {
-    socket.disconnect(true);
+io.use((socket, next) => {
+  const claims = verifyToken(socket.handshake.auth?.token);
+  if (!claims) {
+    next(new Error("Unauthorized"));
     return;
   }
+  socket.data.claims = claims;
+  next();
+});
+
+io.on("connection", (socket) => {
+  const { code, playerId, name, seat } = socket.data.claims as Claims;
   socket.join(channel(code, audienceOf(seat)));
 
-  const room = chatChannel(code);
-  socket.join(room);
-
-  socket.on("chat:history", (reply: unknown) => {
-    if (typeof reply === "function") {
-      reply(chatHistory.get(room) ?? []);
+  for (const chat of CHAT_CHANNELS) {
+    if (canReadChat(chat, seat)) {
+      socket.join(chatChannel(code, chat));
     }
+  }
+
+  socket.on("chat:history", (chat: unknown, reply: unknown) => {
+    if (typeof reply !== "function") {
+      return;
+    }
+    reply(isChatChannel(chat) && canReadChat(chat, seat) ? chatHistory.get(chatChannel(code, chat)) ?? [] : []);
   });
 
   socket.on("chat", (payload: unknown) => {
-    const { name, text } = (payload ?? {}) as { name?: unknown; text?: unknown };
+    const { channel: chat, text } = (payload ?? {}) as { channel?: unknown; text?: unknown };
+    // Unknown visitors can read the chat, not write in it
+    if (!playerId || !isChatChannel(chat) || !canWriteChat(chat, seat)) {
+      return;
+    }
     if (typeof text !== "string") {
       return;
     }
@@ -206,27 +288,32 @@ io.on("connection", (socket) => {
     if (!cleanText) {
       return;
     }
-    // TODO: Take the name from the next-auth session too, the client can lie about it
-    const cleanName = typeof name === "string" && name.trim() ? name.trim().slice(0, CHAT_NAME_MAX) : "Anonymous";
+    const cleanName = name?.trim().slice(0, CHAT_NAME_MAX) || "Anonymous";
 
     const message: ChatMessage = {
       id: `${Date.now()}-${socket.id}`,
+      channel: chat,
+      playerId,
       name: cleanName,
-      seat: typeof seat === "string" ? seat : "spectator",
+      seat,
       text: cleanText,
       at: Date.now(),
     };
 
-    const history = chatHistory.get(room) ?? [];
+    const target = chatChannel(code, chat);
+    const history = chatHistory.get(target) ?? [];
     history.push(message);
-    chatHistory.set(room, history.slice(-CHAT_HISTORY));
+    chatHistory.set(target, history.slice(-CHAT_HISTORY));
 
-    io.to(room).emit("chat", message);
+    io.to(target).emit("chat", message);
   });
 
+  // Forget the conversations once everybody left the room (everybody is in the "room" chat)
   socket.on("disconnect", () => {
-    if (!io.sockets.adapter.rooms.get(room)?.size) {
-      chatHistory.delete(room);
+    if (!io.sockets.adapter.rooms.get(chatChannel(code, "room"))?.size) {
+      for (const chat of CHAT_CHANNELS) {
+        chatHistory.delete(chatChannel(code, chat));
+      }
     }
   });
 });
