@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GameError } from "@/lib/game";
 import { LANGUAGE_FLAGS, type Language } from "@/lib/lobby";
 import { PlayerError, requirePlayer } from "@/lib/player";
 import { createRoom, publicRoom } from "@/lib/rooms";
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     const room = createRoom(language, await requirePlayer());
     return NextResponse.json(publicRoom(room), { status: 201 });
   } catch (error) {
-    if (error instanceof PlayerError) {
+    if (error instanceof PlayerError || error instanceof GameError) {
       return NextResponse.json({ error: error.message }, { status: error.status });
     }
     throw error;
