@@ -14,7 +14,6 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
   }, []);
 
   useEffect(() => {
-    // TODO: Replace the seat query with a signed token, realtime still trusts it to pick the channel
     // Prod : same domain, nginx sends /socket.io/ to the realtime service
     // Dev  : NEXT_PUBLIC_SOCKET_URL points straight at realtime (:3001)
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
