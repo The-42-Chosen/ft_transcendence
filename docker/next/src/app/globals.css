@@ -133,5 +133,63 @@
 }
 
 .word:active{
-  background-color: #687086;
+  filter: brightness(0.9);
+}
+
+.word-card {
+  position: relative;
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 -6px 12px rgb(0 0 0 / 0.25),
+    0 6px 14px -6px rgb(17 20 28 / 0.6);
+  text-shadow: 0 2px 4px rgb(0 0 0 / 0.45);
+}
+
+.word-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.22), transparent);
+  pointer-events: none;
+}
+
+.word-hidden {
+  background-image: linear-gradient(135deg, #24438f 0%, #4a2f86 50%, #8a2a44 100%);
+}
+
+.word-red {
+  background-image: linear-gradient(135deg, #ff8a98 0%, var(--color-brand-red) 50%, #d42f47 100%);
+}
+
+.word-blue {
+  background-image: linear-gradient(135deg, #8bb8ff 0%, var(--color-brand-blue) 50%, #2563eb 100%);
+}
+
+.word-neutral {
+  color: #451a03;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+  background-image: linear-gradient(135deg, #fef3c7 0%, #fde68a 45%, #d9a54a 100%);
+}
+
+.word-assassin {
+  background-image: linear-gradient(135deg, #3a3f4c 0%, #12141a 45%, #000 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(240 68 90 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 -6px 12px rgb(0 0 0 / 0.4),
+    0 6px 14px -6px rgb(17 20 28 / 0.8);
+}
+
+.word.word-hidden:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -6px 12px rgb(0 0 0 / 0.2),
+    0 10px 20px -8px rgb(59 124 255 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word.word-hidden:hover { transform: none; }
 }

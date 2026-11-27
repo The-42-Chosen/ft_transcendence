@@ -35,14 +35,14 @@ export default async function GamePage({ params }: Parameters) {
     <main className="min-h-screen text-center">
       <Header/>
       <ClueProvider roomCode={room.code} seat={playerSeat} initialState={room.viewFor(audienceOf(playerSeat))}>
-        <div className="mx-auto my-4 flex w-[calc(100%-2rem)] max-w-5xl flex-col gap-4 xl:max-w-7xl xl:flex-row">
+        <div className="mx-auto my-4 flex w-[calc(100%-2rem)] max-w-5xl flex-col gap-4 xl:max-w-[100rem] xl:flex-row xl:gap-6">
           <TeamPanelSide
             className="xl:w-80 xl:shrink-0"
             players={players}
             aiTeams={aiTeams}
           />
           <Board type={board.type} team={board.team} words={room.words} colors={room.colors}/>
-          {/* <Chat className="xl:w-80 xl:shrink-0"/> */}
+          <Chat className="xl:w-80 xl:shrink-0"/>
         </div>
         <GameOverSetup/>
         <GameOverModal words={room.words}/>
