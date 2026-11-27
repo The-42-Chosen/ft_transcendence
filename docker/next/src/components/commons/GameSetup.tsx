@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GameModal from '@/components/reusables/GameModal';
 import GameInput from '@/components/reusables/GameInput';
-import { GUEST_NAME_KEY, GUEST_NAME_MAX, LANGUAGE_FLAGS } from '@/lib/lobby';
+import { GUEST_NAME_MAX, LANGUAGE_FLAGS } from '@/lib/lobby';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 type Step = "mode" | "connexion" | "guest_name" | "language" | "room_code";
@@ -23,9 +23,9 @@ export default function GameSetup() {
   const sessionCheck = useRef<Promise<boolean> | null>(null);
 
   useEffect(() => {
-    sessionCheck.current = fetch("/api/auth/session")
+    sessionCheck.current = fetch("/api/me")
       .then((res) => (res.ok ? res.json() : null))
-      .then((session) => !!session?.user)
+      .then((player) => !!player && player.guest === false)
       .catch(() => false);
   }, []);
 
@@ -65,11 +65,6 @@ export default function GameSetup() {
     if (!res?.ok) {
       setError(s.errorServer);
       return;
-    }
-    // TODO: Remove once usePlayer() reads /api/me
-    try {
-      sessionStorage.setItem(GUEST_NAME_KEY, name);
-    } catch {
     }
     goTo(afterLogin);
   }

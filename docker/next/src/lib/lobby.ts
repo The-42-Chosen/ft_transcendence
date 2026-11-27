@@ -53,7 +53,6 @@ export const LANGUAGE_FLAGS: Record<string, Language> = {
 const ROOM_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const ROOM_CODE_LENGTH = 6;
 
-export const GUEST_NAME_KEY = "guestName";
 export const GUEST_NAME_MAX = 16;
 
 export function generateRoomCode(): string {
