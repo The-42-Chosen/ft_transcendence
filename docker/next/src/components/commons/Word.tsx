@@ -25,9 +25,9 @@ export default function Word({ text, readOnly = false, index }: WordProps) {
     <article
       onClick={locked ? undefined : () => setSelected((prev) => !prev)}
       className={cn(
-        "@container relative flex h-24 items-center justify-center overflow-hidden rounded-2xl bg-green-500 px-3 transition",
+        "@container relative flex h-24 items-center justify-center overflow-hidden rounded-2xl px-3 transition",
         locked ? "cursor-default select-none" : "word cursor-pointer",
-        shownColor ? cardColorClasses[shownColor] : selected && "ring-4 ring-amber-400 ring-inset",
+        shownColor ? cardColorClasses[shownColor] : cn("word-card word-hidden", selected && "outline-4 -outline-offset-4 outline-amber-400"),
         shownColor && !revealedOnLoad && "animate-flip-horizontal motion-reduce:animate-none"
       )}
     >

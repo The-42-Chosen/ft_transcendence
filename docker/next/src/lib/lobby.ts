@@ -79,10 +79,10 @@ export const teamStyles: Record<Side, { panel: string; label: string; slot: stri
 };
 
 export const cardColorClasses: Record<CardColor, string> = {
-	red: "bg-(--color-brand-red) text-white",
-	blue: "bg-(--color-brand-blue) text-white",
-	neutral: "bg-amber-200 text-black",
-	assassin: "bg-black text-white",
+	red: "word-card word-red",
+	blue: "word-card word-blue",
+	neutral: "word-card word-neutral",
+	assassin: "word-card word-assassin",
 };
 
 function shuffle<T>(items: T[]): T[] {
