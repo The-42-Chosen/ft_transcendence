@@ -4,13 +4,14 @@ import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import UserCard from "@/components/reusables/UserCard";
+import Avatar from "@/app/components/User/Avatar";
 import {
   LanguageContext,
   type Language,
 } from "@/i18n/LanguageContext";
 
 type SessionUser = {
+  id?: string;
   name?: string | null;
   email?: string | null;
   image?: string | null;
@@ -22,10 +23,7 @@ export default function Nav() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [enableTransition, setEnableTransition] = useState(false);
-
   const [user, setUser] = useState<SessionUser | null>(null);
-
-  const [avatarVersion, setAvatarVersion] = useState(0);
 
   useEffect(() => {
     const id = window.requestAnimationFrame(() => {
@@ -50,8 +48,6 @@ export default function Nav() {
         const session = await response.json();
 
         setUser(session?.user ?? null);
-
-        setAvatarVersion(Date.now());
       } catch (error) {
         console.error("Unable to load session:", error);
         setUser(null);
@@ -102,11 +98,6 @@ export default function Nav() {
         : "!bg-transparent opacity-60 hover:!bg-white/10 hover:opacity-100"
     }`;
 
-  //  * IMPORTANT a noter ?v=... c'est pour empêcher le navigateur de conserver l'ancien avatar en cache
-  const currentAvatarUrl = user?.image
-    ? `${user.image}?v=${avatarVersion}`
-    : null;
-
   return (
     <nav className="relative flex min-w-0 items-center justify-end">
       <button
@@ -122,28 +113,19 @@ export default function Nav() {
       {/* MENU DESKTOP */}
       <ul className="hidden items-center justify-end gap-x-2 md:flex lg:gap-x-5">
         <li>
-          <Link
-            href="/"
-            className={navLinkClass}
-          >
+          <Link href="/" className={navLinkClass}>
             {t.play}
           </Link>
         </li>
 
         <li>
-          <Link
-            href="#ranking"
-            className={navLinkClass}
-          >
+          <Link href="#ranking" className={navLinkClass}>
             {t.ranking}
           </Link>
         </li>
 
         <li>
-          <Link
-            href="#friends"
-            className={navLinkClass}
-          >
+          <Link href="#friends" className={navLinkClass}>
             {t.friends}
           </Link>
         </li>
@@ -183,14 +165,15 @@ export default function Nav() {
         </li>
 
         <li>
-          {user?.name ? (
+          {user?.name && user.id ? (
             <Link
               href={`/users/${user.name}`}
               className="flex cursor-pointer items-center gap-2 rounded-full border border-(--color-border-default) bg-(--color-bg-elevated) px-3 py-1 text-(--color-text-primary) transition hover:border-(--color-accent-gold) hover:text-(--color-accent-gold)"
             >
-              <UserCard
+              <Avatar
+                userId={Number(user.id)}
                 username={user.name}
-                avatarUrl={currentAvatarUrl}
+                avatarUrl={user.image}
                 size={32}
               />
 
@@ -276,15 +259,16 @@ export default function Nav() {
             <hr className="my-1 border-(--color-border-default)" />
 
             <li>
-              {user?.name ? (
+              {user?.name && user.id ? (
                 <Link
                   href={`/users/${user.name}`}
                   onClick={closeMenu}
                   className="flex items-center justify-center gap-2 rounded-xl border border-(--color-border-default) bg-(--color-bg-elevated) py-2 font-sans text-sm font-semibold transition hover:border-(--color-accent-gold) hover:text-(--color-accent-gold)"
                 >
-                  <UserCard
+                  <Avatar
+                    userId={Number(user.id)}
                     username={user.name}
-                    avatarUrl={currentAvatarUrl}
+                    avatarUrl={user.image}
                     size={28}
                   />
 
