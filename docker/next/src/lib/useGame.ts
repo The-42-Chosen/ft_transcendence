@@ -24,7 +24,6 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
       auth: (send: (data: object) => void) => {
         fetch(`/api/rooms/${roomCode}/token`, { cache: "no-store" })
           .then((res) => {
-            // No room any more: retrying would never succeed
             retry = res.status !== 404;
             return res.ok ? res.json() : null;
           })
@@ -49,7 +48,6 @@ export function useGame(roomCode: string, seat: Seat, initialState: GameView) {
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     socket.on("connect_error", (error) => {
       console.error("Socket.IO error:", error.message);
-      // Refused by the server (bad or missing token): socket.io gives up, try again with a new token
       if (!socket.active && retry) {
         retryTimer = setTimeout(() => socket.connect(), 3000);
       }

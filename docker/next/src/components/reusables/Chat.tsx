@@ -28,7 +28,7 @@ function seatColor(seat: string): string {
   return "text-amber-900/70";
 }
 
-// Spymasters see both chats in tabs, everybody else only the room one
+// distribute channel according to their role
 function channelsFor(isSpymaster: boolean): ChatChannel[] {
   return isSpymaster ? ["spymasters", "room"] : ["room"];
 }
@@ -84,7 +84,7 @@ export default function Chat({ className }: ChatProps) {
 
   const shown = messages[active];
 
-  // Keep the last message in sight
+  // Scroll to  display the new message
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [shown]);

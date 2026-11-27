@@ -52,7 +52,6 @@ const ClueContext = createContext<ClueContextValue | null>(null);
 export function ClueProvider({ children, roomCode, seat, initialState }: ClueProviderProps) {
   const { state, applyState, connected, socket, playerId } = useGame(roomCode, seat, initialState);
 
-  // Sends a move to the server, the new state then comes back to everybody through the socket
   async function play(move: string, body: object = {}): Promise<MoveResult> {
     const res = await fetch(`/api/rooms/${roomCode}/${move}`, {
       method: "POST",
