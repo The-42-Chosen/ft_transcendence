@@ -2,9 +2,14 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import AuthCard from "@/components/reusables/AuthCard";
+import AuthInput from "@/components/reusables/AuthInput";
+import Button from "@/components/reusables/Button";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -13,9 +18,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>
-  ) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError(null);
@@ -37,9 +40,7 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(
-          data.error ?? "Unable to create account"
-        );
+        setError(data.error ?? t.auth.errorCreate);
         return;
       }
 
@@ -47,91 +48,67 @@ export default function RegisterPage() {
       router.refresh();
     } catch (error) {
       console.error(error);
-      setError("Something went wrong");
+      setError(t.auth.errorDefault);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-4"
-      >
-        <h1 className="text-2xl font-semibold">
-          Register
-        </h1>
+    <AuthCard
+      title={t.auth.registerTitle}
+      footerText={t.auth.hasAccount}
+      footerLinkText={t.auth.loginLink}
+      footerHref="/login"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          id="email"
+          type="email"
+          label={t.auth.email}
+          placeholder="TontonsForkers@mail.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email">
-            Email
-          </label>
+        <AuthInput
+          id="username"
+          type="text"
+          label={t.auth.username}
+          placeholder="Les Tontons Forkers"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          required
+          minLength={3}
+        />
 
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) =>
-              setEmail(event.target.value)
-            }
-            required
-            className="rounded border px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="username">
-            Username
-          </label>
-
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(event) =>
-              setUsername(event.target.value)
-            }
-            required
-            minLength={3}
-            className="rounded border px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password">
-            Password
-          </label>
-
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) =>
-              setPassword(event.target.value)
-            }
-            required
-            minLength={8}
-            className="rounded border px-3 py-2"
-          />
-        </div>
+        <AuthInput
+          id="password"
+          type="password"
+          label={t.auth.password}
+          placeholder="••••••••"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+          minLength={8}
+        />
 
         {error && (
-          <p className="text-sm text-red-500">
+          <p role="alert" className="text-center font-agent text-xs text-(--color-brand-red)">
             {error}
           </p>
         )}
 
-        <button
+        <Button
           type="submit"
+          variant="action"
           disabled={loading}
-          className="rounded border px-4 py-2"
+          className="mt-2 w-full uppercase"
         >
-          {loading
-            ? "Creating account..."
-            : "Register"}
-        </button>
+          {loading ? t.auth.registerLoading : t.auth.registerSubmit}
+        </Button>
       </form>
-    </main>
+    </AuthCard>
   );
 }
