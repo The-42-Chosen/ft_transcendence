@@ -91,7 +91,11 @@
       "placeholder": "Escribe un mensaje…",
       "send": "Enviar",
       "empty": "Todavía no hay mensajes",
-      "you": "Tú"
+      "you": "Tú",
+      "tabRoom": "General",
+      "tabSpymasters": "Espías maestros",
+      "readOnly": "Los espías maestros no pueden hablar con sus agentes",
+      "unread": "{count} mensajes nuevos"
     }
   },
   "footer": {
